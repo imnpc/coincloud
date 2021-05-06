@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Overtrue\EasySms\PhoneNumber;
 
 class User extends Authenticatable
 {
@@ -42,6 +43,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * 获取登录用户手机号码
+     * @param $notification
+     * @return PhoneNumber
+     */
+    public function routeNotificationForEasySms($notification)
+    {
+        return new PhoneNumber($this->mobile);
+    }
 
     /**
      * Passport 登录支持 邮箱 和 手机号码
