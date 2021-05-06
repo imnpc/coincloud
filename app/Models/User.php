@@ -4,12 +4,16 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
+    use HasApiTokens;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -40,4 +44,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Passport 登录支持 邮箱 和 手机号码
+     * @param $username
+     * @return mixed
+     */
+    public function findForPassport($username)
+    {
+        filter_var($username, FILTER_VALIDATE_EMAIL) ?
+            $credentials['email'] = $username :
+            $credentials['mobile'] = $username;
+
+        return self::where($credentials)->first();
+    }
 }
