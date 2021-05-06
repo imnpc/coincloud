@@ -4,8 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad4af1ea14b8a2c813c7f6b2bf8faac6",
+    "content-hash": "600ab00ca71381196e13a0f25917e7d0",
     "packages": [
+        {
+            "name": "aliyuncs/oss-sdk-php",
+            "version": "v2.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aliyun/aliyun-oss-php-sdk.git",
+                "reference": "053d7ba9e798e4c09b9c5c1edab153d25ea9643a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aliyun/aliyun-oss-php-sdk/zipball/053d7ba9e798e4c09b9c5c1edab153d25ea9643a",
+                "reference": "053d7ba9e798e4c09b9c5c1edab153d25ea9643a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0",
+                "satooshi/php-coveralls": "~1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OSS\\": "src/OSS"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aliyuncs",
+                    "homepage": "http://www.aliyun.com"
+                }
+            ],
+            "description": "Aliyun OSS SDK for PHP",
+            "homepage": "http://www.aliyun.com/product/oss/",
+            "support": {
+                "issues": "https://github.com/aliyun/aliyun-oss-php-sdk/issues",
+                "source": "https://github.com/aliyun/aliyun-oss-php-sdk/tree/v2.3.1"
+            },
+            "time": "2019-11-15T11:05:42+00:00"
+        },
         {
             "name": "asm89/stack-cors",
             "version": "v2.0.3",
@@ -167,6 +212,64 @@
                 }
             ],
             "time": "2021-01-20T22:51:39+00:00"
+        },
+        {
+            "name": "calchen/flysystem-aliyun-oss",
+            "version": "1.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/calchen/flysystem-aliyun-oss.git",
+                "reference": "9c584d18afc736ee3ef48ecae751b731c28c20e0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/calchen/flysystem-aliyun-oss/zipball/9c584d18afc736ee3ef48ecae751b731c28c20e0",
+                "reference": "9c584d18afc736ee3ef48ecae751b731c28c20e0",
+                "shasum": ""
+            },
+            "require": {
+                "aliyuncs/oss-sdk-php": "~2.3.0",
+                "league/flysystem": "^1.0",
+                "php": ">=5.5.9"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Calchen\\Flysystem\\AliyunOss\\AliyunOssServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Calchen\\Flysystem\\AliyunOss\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "陈恺垣",
+                    "email": "contact@chenky.com"
+                }
+            ],
+            "description": "用于阿里云对象存储（OSS）的 Flysystem Adapter（Flysystem Adapter for Aliyun OSS）",
+            "keywords": [
+                "Object Storage Service",
+                "aliyun",
+                "laravel",
+                "lumen",
+                "oss",
+                "对象存储",
+                "阿里云"
+            ],
+            "support": {
+                "issues": "https://github.com/calchen/flysystem-aliyun-oss/issues",
+                "source": "https://github.com/calchen/flysystem-aliyun-oss/tree/1.3.3"
+            },
+            "time": "2021-01-26T06:11:37+00:00"
         },
         {
             "name": "codingyu/laravel-ueditor",
