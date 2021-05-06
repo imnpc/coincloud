@@ -15,6 +15,7 @@
         "ghost/google-authenticator": "^1.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "ichynul/configx": "^1.4",
+        "kra8/laravel-snowflake": "^2.0",
         "laravel-admin-ext/config": "^1.1",
         "laravel-admin-ext/helpers": "1.*",
         "laravel-admin-ext/scheduling": "^1.1",

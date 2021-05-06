@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "600ab00ca71381196e13a0f25917e7d0",
+    "content-hash": "57ead771141aa776e68e4fa46cdca498",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -1832,6 +1832,64 @@
                 "source": "https://github.com/ichynul/row-table/tree/1.1.9"
             },
             "time": "2020-06-08T12:19:21+00:00"
+        },
+        {
+            "name": "kra8/laravel-snowflake",
+            "version": "v2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kra8/laravel-snowflake.git",
+                "reference": "9fd3440a8a19b3bf43e6c6c5ffa239afc0463ea6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kra8/laravel-snowflake/zipball/9fd3440a8a19b3bf43e6c6c5ffa239afc0463ea6",
+                "reference": "9fd3440a8a19b3bf43e6c6c5ffa239afc0463ea6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^6|^7|^8",
+                "php": "^7.2.5|^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^5.0",
+                "phpunit/phpunit": "~8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Kra8\\Snowflake\\Providers\\LaravelServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Kra8\\Snowflake\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Koki Asai",
+                    "email": "me@kra.dev"
+                }
+            ],
+            "description": "Snowflake for Laravel and Lumen.",
+            "homepage": "https://github.com/kra8/laravel-snowflake",
+            "keywords": [
+                "laravel",
+                "lumen",
+                "snowflake"
+            ],
+            "support": {
+                "issues": "https://github.com/kra8/laravel-snowflake/issues",
+                "source": "https://github.com/kra8/laravel-snowflake/tree/v2.0.2"
+            },
+            "time": "2020-12-08T08:41:58+00:00"
         },
         {
             "name": "laravel-admin-ext/config",
