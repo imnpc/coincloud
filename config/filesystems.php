@@ -38,7 +38,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 
@@ -52,6 +52,15 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
         ],
 
+        'oss' => [
+            'driver' => 'oss',
+            'access_id' => env('OSS_ACCESS_KEY_ID'),
+            'access_key_secret' => env('OSS_ACCESS_KEY_SECRET'),
+            'bucket' => env('OSS_BUCKET'),
+            'endpoint' => env('OSS_ENDPOINT'),
+            'cdn_base_url' => env('ALIYUN_OSS_CDN_BASE_URL'),  // 可选
+            'prefix' => '',                                    // 可选
+        ],
     ],
 
     /*
