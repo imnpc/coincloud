@@ -122,6 +122,8 @@ return [
     'uploaded'             => ':attribute 上传失败。',
     'url'                  => ':attribute 格式不正确。',
     'uuid'                 => ':attribute 必须是有效的 UUID。',
+    'phone'       => ':attribute 格式不正确。',
+    'captcha'     => ':attribute 不正确。',
     'custom'               => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
@@ -157,5 +159,6 @@ return [
         'title'                 => '标题',
         'username'              => '用户名',
         'year'                  => '年',
+	    'captcha'               => '验证码',
     ],
 ];

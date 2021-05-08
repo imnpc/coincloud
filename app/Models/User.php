@@ -2,6 +2,12 @@
 
 namespace App\Models;
 
+use Bavix\Wallet\Interfaces\Wallet;
+use Bavix\Wallet\Interfaces\WalletFloat;
+use Bavix\Wallet\Traits\HasWallet;
+use Bavix\Wallet\Traits\HasWalletFloat;
+use Bavix\Wallet\Traits\HasWallets;
+use DateTimeInterface;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,11 +16,13 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Overtrue\EasySms\PhoneNumber;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Wallet, WalletFloat
 {
     use HasFactory, Notifiable;
     use HasApiTokens;
     use SoftDeletes;
+    use HasWallet, HasWallets;
+    use HasWalletFloat;
 
     /**
      * The attributes that are mass assignable.
@@ -66,5 +74,16 @@ class User extends Authenticatable
             $credentials['mobile'] = $username;
 
         return self::where($credentials)->first();
+    }
+
+    /**
+     * 为数组 / JSON 序列化准备日期。
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
     }
 }

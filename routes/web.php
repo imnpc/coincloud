@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RegController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +16,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+//Route::get('/', function () {
+//    return view('welcome');
+//});
+
+Auth::routes();
+
+Route::get('/home', [HomeController::class, 'index']); // 注册表单
+
+Route::get('/users/register', [UserController::class, 'create']); // 注册表单
+Route::post('/users/store', [UserController::class, 'store'])->name('userregister'); // 注册动作
+Route::post("sendcode", [UserController::class, 'sendcode'])->name('sendcode');//发送验证码
+Route::get('/users/{user}', [UserController::class, 'show'])->name('user.show');
+
+Route::get('/user/reg', [RegController::class, 'create']); // 注册表单
+Route::post("/users/regstore", [RegController::class, 'store'])->name('regstore');;//注册动作
+

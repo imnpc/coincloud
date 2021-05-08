@@ -27,7 +27,7 @@ return [
     'gateways' => [
         // 失败日志
         'errorlog' => [
-            'channel' => 'smslog',
+            'channel' => 'daily',
         ],
 
         // 阿里云

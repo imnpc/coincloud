@@ -410,15 +410,13 @@ return [
             'enable' => true,
             'tabs' => [
                 'website' => '网站',
+                'user' => '用户',
                 'order' => '订单',
                 'system' => '系统参数',
-                'power' => '有效算力',
                 'reward' => '奖励币',
                 'withdraw' => '提币提现',
                 'upload' => '文件上传',
                 'app' => 'APP',
-                'filpool' => '矿池数据',
-                'cloud' => '云算力',
             ],
             // Whether check group permissions.
             //if (!Admin::user()->can('confix.tab.base')) {/*hide base tab*/ } .
