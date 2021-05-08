@@ -39,13 +39,16 @@ class HomeController extends Controller
             $wallet = $user->getWallet('USDT');
         }
 
+        $id = $wallet->id;
         //$meta['remark'] = '测试增加理由,订单ID #1';
         //$wallet->deposit(10,$meta); //增加数量
         //echo $wallet->balance; // 显示数量(整数)
         //$wallet->depositFloat(0.96999); //增加数量(小数)
         //echo $wallet->transactions()->first()->amount;
-        $lists = $wallet->transactions()->get();
-        //print_r($lists->toArray());
+        $lists = $wallet->transactions()
+            ->where('wallet_id', '=', $id)
+            ->get();
+        print_r($lists->toArray());
 //        foreach ($lists as $list) {
 //            // echo $user->wallet->balance;
 //            echo $list->amount; // Abbreviated notation
