@@ -47,18 +47,30 @@ class Handler extends ExceptionHandler
             //
         });
     }
+    /**
+     * Report or log an exception.
+     *
+     * @param \Exception $exception
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function report(Throwable $e)
+    {
+        parent::report($e);
+    }
 
-    public function render($request, Throwable $exception)
+    public function render($request, Throwable $e)
     {
         if ($request->is('api/*') || $request->is('oauth/*') || $request->is('sendcode')) {
             $response = [];
-            $error = $this->convertExceptionToResponse($exception);
-            $error_msg = empty($exception->getMessage()) ? 'something error' : $exception->getMessage();
+            $error = $this->convertExceptionToResponse($e);
+            $error_msg = empty($e->getMessage()) ? 'something error' : $e->getMessage();
             $error_code = $error->getStatusCode();
             $error_msg_404 = "404 Not Found";
             $error_route_msg_404 = "Route 404 Not Found";
             $error_model_msg_404 = "Data 404 Not Found";
-            if ($exception instanceof AuthenticationException) { // 未授权
+            if ($e instanceof AuthenticationException) { // 未授权
                 $error_code = Response::HTTP_UNAUTHORIZED;
                 if ($request->is('*/authorization*')) { // 登录授权验证控制器
                     $response['message'] = $error_msg;
@@ -68,39 +80,39 @@ class Handler extends ExceptionHandler
                 } else {
                     $response['message'] = $error_msg;
                 }
-            } elseif ($exception instanceof ValidationException) { // 验证规则错误
+            } elseif ($e instanceof ValidationException) { // 验证规则错误
                 $error_code = Response::HTTP_UNPROCESSABLE_ENTITY;
-                $response['message'] = $exception->validator->errors()->first(); // 获取第一条的错误
-            } elseif ($exception instanceof NotFoundHttpException) {
+                $response['message'] = $e->validator->errors()->first(); // 获取第一条的错误
+            } elseif ($e instanceof NotFoundHttpException) {
                 //路由未找到
                 $error_code = Response::HTTP_NOT_FOUND;
                 $response['code'] = Response::HTTP_NOT_FOUND;
                 $response['data']['message'] = $error_route_msg_404;
-            } elseif ($exception instanceof ModelNotFoundException) {
+            } elseif ($e instanceof ModelNotFoundException) {
                 // 模型未找到
                 $error_code = Response::HTTP_NOT_FOUND;
                 $response['message'] = $error_model_msg_404;
-            } elseif ($exception instanceof MethodNotAllowedHttpException) { // 请求方法错误
+            } elseif ($e instanceof MethodNotAllowedHttpException) { // 请求方法错误
                 $error_code = Response::HTTP_METHOD_NOT_ALLOWED;
                 $response['code'] = Response::HTTP_METHOD_NOT_ALLOWED;
                 $response['data']['message'] = $error_msg;
-            } elseif ($exception instanceof QueryException) { // 查询或者更新数据错误
+            } elseif ($e instanceof QueryException) { // 查询或者更新数据错误
                 $error_code = Response::HTTP_FORBIDDEN;
                 if (env('APP_DEBUG')) {
-                    $response['message'] = $exception->getPrevious()->getMessage();
+                    $response['message'] = $e->getPrevious()->getMessage();
                 } else {
                     //$response['message'] = "Please check if something is empty";
-                    $response['message'] = $exception->getPrevious()->getMessage();
+                    $response['message'] = $e->getPrevious()->getMessage();
                 }
-            } elseif ($exception instanceof ThrottleRequestsException) { // 请求次数频繁 超过限制
+            } elseif ($e instanceof ThrottleRequestsException) { // 请求次数频繁 超过限制
                 $error_code = Response::HTTP_TOO_MANY_REQUESTS;
                 $response['code'] = Response::HTTP_TOO_MANY_REQUESTS;
                 $response['data']['message'] = $error_msg;
             } else { // 其他错误
-                $class = get_class($exception);
+                $class = get_class($e);
                 if ($class == 'Laravel\Passport\Exceptions\OAuthServerException') { // Passport 错误
                     $error_code = Response::HTTP_UNAUTHORIZED;
-                    $type = $exception->getPrevious()->getErrorType();
+                    $type = $e->getPrevious()->getErrorType();
                     if ($type) {
                         $transPayload = trans('oauth.' . $type);
                         if (is_array($transPayload)) {
@@ -112,7 +124,7 @@ class Handler extends ExceptionHandler
             }
             return response()->json($response, $error_code);
         } else {
-            return parent::render($request, $exception);
+            return parent::render($request, $e);
         }
     }
 }

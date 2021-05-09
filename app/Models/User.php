@@ -24,6 +24,18 @@ class User extends Authenticatable implements Wallet, WalletFloat
     use HasWallet, HasWallets;
     use HasWalletFloat;
 
+    // 钱包列表
+    public const WALLETSLIST = [
+        ['name' => '余额', 'slug' => 'money', 'decimal_places' => '2',],
+        ['name' => '积分', 'slug' => 'credit', 'decimal_places' => '2',],
+        ['name' => 'Tether 钱包', 'slug' => 'USDT', 'decimal_places' => '5',],
+        ['name' => 'Filecoin 钱包', 'slug' => 'FIL', 'decimal_places' => '5',],
+    ];
+    //                'name' => 'USDT 钱包',
+    //                'slug' => 'USDT',
+    //                'description' => '用户' . $user->id . '的 USDT 钱包',
+    //                'decimal_places' => '5', // 钱包小数点
+
     /**
      * The attributes that are mass assignable.
      *
@@ -79,7 +91,7 @@ class User extends Authenticatable implements Wallet, WalletFloat
     /**
      * 为数组 / JSON 序列化准备日期。
      *
-     * @param  \DateTimeInterface  $date
+     * @param \DateTimeInterface $date
      * @return string
      */
     protected function serializeDate(DateTimeInterface $date)

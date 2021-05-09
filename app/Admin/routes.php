@@ -13,4 +13,5 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
     $router->resource('users', UserController::class); // 用户
+    $router->resource('wallet-types', WalletTypeController::class); // 钱包类型
 });

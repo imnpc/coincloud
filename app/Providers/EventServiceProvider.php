@@ -18,6 +18,15 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        // access_token 生成以后清除旧的 token ，然后记录登录时间和日期
+        'Laravel\Passport\Events\AccessTokenCreated' => [
+//            'App\Listeners\RevokeOldTokens',
+            'App\Listeners\LogSuccessfulLogin',
+        ],
+        // refresh_token 生成以后删除已吊销的 token
+        'Laravel\Passport\Events\RefreshTokenCreated' => [
+//            'App\Listeners\PruneOldTokens',
+        ],
     ];
 
     /**
