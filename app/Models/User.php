@@ -31,10 +31,6 @@ class User extends Authenticatable implements Wallet, WalletFloat
         ['name' => 'Tether 钱包', 'slug' => 'USDT', 'decimal_places' => '5',],
         ['name' => 'Filecoin 钱包', 'slug' => 'FIL', 'decimal_places' => '5',],
     ];
-    //                'name' => 'USDT 钱包',
-    //                'slug' => 'USDT',
-    //                'description' => '用户' . $user->id . '的 USDT 钱包',
-    //                'decimal_places' => '5', // 钱包小数点
 
     /**
      * The attributes that are mass assignable.

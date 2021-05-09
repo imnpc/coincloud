@@ -9,7 +9,7 @@ class SigninLog extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
+    public $timestamps = false; // 不记录创建和更新时间
 
     /**
      * The attributes that are mass assignable.

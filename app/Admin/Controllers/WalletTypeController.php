@@ -90,10 +90,10 @@ class WalletTypeController extends AdminController
     {
         $form = new Form(new WalletType());
 
-        $form->text('name', __('Name'));
-        $form->text('slug', __('Slug'));
-        $form->text('description', __('Description'));
-        $form->number('decimal_places', __('Decimal places'))->default(5);
+        $form->text('name', __('Name'))->required()->help('钱包名称,显示用');
+        $form->text('slug', __('Slug'))->required()->help('钱包代码,英文大写,不能有空格和特殊字符,例如 USDT');
+        $form->text('description', __('Description'))->help('钱包描述,可不填');
+        $form->number('decimal_places', __('Decimal places'))->default(5)->required()->help('小数点位数,虚拟币默认5位');
         //$form->number('is_enblened', __('Is enblened'));
         $states = [
             'on' => ['value' => 1, 'text' => '启用', 'color' => 'primary'],

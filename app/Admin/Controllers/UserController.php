@@ -7,6 +7,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Illuminate\Http\Request;
 
 class UserController extends AdminController
 {
@@ -15,7 +16,7 @@ class UserController extends AdminController
      *
      * @var string
      */
-    protected $title = 'User';
+    protected $title = '用户';
 
     /**
      * Make a grid builder.
@@ -103,16 +104,52 @@ class UserController extends AdminController
         $form = new Form(new User());
 
         $form->text('name', __('Name'));
-        $form->email('email', __('Email'));
-        $form->datetime('email_verified_at', __('Email verified at'))->default(date('Y-m-d H:i:s'));
-        $form->password('password', __('Password'));
-        $form->text('remember_token', __('Remember token'));
-        $form->mobile('mobile', __('Mobile'));
+//        $form->email('email', __('Email'));
+//        $form->datetime('email_verified_at', __('Email verified at'))->default(date('Y-m-d H:i:s'));
+//        $form->password('password', __('Password'));
+//        $form->text('remember_token', __('Remember token'));
+//        $form->mobile('mobile', __('Mobile'));
         $form->text('nickname', __('Nickname'));
-        $form->number('parent_id', __('Parent id'));
-        $form->number('status', __('Status'));
-        $form->datetime('last_login_at', __('Last login at'))->default(date('Y-m-d H:i:s'));
-        $form->text('last_login_ip', __('Last login ip'));
+        if ($form->isEditing()) {
+            $form->display('mobile', __('Mobile'));
+            $form->password('password', __('Password'))->help('不修改密码无需填写 默认密码 123456789');
+        }
+        if ($form->isCreating()) {
+            $form->mobile('mobile', __('Mobile'))->required();
+            $form->password('password', __('Password'))->default('123456789')->required()->help('默认密码 123456789');
+        }
+
+        $form->select('parent_id', __('Parent id'))->options(function ($id) {
+            $user = User::find($id);
+            if ($user) {
+                return [$user->id => $user->mobile];
+            }
+        })->ajax('/admin/api/users');
+
+        $states = [
+            'on' => ['value' => 0, 'text' => '启用', 'color' => 'primary'],
+            'off' => ['value' => 1, 'text' => '禁用', 'color' => 'danger'],
+        ];
+
+        $form->switch('status', __('Status'))->states($states);
+        $form->display('last_login_at', __('Last login at'));
+        $form->display('last_login_ip', __('Last login ip'));
+
+        // 保存前回调 设置未填写参数的默认值
+        $form->saving(function (Form $form) {
+            if (empty($form->nickname)) {
+                $form->nickname = $form->mobile;
+            }
+            if (empty($form->name)) {
+                $form->name = $form->mobile;
+            }
+            // 密码修改
+            if (empty($form->input('password'))) {
+                $form->input('password', $form->model()->password);
+            } elseif ($form->password && $form->model()->password != $form->password) {
+                $form->password = bcrypt($form->password);
+            }
+        });
 
         $form->tools(function (Form\Tools $tools) {
 //            $tools->disableList(); // 去掉`列表`按钮
@@ -128,5 +165,11 @@ class UserController extends AdminController
         });
 
         return $form;
+    }
+
+    public function users(Request $request)
+    {
+        $q = $request->get('q');
+        return User::where('mobile', 'like', "%$q%")->paginate(null, ['id', 'mobile as text']);
     }
 }
