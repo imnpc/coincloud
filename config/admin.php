@@ -138,6 +138,7 @@ return [
         'excepts' => [
             'auth/login',
             'auth/logout',
+            'locale', // 多语言支持 ADD
         ],
     ],
 
@@ -426,6 +427,24 @@ return [
         'google-authenticator'=> [
             'enable' => true,
             'authenticatorname' => '两步验证' //名称
+        ],
+        // 多语言支持
+        'multi-language' => [
+            'enable' => true,
+            // the key should be same as var locale in config/app.php
+            // the value is used to show
+            'languages' => [
+                'en' => 'English',
+                'zh_CN' => '简体中文',
+            ],
+            // default locale
+            'default' => 'zh_CN',
+            // if or not show multi-language login page, optional, default is true
+            'show-login-page' => false,
+            // if or not show multi-language navbar, optional, default is true
+            'show-navbar' => true,
+            // the cookie name for the multi-language var, optional, default is 'locale'
+            'cookie-name' => 'locale'
         ],
     ],
 ];

@@ -22,6 +22,7 @@
         "laravel-admin-ext/config": "^1.1",
         "laravel-admin-ext/helpers": "1.*",
         "laravel-admin-ext/scheduling": "^1.1",
+        "laravel-admin-extensions/multi-language": "^0.0.6",
         "laravel-lang/lang": "~8.0",
         "laravel/framework": "^8.12",
         "laravel/horizon": "^5.7",
