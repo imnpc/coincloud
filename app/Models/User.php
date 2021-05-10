@@ -61,10 +61,10 @@ class User extends Authenticatable implements Wallet, WalletFloat
     ];
 
     // 关联 订单
-//    public function order()
-//    {
-//        return $this->hasMany(Order::class);
-//    }
+    public function order()
+    {
+        return $this->hasMany(Order::class);
+    }
 
     // 用户总数
     public static function count()
@@ -72,7 +72,7 @@ class User extends Authenticatable implements Wallet, WalletFloat
         return self::all()->count();
     }
 
-    // 推荐下级列表
+    // 用户推荐下级列表
     public function sons()
     {
         return $this->hasMany(User::class, 'parent_id', 'id');

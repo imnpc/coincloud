@@ -73,6 +73,12 @@ class Product extends Model
         return $this->belongsTo(WalletType::class);
     }
 
+    // 关联 订单
+    public function order()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     /**
      * 为数组 / JSON 序列化准备日期。
      *
