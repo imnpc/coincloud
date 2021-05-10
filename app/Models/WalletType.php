@@ -35,4 +35,10 @@ class WalletType extends Model
      */
     protected $casts = [
     ];
+
+    // 关联 产品
+    public function product()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

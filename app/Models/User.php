@@ -60,6 +60,24 @@ class User extends Authenticatable implements Wallet, WalletFloat
         'email_verified_at' => 'datetime',
     ];
 
+    // 关联 订单
+//    public function order()
+//    {
+//        return $this->hasMany(Order::class);
+//    }
+
+    // 用户总数
+    public static function count()
+    {
+        return self::all()->count();
+    }
+
+    // 推荐下级列表
+    public function sons()
+    {
+        return $this->hasMany(User::class, 'parent_id', 'id');
+    }
+
     /**
      * 获取登录用户手机号码
      * @param $notification

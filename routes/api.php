@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthorizationsController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +18,7 @@ use App\Http\Controllers\Api\UserController;
 */
 
 Route::prefix('v1')
-    ->namespace('Api')
+    //->namespace('Api')
     ->name('api.v1.')
     ->group(function () {
 
@@ -37,7 +38,7 @@ Route::prefix('v1')
                 Route::get('version', 'VersionController@index'); // 检测最新版本
                 Route::post('checkversion', 'VersionController@check'); // 比较版本号
 
-                Route::resource('product', 'ProductController'); // 产品
+                Route::resource('product', ProductController::class); // 产品
 
                 // 登录后可以访问的接口
                 Route::middleware('auth:api')->group(function () {
