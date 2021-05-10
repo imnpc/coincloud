@@ -19,10 +19,11 @@ class Product extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'tag', 'price', 'price_usdt', 'price_coin', 'coin_wallet_address', 'coin_wallet_qrcode', 'wallet_type_id', 'wait_days',
-        'valid_days', 'valid_days_text', 'choose_reason', 'choose_reason_text', 'service_rate', 'day_customer_rate', 'day_rate',
-        'freed_rate', 'parent1', 'parent2', 'invite_rate', 'bonus_team_a', 'bonus_team_b', 'bonus_team_c', 'upgrade_team_a', 'upgrade_team_b',
-        'upgrade_team_c', 'gas_fee', 'pledge_fee', 'pledge_days', 'valid_rate', 'package_rate', 'thumb', 'desc', 'content', 'status',
+        'name', 'tag', 'price', 'price_usdt', 'price_coin', 'coin_wallet_address', 'coin_wallet_qrcode', 'wallet_type_id',
+        'wait_days', 'valid_days', 'valid_days_text', 'choose_reason', 'choose_reason_text', 'service_rate', 'day_customer_rate',
+        'day_rate', 'freed_rate', 'parent1', 'parent2', 'invite_rate', 'bonus_team_a', 'bonus_team_b', 'bonus_team_c', 'upgrade_team_a',
+        'upgrade_team_b', 'upgrade_team_c', 'gas_fee', 'pledge_fee', 'pledge_days', 'valid_rate', 'package_rate', 'thumb',
+        'desc', 'content', 'status',
     ];
 
     /**
@@ -43,7 +44,7 @@ class Product extends Model
 
     /* @array $appends */
     protected $appends = [
-        'thumb_url', 'wallet_type',
+        'thumb_url', 'wallet_slug',
     ];
 
     // 获取缩略图地址
@@ -57,7 +58,7 @@ class Product extends Model
     }
 
     // 获取钱包类型的名称
-    public function getWalletTypeAttribute()
+    public function getWalletSlugAttribute()
     {
         if ($this->wallet_type_id > 0) {
             return WalletType::find($this->wallet_type_id)->slug;

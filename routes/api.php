@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\ProductController;
 */
 
 Route::prefix('v1')
-    //->namespace('Api')
+    //->namespace('Api') // laravel 8 api 需要去掉这个
     ->name('api.v1.')
     ->group(function () {
 
@@ -38,7 +38,9 @@ Route::prefix('v1')
                 Route::get('version', 'VersionController@index'); // 检测最新版本
                 Route::post('checkversion', 'VersionController@check'); // 比较版本号
 
-                Route::resource('product', ProductController::class); // 产品
+//                Route::resource('product', ProductController::class); // 产品资源
+                Route::get('product', [ProductController::class, 'index']); // 产品列表
+                Route::get('product/{product}', [ProductController::class, 'show']); // 产品详情
 
                 // 登录后可以访问的接口
                 Route::middleware('auth:api')->group(function () {
