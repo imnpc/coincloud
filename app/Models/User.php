@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\dateTrait;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Interfaces\WalletFloat;
 use Bavix\Wallet\Traits\HasWallet;
@@ -23,6 +24,7 @@ class User extends Authenticatable implements Wallet, WalletFloat
     use SoftDeletes;
     use HasWallet, HasWallets;
     use HasWalletFloat;
+    use dateTrait;
 
     // 钱包列表
     public const WALLETSLIST = [
@@ -100,16 +102,5 @@ class User extends Authenticatable implements Wallet, WalletFloat
             $credentials['mobile'] = $username;
 
         return self::where($credentials)->first();
-    }
-
-    /**
-     * 为数组 / JSON 序列化准备日期。
-     *
-     * @param \DateTimeInterface $date
-     * @return string
-     */
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
     }
 }

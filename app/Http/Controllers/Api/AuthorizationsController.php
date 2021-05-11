@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
-use Illuminate\Support\Arr;
-use Illuminate\Http\Request;
 use App\Traits\PassportToken;
 use Illuminate\Auth\AuthenticationException;
 use Psr\Http\Message\ServerRequestInterface;
