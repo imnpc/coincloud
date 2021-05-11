@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthorizationsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,9 +67,9 @@ Route::prefix('v1')
                     Route::resource('bankcard', 'BankcardController'); // 银行卡
                     Route::resource('feedback', 'FeedbackController'); // 问题反馈
 
-                    Route::resource('order', 'OrderController'); // 订单
-                    Route::post('checkorder', 'OrderController@check'); // 重设密码
-                    Route::patch('orders/{order}', 'OrderController@update'); // 更新订单支付凭证
+                    Route::resource('order', OrderController::class); // 订单
+                    Route::post('checkorder', [OrderController::class, 'check']); // 预览检测订单
+                    Route::patch('orders/{order}', [OrderController::class, 'update']); // 更新订单支付凭证
 
                     Route::resource('recharge', 'RechargeController'); // 充值
                     Route::get('myrecharge', 'RechargeController@my'); // 我的充值页面

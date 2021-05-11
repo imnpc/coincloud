@@ -44,7 +44,11 @@ class Product extends Model
     protected $casts = [
     ];
 
-    /* @array $appends */
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
     protected $appends = [
         'thumb_url', 'wallet_slug',
     ];

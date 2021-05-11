@@ -41,6 +41,7 @@ class CreateProductsTable extends Migration
             $table->integer('upgrade_team_a')->default(0)->comment('分红池A所需推荐购买T数');
             $table->integer('upgrade_team_b')->default(0)->comment('分红池A所需推荐购买T数');
             $table->integer('upgrade_team_c')->default(0)->comment('分红池A所需推荐购买T数');
+            $table->decimal('risk_rate', 8, 2)->default(0.00)->comment('风控池比例');
             $table->decimal('gas_fee', 32, 5)->default(0.00000)->comment('每 T 所需 GAS 费');
             $table->decimal('pledge_fee', 32, 5)->default(0.00000)->comment('每 T 所需质押币');
             $table->integer('pledge_days')->default('1')->comment('质押币天数');

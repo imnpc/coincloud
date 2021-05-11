@@ -18,4 +18,5 @@ Route::group([
     $router->resource('users', UserController::class); // 用户
     $router->resource('wallet-types', WalletTypeController::class); // 钱包类型
     $router->resource('products', ProductController::class); // 产品
+    $router->resource('orders', OrderController::class); // 订单
 });

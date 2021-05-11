@@ -19,7 +19,7 @@ function upload_images($file, $type, $user_id, $disk = "oss")
     $image->type = $type; //上传类型 参见 ImageRequest
     $image->path = $path;// URL 路径
     $image->disk = $disk; //上传磁盘
-    $image->size = $file->getClientSize();// 获取文件大小
+    $image->size = $file->getSize();// 获取文件大小
     $image->size_kb = number_fixed($image->size / 1024, 2);// 获取文件大小 k
     $image->user_id = $user_id;
     $image->save();

@@ -22,7 +22,7 @@ class CreateOrdersTable extends Migration
             $table->integer('number')->comment('购买数量');
             $table->decimal('pay_money', 8, 2)->default(0.00)->comment('支付金额');
             $table->integer('wait_days')->default(0)->comment('等待天数');
-            $table->tinyInteger('wait_status')->default(0)->comment('等待状态0-已生效 1-等待中');
+            $table->tinyInteger('wait_status')->default(0)->comment('等待状态 0-已生效 1-等待中');
             $table->integer('valid_days')->default(0)->comment('有效天数');
             $table->decimal('valid_rate', 8, 2)->default(0.00)->comment('有效T数比例');
             $table->decimal('valid_power', 16, 2)->comment('当前有效T数');
@@ -31,6 +31,8 @@ class CreateOrdersTable extends Migration
             $table->decimal('package_already', 32, 5)->comment('已封装数量');
             $table->decimal('package_wait', 32, 5)->comment('等待封装数量');
             $table->tinyInteger('package_status')->default(0)->comment('封装状态 0-封装完成 1-等待封装 2-封装中');
+            $table->tinyInteger('payment')->default('0')->comment('支付方式 0-后台 1-银行转账 2-USDT 3-其他虚拟币');
+            $table->string('payment_type')->nullable()->comment('付款类型');
             $table->tinyInteger('pay_status')->default('0')->comment('支付状态 0-已完成 1-未提交 2-审核中');
             $table->string('pay_image')->nullable()->comment('支付凭证图片');
             $table->timestamp('pay_time')->nullable()->comment('支付时间');

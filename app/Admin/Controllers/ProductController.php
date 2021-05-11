@@ -185,6 +185,7 @@ class ProductController extends AdminController
         $form->number('upgrade_team_a', __('Upgrade team a'))->default(0)->required();
         $form->number('upgrade_team_b', __('Upgrade team b'))->default(0)->required();
         $form->number('upgrade_team_c', __('Upgrade team c'))->default(0)->required();
+        $form->decimal('risk_rate', __('Risk rate'))->default(0.00)->required();
         $form->decimal('gas_fee', __('Gas fee'))->default(0.00000)->required();
         $form->decimal('pledge_fee', __('Pledge fee'))->default(0.00000)->required();
         $form->number('pledge_days', __('Pledge days'))->default(1)->required();
