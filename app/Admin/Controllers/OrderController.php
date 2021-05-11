@@ -10,6 +10,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\InfoBox;
 
 class OrderController extends AdminController
 {
@@ -34,6 +35,27 @@ class OrderController extends AdminController
     {
         $grid = new Grid(new Order());
 
+        $grid->header(function ($query) {
+            $count = Order::all()->count();
+            $total = Order::total();
+            $success = Order::success();
+            $wait = Order::wait();
+       
+            $infoBox1 = new InfoBox('订单总数', 'shopping-cart', 'aqua', '', $count);
+            $infoBox1 = $infoBox1->render();
+            $infoBox2 = new InfoBox('已售T数', 'shopping-cart', 'green', '', $total);
+            $infoBox2 = $infoBox2->render();
+            $infoBox3 = new InfoBox('有效T数', 'shopping-cart', 'yellow', '', $success);
+            $infoBox3 = $infoBox3->render();
+            $infoBox4 = new InfoBox('等待生效T数', 'shopping-cart', 'red', '', $wait);
+            $infoBox4 = $infoBox4->render();
+            return "
+<div class='col-md-3'>$infoBox1</div>
+<div class='col-md-3'>$infoBox2</div>
+<div class='col-md-3'>$infoBox3</div>
+<div class='col-md-3'>$infoBox4</div>
+";
+        });
         $grid->filter(function ($filter) {
             // 去掉默认的id过滤器
             $filter->disableIdFilter();
@@ -126,7 +148,7 @@ class OrderController extends AdminController
         $grid->model()->orderBy('id', 'desc');// 按照 ID 倒序
 
         $grid->actions(function ($actions) {
-            if ($actions->row['pay_status'] == 2) {
+            if ($actions->row['pay_status'] == 0) {
                 $actions->disableDelete();// 去掉删除
             }
             //$actions->disableDelete();// 去掉删除

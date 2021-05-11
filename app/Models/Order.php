@@ -129,4 +129,30 @@ class Order extends Model
         return $this->belongsTo(WalletType::class);
     }
 
+    // 已售 T 币
+    public static function total()
+    {
+        return self::where('user_id', '>', 0)
+            ->where('status', '=', 0)
+            ->where('pay_status', '=', 0)
+            ->sum('number');
+    }
+
+    // 等待生效的 T 币
+    public static function wait()
+    {
+        return self::where('wait_status', '=', 1)
+            ->where('status', '=', 0)
+            ->where('pay_status', '=', 0)
+            ->sum('number');
+    }
+
+    // 已经生效的 T 币
+    public static function success()
+    {
+        return self::where('wait_status', '=', 0)
+            ->where('status', '=', 0)
+            ->where('pay_status', '=', 0)
+            ->sum('number');
+    }
 }
