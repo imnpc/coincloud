@@ -40,7 +40,7 @@ class OrderController extends AdminController
             $total = Order::total();
             $success = Order::success();
             $wait = Order::wait();
-       
+
             $infoBox1 = new InfoBox('订单总数', 'shopping-cart', 'aqua', '', $count);
             $infoBox1 = $infoBox1->render();
             $infoBox2 = new InfoBox('已售T数', 'shopping-cart', 'green', '', $total);
