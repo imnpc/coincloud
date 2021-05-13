@@ -84,4 +84,10 @@ class Product extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    // 关联 每日分红
+    public function daybonus()
+    {
+        return $this->hasMany(DayBonus::class);
+    }
 }

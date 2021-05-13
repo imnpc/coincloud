@@ -19,4 +19,5 @@ Route::group([
     $router->resource('wallet-types', WalletTypeController::class); // 钱包类型
     $router->resource('products', ProductController::class); // 产品
     $router->resource('orders', OrderController::class); // 订单
+    $router->resource('day-bonuses', DayBonusController::class); // 每日分红
 });
