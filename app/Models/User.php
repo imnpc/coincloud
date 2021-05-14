@@ -68,6 +68,12 @@ class User extends Authenticatable implements Wallet, WalletFloat
         return $this->hasMany(Order::class);
     }
 
+    // 关联 用户分红
+    public function userbonus()
+    {
+        return $this->hasMany(UserBonus::class);
+    }
+
     // 用户总数
     public static function count()
     {
