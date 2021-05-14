@@ -90,4 +90,10 @@ class Product extends Model
     {
         return $this->hasMany(DayBonus::class);
     }
+
+    // 关联 默认每日分红
+    public function defaultdaybonus()
+    {
+        return $this->hasOne(DefaultDayBonus::class);
+    }
 }

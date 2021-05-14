@@ -20,4 +20,5 @@ Route::group([
     $router->resource('products', ProductController::class); // 产品
     $router->resource('orders', OrderController::class); // 订单
     $router->resource('day-bonuses', DayBonusController::class); // 每日分红
+    $router->resource('default-day-bonuses', DefaultDayBonusController::class); // 默认每日分红数据
 });
