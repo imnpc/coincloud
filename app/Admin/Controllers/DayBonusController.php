@@ -76,7 +76,8 @@ class DayBonusController extends AdminController
         $show = new Show(DayBonus::findOrFail($id));
 
         $show->field('id', __('Id'));
-        $show->field('product_id', __('Product id'));
+//        $show->field('product_id', __('Product id'));
+        $show->field('product.name', __('Products'));
         $show->field('day', __('Day'));
         $show->field('total_power', __('Total power'));
         $show->field('power_add', __('Power add'));

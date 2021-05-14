@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\AutoCreateDayBonus;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -25,6 +26,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+
+        // 服务器
+        $schedule->job(new AutoCreateDayBonus)->dailyAt('0:02'); // 每天自动创建分红记录
     }
 
     /**
