@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Jobs\AutoCreateDayBonus;
+use App\Jobs\ChangeOrderWaitStatus;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -20,7 +21,7 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -29,6 +30,7 @@ class Kernel extends ConsoleKernel
 
         // 服务器
         $schedule->job(new AutoCreateDayBonus)->dailyAt('0:02'); // 每天自动创建分红记录
+        $schedule->job(new ChangeOrderWaitStatus)->dailyAt('1:00'); // 更改订单等待状态
     }
 
     /**
@@ -38,7 +40,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
