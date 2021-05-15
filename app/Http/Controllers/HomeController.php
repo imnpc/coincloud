@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\TestProduct;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -24,6 +26,13 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $list = Product::all();
+        foreach ($list as $product) {
+             //print_r($product);
+             //echo $product->id;
+            TestProduct::dispatch($product->id);
+        }
+        exit();
         //获取当前用户
         $user = User::first();
 

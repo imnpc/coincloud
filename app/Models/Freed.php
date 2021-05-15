@@ -19,7 +19,7 @@ class Freed extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'user_bonus_id', 'product_id', 'day', 'coins', 'rate_freed', 'coin_freed', 'coin_freed_day', 'other_fee',
+        'user_id', 'user_bonus_id', 'product_id', 'day', 'coins', 'freed_rate', 'coin_freed', 'coin_freed_day', 'other_fee',
         'days', 'already_day', 'already_coin', 'wait_coin', 'status',
     ];
 

@@ -20,7 +20,7 @@ class CreateFreedsTable extends Migration
             $table->integer('product_id')->comment('产品 ID');
             $table->date('day')->comment('所属日期');
             $table->decimal('coins', 16, 5)->comment('当日总产币量');
-            $table->integer('rate_freed')->comment('释放比例');
+            $table->integer('freed_rate')->comment('释放比例');
             $table->decimal('coin_freed', 16, 5)->comment('释放总数量');
             $table->decimal('coin_freed_day', 16, 5)->comment('每日释放数量');
             $table->decimal('other_fee', 16, 5)->comment('其他扣费');

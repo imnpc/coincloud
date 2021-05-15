@@ -54,6 +54,7 @@ class ProductController extends AdminController
         $grid->column('pay_user_rate', __('Pay user rate'));
         $grid->column('now_rate', __('Now rate'));
         $grid->column('freed_rate', __('Freed rate'));
+        $grid->column('freed_days', __('Freed days'));
 //        $grid->column('parent1_rate', __('Parent1 rate'));
 //        $grid->column('parent2_rate', __('Parent2 rate'));
 //        $grid->column('invite_rate', __('Invite rate'));
@@ -125,6 +126,7 @@ class ProductController extends AdminController
         $show->field('pay_user_rate', __('Pay user rate'));
         $show->field('now_rate', __('Now rate'));
         $show->field('freed_rate', __('Freed rate'));
+        $show->field('freed_days', __('Freed days'));
         $show->field('parent1_rate', __('Parent1 rate'));
         $show->field('parent2_rate', __('Parent2 rate'));
         $show->field('invite_rate', __('Invite rate'));
@@ -176,6 +178,7 @@ class ProductController extends AdminController
         $form->decimal('pay_user_rate', __('Pay user rate'))->default(0.00)->required();
         $form->decimal('now_rate', __('Now rate'))->default(0.00)->required();
         $form->decimal('freed_rate', __('Freed rate'))->default(0.00)->required();
+        $form->number('freed_days', __('Freed days'))->default(0)->required();
         $form->decimal('parent1_rate', __('Parent1 rate'))->default(0.00)->required();
         $form->decimal('parent2_rate', __('Parent2 rate'))->default(0.00)->required();
         $form->decimal('invite_rate', __('Invite rate'))->default(0.00)->required();

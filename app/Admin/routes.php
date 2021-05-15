@@ -21,4 +21,7 @@ Route::group([
     $router->resource('orders', OrderController::class); // 订单
     $router->resource('day-bonuses', DayBonusController::class); // 每日分红
     $router->resource('default-day-bonuses', DefaultDayBonusController::class); // 默认每日分红数据
+    $router->resource('user-bonuses', UserBonusController::class); // 用户分成
+    $router->resource('freeds', FreedController::class); // 线性释放
+    $router->resource('day-freeds', DayFreedController::class); // 每日线性释放
 });

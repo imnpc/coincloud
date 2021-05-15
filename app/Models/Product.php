@@ -23,9 +23,9 @@ class Product extends Model
     protected $fillable = [
         'name', 'tag', 'price', 'price_usdt', 'price_coin', 'coin_wallet_address', 'coin_wallet_qrcode', 'wallet_type_id',
         'wait_days', 'valid_days', 'valid_days_text', 'choose_reason', 'choose_reason_text', 'service_rate', 'day_customer_rate',
-        'day_rate', 'freed_rate', 'parent1', 'parent2', 'invite_rate', 'bonus_team_a', 'bonus_team_b', 'bonus_team_c', 'upgrade_team_a',
-        'upgrade_team_b', 'upgrade_team_c', 'gas_fee', 'pledge_fee', 'pledge_days', 'valid_rate', 'package_rate', 'thumb',
-        'desc', 'content', 'status',
+        'day_rate', 'freed_rate', 'freed_days', 'parent1', 'parent2', 'invite_rate', 'bonus_team_a', 'bonus_team_b', 'bonus_team_c',
+        'upgrade_team_a', 'upgrade_team_b', 'upgrade_team_c', 'gas_fee', 'pledge_fee', 'pledge_days', 'valid_rate', 'package_rate',
+        'thumb', 'desc', 'content', 'status',
     ];
 
     /**

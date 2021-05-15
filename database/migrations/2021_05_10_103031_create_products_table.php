@@ -32,6 +32,7 @@ class CreateProductsTable extends Migration
             $table->decimal('pay_user_rate', 5, 2)->default(0.00)->comment('客户每日收益比例');
             $table->decimal('now_rate', 5, 2)->default(0.00)->comment('每日立即释放比例');
             $table->decimal('freed_rate', 5, 2)->default(0.00)->comment('每日线性释放比例');
+            $table->integer('freed_days')->default(0)->comment('线性释放天数');
             $table->decimal('parent1_rate', 5, 2)->default(0.00)->comment('推荐分成1代');
             $table->decimal('parent2_rate', 5, 2)->default(0.00)->comment('推荐分成2代');
             $table->decimal('invite_rate', 5, 2)->default(0.00)->comment('邀请人奖励比例');
