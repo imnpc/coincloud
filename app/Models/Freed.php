@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class UserBonus extends Model
+class Freed extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -19,10 +19,8 @@ class UserBonus extends Model
      * @var array
      */
     protected $fillable = [
-        'day', 'bonus_id', 'user_id', 'product_id', 'bonus_coin_add', 'valid_power', 'each_add', 'coins', 'pay_user_rate',
-        'coin_for_user', 'now_rate', 'coin_now', 'freed_rate', 'coin_freed', 'coin_freed_day', 'coin_freed_other', 'coin_day',
-        'balance', 'parent1_uid', 'parent1_rate', 'coin_parent1', 'parent2_uid', 'parent2_rate', 'coin_parent2', 'bonus_rate',
-        'coin_bonus', 'risk_rate', 'coin_risk', 'status',
+        'user_id', 'user_bonus_id', 'product_id', 'day', 'coins', 'rate_freed', 'coin_freed', 'coin_freed_day', 'other_fee',
+        'days', 'already_day', 'already_coin', 'wait_coin', 'status',
     ];
 
     /**
@@ -47,15 +45,21 @@ class UserBonus extends Model
         return $this->belongsTo(User::class);
     }
 
+    // 关联 用户分红
+    public function userbonus()
+    {
+        return $this->belongsTo(UserBonus::class);
+    }
+
+    // 关联 每日线性释放记录
+    public function dayfreed()
+    {
+        return $this->hasMany(DayFreed::class);
+    }
+
     // 关联 产品
     public function product()
     {
         return $this->belongsTo(Product::class);
-    }
-
-    // 关联 线性释放
-    public function freed()
-    {
-        return $this->hasMany(Freed::class);
     }
 }

@@ -102,4 +102,16 @@ class Product extends Model
     {
         return $this->hasMany(UserBonus::class);
     }
+
+    // 关联 线性释放
+    public function freed()
+    {
+        return $this->hasMany(Freed::class);
+    }
+
+    // 关联 每日线性释放记录
+    public function dayfreed()
+    {
+        return $this->hasMany(DayFreed::class);
+    }
 }
