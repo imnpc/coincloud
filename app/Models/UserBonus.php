@@ -19,11 +19,10 @@ class UserBonus extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'day', 'yesterday_power', 'power_add', 'power', 'coin_add', 'coin_add_day', 'coin', 'coin_user', 'rate_day',
-        'rate_freed', 'coin_rate_day', 'coin_freed', 'coin_freed_day', 'coin_freed_other', 'coin_day', 'pay_customer_rate',
-        'balance', 'parent1_balance', 'parent1_uid', 'parent1', 'parent2_balance', 'parent2_uid', 'parent2', 'bonus_rate',
-        'bonus_pool', 'fee', 'status', 'max_valid_power', 'borrowed_filecoin_coin_day', 'borrowed_filecoin_other', 'bonus_id',
-        'type', 'product_id', 'returns_ratio', 'system_coin',
+        'day', 'bonus_id', 'user_id', 'product_id', 'bonus_coin_add', 'valid_power', 'each_add', 'coins', 'pay_user_rate',
+        'coin_for_user', 'now_rate', 'coin_now', 'freed_rate', 'coin_freed', 'coin_freed_day', 'coin_freed_other', 'coin_day',
+        'balance', 'parent1_uid', 'parent1_rate', 'coin_parent1', 'parent2_uid', 'parent2_rate', 'coin_parent2', 'bonus_rate',
+        'coin_bonus', 'risk_rate', 'coin_risk', 'status',
     ];
 
     /**
