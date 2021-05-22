@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\UserBonus;
 use App\Models\UserWalletLog;
 use App\Services\LogService;
+use App\Services\UserWalletService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -69,6 +70,7 @@ class AutoDayBonus implements ShouldQueue
 
         try {
             $logService = app()->make(LogService::class); // 钱包服务初始化 TODO
+            $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
 
             $bonus = DayBonus::where('day', '=', $day)
                 ->where('product_id', '=', $this->product_id) // 产品ID
@@ -142,6 +144,7 @@ class AutoDayBonus implements ShouldQueue
                         //添加到用户余额 + 记录日志 filecoin_balance
                         $remark2 = "推荐分红2代";
                         $logService->userLog(User::BALANCE_FILECOIN, $parent2_uid, $coin_parent2, $parent1_uid, $day, UserWalletLog::FROM_COMMISSION, $remark2, 0, 0, 0, Order::TYPE_CLOUD);
+                        // $UserWalletService
                     }
                 }
 

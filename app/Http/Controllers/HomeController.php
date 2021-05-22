@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\TestProduct;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\UserWalletService;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -26,6 +27,11 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
+        $uid = 1;
+        $user = User::find($uid);
+        $UserWalletService->checkWallet($uid);
+        exit();
         $list = Product::all();
         foreach ($list as $product) {
              //print_r($product);

@@ -25,3 +25,4 @@ Route::group([
     $router->resource('freeds', FreedController::class); // 线性释放
     $router->resource('day-freeds', DayFreedController::class); // 每日线性释放
 });
+
