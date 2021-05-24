@@ -26,5 +26,6 @@ Route::group([
     $router->resource('day-freeds', DayFreedController::class); // 每日线性释放
     $router->resource('announcements', AnnouncementController::class); // 公告
     $router->resource('article-categories', ArticleCategoryController::class); // 文章分类
+    $router->resource('articles', ArticleController::class); // 文章
 });
 

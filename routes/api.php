@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\AnnouncementController;
+use App\Http\Controllers\Api\ArticleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +36,7 @@ Route::prefix('v1')
             ->group(function () {
                 // 游客可以访问的接口
                 Route::resource('announcement', AnnouncementController::class); // 公告
-                Route::resource('article', 'ArticleController'); // 文章系统
+                Route::resource('article', ArticleController::class); // 文章系统
                 Route::get('index', 'IndexController@index'); // APP 首页
                 Route::get('version', 'VersionController@index'); // 检测最新版本
                 Route::post('checkversion', 'VersionController@check'); // 比较版本号

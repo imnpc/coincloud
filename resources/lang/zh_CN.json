@@ -208,6 +208,8 @@
     "admin.day-bonuses": "每日分红",
     "admin.default-day-bonuses": "默认分红数据",
     "admin.announcements": "公告",
+    "admin.articles": "文章",
+    "admin.article-categories": "文章分类",
     "Times": "倍数",
     "Is output coin": "是否产币",
     "XCH": "XCH币",

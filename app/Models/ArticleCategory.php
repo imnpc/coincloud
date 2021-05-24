@@ -44,4 +44,10 @@ class ArticleCategory extends Model
             return '';
         }
     }
+
+    // 关联 文章
+    public function article()
+    {
+        return $this->hasMany(Article::class);
+    }
 }
