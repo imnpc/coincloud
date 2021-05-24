@@ -8,12 +8,11 @@ use Bavix\Wallet\Interfaces\WalletFloat;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWalletFloat;
 use Bavix\Wallet\Traits\HasWallets;
-use DateTimeInterface;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Storage;
 use Laravel\Passport\HasApiTokens;
 use Overtrue\EasySms\PhoneNumber;
 
@@ -40,7 +39,8 @@ class User extends Authenticatable implements Wallet, WalletFloat
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'mobile', 'nickname', 'parent_id', 'status', 'last_login_at', 'last_login_ip',
+        'name', 'email', 'password', 'mobile', 'nickname', 'parent_id', 'status', 'last_login_at', 'last_login_ip', 'avatar',
+        'real_name', 'id_number', 'id_front', 'id_back', 'is_verify',
     ];
 
     /**
@@ -61,6 +61,48 @@ class User extends Authenticatable implements Wallet, WalletFloat
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'avatar_url', 'invite_code', 'id_front_url', 'id_back_url',
+    ];
+
+    // 返回头像链接
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return Storage::disk('oss')->url($this->avatar);
+        } else {
+            return '';
+        }
+    }
+
+    public function getInviteCodeAttribute()
+    {
+        return \Hashids::encode($this->attributes['id']);
+    }
+
+    public function getIdFrontUrlAttribute()
+    {
+        if ($this->id_front) {
+            return Storage::disk('oss')->url($this->id_front);
+        } else {
+            return '';
+        }
+    }
+
+    public function getIdBackUrlAttribute()
+    {
+        if ($this->id_back) {
+            return Storage::disk('oss')->url($this->id_back);
+        } else {
+            return '';
+        }
+    }
 
     // 关联 订单
     public function order()

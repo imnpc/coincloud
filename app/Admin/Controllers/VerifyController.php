@@ -9,14 +9,14 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Illuminate\Http\Request;
 
-class UserController extends AdminController
+class VerifyController extends AdminController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title = '用户';
+    protected $title = '待实名用户';
 
     /**
      * Make a grid builder.
@@ -27,18 +27,8 @@ class UserController extends AdminController
     {
         $grid = new Grid(new User());
 
-        $grid->filter(function ($filter) {
-            // 去掉默认的id过滤器
-            $filter->disableIdFilter();
-            // 在这里添加字段过滤器
-            $filter->equal('id', __('Id'));
-            $filter->like('real_name', __('Real name'));
-            $filter->equal('is_verify', __('是否实名'))->radio([
-                '' => '所有',
-                0 => '未实名',
-                1 => '已实名',
-            ]);
-        });
+        $grid->model()->where('is_verify', '=', 0)
+            ->whereNotNull('real_name');
 
         $grid->column('id', __('Id'));
         $grid->column('avatar_url', __('Avatar'))->display(function ($value) {
@@ -70,9 +60,9 @@ class UserController extends AdminController
         $grid->column('updated_at', __('Updated at'));
 //        $grid->column('deleted_at', __('Deleted at'));
 
-//        $grid->disableFilter(); // 禁用查询过滤器
-//        $grid->disableRowSelector(); // 禁用行选择checkbox
-//        $grid->disableCreateButton(); // 禁用创建按钮
+        $grid->disableFilter(); // 禁用查询过滤器
+        $grid->disableRowSelector(); // 禁用行选择checkbox
+        $grid->disableCreateButton(); // 禁用创建按钮
 //        $grid->disableActions(); // 禁用行操作列
         $grid->disableExport(); // 禁用导出数据
         $grid->disableColumnSelector();// 禁用行选择器

@@ -26,10 +26,10 @@ Encore\Admin\Form::forget(['map']);
 Admin::navbar(function (\Encore\Admin\Widgets\Navbar $navbar) {
     if(Admin::user()){
         if(Admin::user()->isAdministrator()){
-//            $total = User::where('is_verify', '=', 0)
-//                ->whereNotNull('real_name')
-//                ->count();
-//            $navbar->right(Nav\Link::make('实名待审核'.'(<font color=red>'.$total.'</font>)', 'verify','fa-shield'));
+            $total = User::where('is_verify', '=', 0)
+                ->whereNotNull('real_name')
+                ->count();
+            $navbar->right(Nav\Link::make('实名待审核'.'(<font color=red>'.$total.'</font>)', 'verify','fa-shield'));
             $navbar->right(Nav\Link::make('设置', 'configx/edit'));
         }
     }
