@@ -28,5 +28,6 @@ Route::group([
     $router->resource('article-categories', ArticleCategoryController::class); // 文章分类
     $router->resource('articles', ArticleController::class); // 文章
     $router->resource('versions', VersionController::class); // APP版本
+    $router->resource('feedback', FeedbackController::class); // 问题反馈
 });
 

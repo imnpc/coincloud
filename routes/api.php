@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\VersionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthorizationsController;
@@ -9,6 +8,8 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\VersionController;
+use App\Http\Controllers\Api\FeedbackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +69,7 @@ Route::prefix('v1')
                     Route::resource('withdrawmoney', 'WithdrawMoneyController'); // 提现
                     Route::get('mymoney', 'WithdrawMoneyController@my'); // 我的提现
                     Route::resource('bankcard', 'BankcardController'); // 银行卡
-                    Route::resource('feedback', 'FeedbackController'); // 问题反馈
+                    Route::resource('feedback', FeedbackController::class); // 问题反馈
 
                     Route::resource('order', OrderController::class); // 订单
                     Route::post('checkorder', [OrderController::class, 'check']); // 预览检测订单

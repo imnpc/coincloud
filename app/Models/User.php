@@ -86,6 +86,12 @@ class User extends Authenticatable implements Wallet, WalletFloat
         return $this->hasMany(DayFreed::class);
     }
 
+    // 关联 问题反馈
+    public function feedback()
+    {
+        return $this->hasMany(Feedback::class);
+    }
+
     // 用户总数
     public static function count()
     {
