@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthorizationsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\AnnouncementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ Route::prefix('v1')
         Route::middleware('throttle:' . config('api.rate_limits.access'))
             ->group(function () {
                 // 游客可以访问的接口
-                Route::resource('announcement', 'AnnouncementController'); // 公告
+                Route::resource('announcement', AnnouncementController::class); // 公告
                 Route::resource('article', 'ArticleController'); // 文章系统
                 Route::get('index', 'IndexController@index'); // APP 首页
                 Route::get('version', 'VersionController@index'); // 检测最新版本
