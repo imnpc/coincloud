@@ -24,5 +24,6 @@ Route::group([
     $router->resource('user-bonuses', UserBonusController::class); // 用户分成
     $router->resource('freeds', FreedController::class); // 线性释放
     $router->resource('day-freeds', DayFreedController::class); // 每日线性释放
+    $router->resource('announcements', AnnouncementController::class); // 公告
 });
 
