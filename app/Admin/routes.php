@@ -27,5 +27,6 @@ Route::group([
     $router->resource('announcements', AnnouncementController::class); // 公告
     $router->resource('article-categories', ArticleCategoryController::class); // 文章分类
     $router->resource('articles', ArticleController::class); // 文章
+    $router->resource('versions', VersionController::class); // APP版本
 });
 

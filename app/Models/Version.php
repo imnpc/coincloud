@@ -8,11 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Storage;
 
-class Article extends Model
+class Version extends Model
 {
     use HasFactory;
     use SoftDeletes;
     use dateTrait;
+
+    // 平台 1-Android 2-iOS
+    public const ANDROID = 1; // Android
+    public const IOS = 2; // iOS
+
+    public static $platformMap = [
+        self::ANDROID => 'Android',
+        self::IOS => 'iOS',
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +29,7 @@ class Article extends Model
      * @var array
      */
     protected $fillable = [
-        'article_category_id', 'title', 'content', 'is_recommand', 'status', 'thumb',
+        'platform', 'version', 'description', 'app', 'url', 'status',
     ];
 
     /**
@@ -29,22 +38,15 @@ class Article extends Model
      * @var array
      */
     protected $appends = [
-        'thumb_url',
+        'download_url',
     ];
 
-    public function getThumbUrlAttribute()
+    public function getDownloadUrlAttribute()
     {
-        if ($this->thumb) {
-            return Storage::disk('oss')->url($this->thumb);
+        if ($this->app) {
+            return Storage::disk('oss')->url($this->app);
         } else {
-            return '';
+            return $this->url;
         }
     }
-
-    // 关联 文章分类
-    public function article_category()
-    {
-        return $this->belongsTo(ArticleCategory::class);
-    }
-
 }

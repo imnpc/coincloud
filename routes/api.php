@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\VersionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthorizationsController;
@@ -38,8 +39,8 @@ Route::prefix('v1')
                 Route::resource('announcement', AnnouncementController::class); // 公告
                 Route::resource('article', ArticleController::class); // 文章系统
                 Route::get('index', 'IndexController@index'); // APP 首页
-                Route::get('version', 'VersionController@index'); // 检测最新版本
-                Route::post('checkversion', 'VersionController@check'); // 比较版本号
+                Route::get('version', [VersionController::class, 'index']); // 检测最新版本
+                Route::post('checkversion', [VersionController::class, 'check']); // 比较版本号
 
 //                Route::resource('product', ProductController::class); // 产品资源
                 Route::get('product', [ProductController::class, 'index']); // 产品列表
