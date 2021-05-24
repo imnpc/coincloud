@@ -51,12 +51,12 @@ Route::prefix('v1')
                 Route::middleware('auth:api')->group(function () {
                     Route::get('user', [UserController::class, 'me']); // 当前登录用户信息
 
-                    Route::get('my', 'UserController@my'); // 我的
+                    Route::get('my', [UserController::class, 'my']); // 我的
                     Route::get('team', 'UserController@team'); // 我的团队
-                    Route::post('avatar', 'UserController@avatar'); // 修改用户头像
-                    Route::post('verify', 'UserController@verify'); // 用户实名认证
-                    Route::post('reset', 'UserController@resetPassword'); // 重设密码
-                    Route::get('invite', 'UserController@invite'); // 邀请码
+                    Route::post('avatar', [UserController::class, 'avatar']); // 修改用户头像
+                    Route::post('verify', [UserController::class, 'verify']); // 用户实名认证
+                    Route::post('reset', [UserController::class, 'resetPassword']); // 重设密码
+                    Route::get('invite', [UserController::class, 'invite']); // 邀请码
 
                     Route::get('mypower', 'UserController@mypower'); // 算力管理
                     Route::get('myorder', 'UserController@myorder'); // 我的订单

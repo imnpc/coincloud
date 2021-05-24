@@ -30,4 +30,5 @@ Route::group([
     $router->resource('versions', VersionController::class); // APP版本
     $router->resource('feedback', FeedbackController::class); // 问题反馈
     $router->resource('verify', VerifyController::class); // 实名认证
+    $router->resource('withdraws', WithdrawController::class); // 提币
 });
