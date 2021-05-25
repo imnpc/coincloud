@@ -27,10 +27,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
+        //$UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
         $uid = 1;
         $user = User::find($uid);
-        $UserWalletService->checkWallet($uid);
+        $wallet = $user->getWallet('USDT');
+        echo $wallet->decimal_places;
+        //$UserWalletService->checkWallet($uid);
         exit();
         $list = Product::all();
         foreach ($list as $product) {

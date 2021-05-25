@@ -10,9 +10,34 @@ use Carbon\Carbon;
 class UserWalletService
 {
     // 操作写入钱包数据
+    public function store($uid, $wallet_type_id, $money, $remark)
+    {
+        $decimal = 0;
+        $user = User::find($uid);
+        $wallet_type = WalletType::find($wallet_type_id);
+        $name = $wallet_type->slug;
+        $wallet = $user->getWallet($name);
+
+        // 如果钱包带小数点
+        if ($wallet->decimal_places > 0) {
+            $decimal = 1;
+        }
+
+        if ($money > 0 && $decimal == 1) {
+            $wallet->depositFloat($money, $remark); // 增加
+        } elseif ($money > 0 && $decimal == 0) {
+            $wallet->deposit($money, $remark); // 增加
+        }
+
+        if ($money < 0 && $decimal == 1) {
+            $wallet->withdrawFloat($money, $remark); // 减少
+        } elseif ($money < 0 && $decimal == 0) {
+            $wallet->withdraw($money, $remark); // 减少
+        }
+    }
 
     // 查询用户是否创建钱包
-    public function checkWallet($uid)
+    public function checkWallet(int $uid)
     {
         $user = User::find($uid);
 //        $lists = WalletType::all(); // 钱包类型列表

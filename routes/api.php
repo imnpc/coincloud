@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\WithdrawController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthorizationsController;
@@ -64,8 +65,9 @@ Route::prefix('v1')
                     Route::get('walletlog', 'UserController@walletLog'); // 我的资产流水
                     Route::get('rewardwalletlog', 'UserController@RewardwalletLog'); // 奖励算力资产流水
 
-                    Route::resource('withdraw', 'WithdrawController'); // 提币
-                    Route::get('mycoin', 'WithdrawController@my'); // 我的提币
+                    Route::resource('withdraw', WithdrawController::class); // 提币
+                    Route::get('mycoin', [WithdrawController::class, 'my']); // 我的提币
+
                     Route::resource('withdrawmoney', 'WithdrawMoneyController'); // 提现
                     Route::get('mymoney', 'WithdrawMoneyController@my'); // 我的提现
                     Route::resource('bankcard', 'BankcardController'); // 银行卡

@@ -22,7 +22,7 @@ class CreateWithdrawsTable extends Migration
             $table->decimal('coin', 32, 5)->comment('提币金额');
             $table->decimal('fee', 32, 5)->comment('手续费');
             $table->decimal('real_coin', 32, 5)->comment('到账金额');
-            $table->string('reason')->comment('取消原因');
+            $table->string('reason')->nullable()->comment('取消原因');
             $table->timestamp('canceled_time')->nullable()->comment('取消时间');
             $table->tinyInteger('status')->default(0)->comment('0-待审核 1-已转账 2-驳回申请');
             $table->timestamps();
