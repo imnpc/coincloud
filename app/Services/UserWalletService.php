@@ -14,6 +14,7 @@ class UserWalletService
     {
         $decimal = 0;
         $user = User::find($uid);
+        $this->checkWallet($uid); // 检测用户是否创建过钱包
         $wallet_type = WalletType::find($wallet_type_id);
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
@@ -27,9 +28,7 @@ class UserWalletService
             $wallet->depositFloat($money, $remark); // 增加
         } elseif ($money > 0 && $decimal == 0) {
             $wallet->deposit($money, $remark); // 增加
-        }
-
-        if ($money < 0 && $decimal == 1) {
+        } elseif ($money < 0 && $decimal == 1) {
             $wallet->withdrawFloat($money, $remark); // 减少
         } elseif ($money < 0 && $decimal == 0) {
             $wallet->withdraw($money, $remark); // 减少

@@ -17,6 +17,7 @@
         "ghost/google-authenticator": "^1.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "ichynul/configx": "^1.4",
+        "ichynul/row-table": "^1.1",
         "kra8/laravel-snowflake": "^2.0",
         "laminas/laminas-diactoros": "^2.5",
         "laravel-admin-ext/config": "^1.1",

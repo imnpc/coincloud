@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\IndexController;
 use App\Http\Controllers\Api\WithdrawController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -40,7 +41,7 @@ Route::prefix('v1')
                 // 游客可以访问的接口
                 Route::resource('announcement', AnnouncementController::class); // 公告
                 Route::resource('article', ArticleController::class); // 文章系统
-                Route::get('index', 'IndexController@index'); // APP 首页
+                Route::get('index', [IndexController::class, 'index']); // APP 首页
                 Route::get('version', [VersionController::class, 'index']); // 检测最新版本
                 Route::post('checkversion', [VersionController::class, 'check']); // 比较版本号
 

@@ -194,6 +194,16 @@ class ProductController extends AdminController
         $form->number('pledge_days', __('Pledge days'))->default(1)->required();
         $form->decimal('valid_rate', __('Valid rate'))->default(0.00)->required();
         $form->decimal('package_rate', __('Package rate'))->default(0.00)->required();
+
+        $form->decimal('total_revenue', __('Total revenue'))->default(0.00000);
+        $form->decimal('yesterday_revenue', __('Yesterday revenue'))->default(0.00000);
+        $form->decimal('yesterday_gas', __('Yesterday gas'))->default(0.00000);
+        $form->decimal('yesterday_efficiency', __('Yesterday efficiency'))->default(0.00000);
+        $form->text('total_revenue_text', __('Total revenue text'))->default('矿池总产量');
+        $form->text('yesterday_revenue_text', __('Yesterday revenue text'))->default('昨日产量');
+        $form->text('yesterday_gas_text', __('Yesterday gas text'))->default('昨日消耗GAS');
+        $form->text('yesterday_efficiency_text', __('Yesterday efficiency text'))->default('昨日挖矿效率');
+
         $form->image('thumb', __('Thumb'))->required();
 //        $form->textarea('desc', __('Desc'));
         $form->editor('content', __('Content'))->required();

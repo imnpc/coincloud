@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserWalletLog;
 use App\Models\Withdraw;
 use App\Services\LogService;
+use App\Services\UserWalletService;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -180,11 +181,11 @@ class WithdrawController extends AdminController
                     $order->canceled_time = Carbon::now(); // 标记订单确认时间
                     $order->save();
                     // 给用户账户增加对应金额
-                    $logService = app()->make(LogService::class);
+                    $UserWalletService = app()->make(UserWalletService::class);
                     if ($form->model()->status == 2) {
-                        // 充值账户转入 TODO
-                        $remark2 = "取消提币退回 " . $form->model()->coin . ',理由-' . $form->model()->reason . '#' . $form->model()->id;
-                        $logService->userLog(User::BALANCE_FILECOIN, $form->model()->user_id, $form->model()->coin, 0, $day, UserWalletLog::FROM_CANCEL_WITHDRAW, $remark2, 0, 0, 0, UserWalletLog::TYPE_MINER);
+                        $meta['add'] = $form->model()->coin;
+                        $meta['remark'] = "取消提币退回 " . $form->model()->coin . ',理由-' . $form->model()->reason . '#' . $form->model()->id;
+                        $UserWalletService->store($form->model()->user_id, $form->model()->wallet_type_id, $form->model()->coin, $meta);
                     }
                 }
             });

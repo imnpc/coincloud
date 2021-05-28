@@ -213,5 +213,13 @@
     "Times": "倍数",
     "Is output coin": "是否产币",
     "XCH": "XCH币",
-    "Chia power": "起亚算力"
+    "Chia power": "起亚算力",
+    "Total revenue": "矿池总产量",
+    "Yesterday revenue": "昨日产量",
+    "Yesterday gas": "昨日消耗GAS",
+    "Yesterday efficiency": "昨日挖矿效率",
+    "Total revenue text": "矿池总产量-文字",
+    "Yesterday revenue text": "昨日产量-文字",
+    "Yesterday gas text": "昨日消耗GAS-文字",
+    "Yesterday efficiency text": "昨日挖矿效率-文字"
 }
