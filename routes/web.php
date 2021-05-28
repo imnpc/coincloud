@@ -20,7 +20,7 @@ use App\Http\Controllers\HomeController;
 //    return view('welcome');
 //});
 
-Auth::routes();
+//Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index']); // 注册表单
 
