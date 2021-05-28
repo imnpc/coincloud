@@ -42,7 +42,7 @@ class IndexController extends Controller
             ->select('id', 'title', 'icon')
             ->get();
         $data['nav'] = $nav;
-        
+
         // 矿池运营数据 TODO
         $list = Product::where('status', '=', 0)
             ->orderBy('id', 'asc')

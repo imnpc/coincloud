@@ -53,7 +53,7 @@ class AutoProductBonus implements ShouldQueue
     {
         $list = Product::all();
         foreach ($list as $product) {
-            TestProduct::dispatch($product->id);
+            AutoDayBonus::dispatch($product->id);
 //            AutoDayBonus::dispatch($product->id);
         }
     }

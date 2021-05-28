@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\OrderResource;
+use App\Models\Product;
 use App\Models\User;
+use App\Models\UserBonus;
+use App\Models\WalletType;
+use Bavix\Wallet\Interfaces\Mathable;
+use Bavix\Wallet\Models\Transaction;
+use Bavix\Wallet\Services\WalletService;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
@@ -58,18 +65,22 @@ class UserController extends Controller
     public function my(Request $request)
     {
         $user = $request->user();
-        $cloud_power_reward = floor($user->cloud_power_reward / 1);
+
+        $list = Product::where('status', '=', 0)
+            ->orderBy('id', 'asc')
+            ->select('id', 'wallet_type_id')
+            ->get();
+        foreach ($list as $k => &$v) {
+            $list[$k]['wallet_slug_text'] = $v->wallet_slug . '资产';
+        }
 
         $data = [
             'id' => $user->id,
             'mobile' => $user->mobile, // 手机号码
-            'nickname' => $user->nickname, // 昵称
+//            'nickname' => $user->nickname, // 昵称
             'name' => $user->name, // 账户
-            'total_power' => $user->cloud_power, // 总存储空间
-            'valid_power' => $user->cloud_valid_power, // 有效算力
-            'progress' => @number_fixed($user->cloud_valid_power / $user->cloud_power * 100, 2), // 进度
             'is_verify' => $user->is_verify, // 是否实名认证 0-未认证 1-已认证
-            'xch' => $user->balance_xch, // 奇亚币余额
+            'power_list' => $list,
         ];
 
         return $data;
@@ -106,15 +117,51 @@ class UserController extends Controller
      */
     public function account(Request $request)
     {
+        // wallet_type_id
         $user = $request->user();
         $day = Carbon::now()->subDay()->toDateString();// 获得前一天日期
+
+        // wallet_type_id 钱包类型/slug/获取对应钱包 TODO
+        $wallet_type = WalletType::find($request->wallet_type_id);
+        if (empty($wallet_type) || $wallet_type->is_enblened = 0) {
+            $data['message'] = "不支持该类型！";
+            return response()->json($data, 403);
+        }
+        $product = Product::where('wallet_type_id', $request->wallet_type_id)
+            ->where('status', 0)
+            ->first();
+
+        if (empty($product)) {
+            $data['message'] = "产品不存在或者未启用！";
+            return response()->json($data, 403);
+        }
+
         $bonus = UserBonus::where('day', '=', $day)
             ->where('user_id', '=', auth('api')->id())
-            ->first();// 查询前一天系统分红记录
-        if (!$bonus) {
-            $data['message'] = "Data Not Found.";
-            return response()->json($data, 404);
-        }
+            ->where('product_id', $product->id)
+            ->first();
+        // 临时禁用 TODO
+//        if (!$bonus) {
+//            $data['message'] = "Data Not Found.";
+//            return response()->json($data, 404);
+//        }
+
+        $name = $wallet_type->slug;
+        $wallet = $user->getWallet($name);
+        $balance = $wallet->balanceFloat; // 钱包余额
+        //echo $balance;
+        // 昨日增加
+        $yesterday_add = $wallet->transactions()
+            ->where('type', '=', Transaction::TYPE_DEPOSIT)
+            ->whereDate('created_at', '=', Carbon::yesterday())
+//            ->whereDate('created_at', '=', '2021-05-08')
+            ->sum('amount');
+        $math = app(Mathable::class);
+        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
+        $yesterday_add = $math->div($yesterday_add, $decimalPlaces);
+        echo $yesterday_add;
+        exit();
+
 
         $system = CloudBonus::findOrFail($bonus->bonus_id);
 
@@ -122,15 +169,20 @@ class UserController extends Controller
         $total_reward = 0;
         $my_recharge_pledge = 0;
 
-        $reward = Reward::where('user_id', '=', auth('api')->id())->first();
+        // 查询奖励币
+        $reward = Reward::where('user_id', '=', auth('api')->id())
+            ->where('product_id', $product->id)
+            ->first();
         if ($reward) {
-            $wait_reward = $reward->wait_coin;// 查询奖励币
-            $total_reward = $reward->coin_freed;// 查询奖励币
+            $wait_reward = $reward->wait_coin;
+            $total_reward = $reward->coin_freed;
         }
 
+        // 昨日获得的奖励币
         $day_reward = DayReward::where('user_id', '=', auth('api')->id())
+            ->where('product_id', $product->id)
             ->where('day', '=', $day)
-            ->sum('coin');// 昨日获得的奖励币
+            ->sum('coin');
 
         // 75% 未释放 总计
         $coin_unfreed_day = Freed::where('user_id', '=', auth('api')->id())->sum('wait_coin');
