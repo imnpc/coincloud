@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\CloudWalletLog;
 use App\Models\DayBonus;
 use App\Models\DayFreed;
 use App\Models\Freed;

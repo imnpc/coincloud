@@ -78,6 +78,7 @@ Route::prefix('v1')
 
                     Route::resource('order', OrderController::class); // 订单
                     Route::post('checkorder', [OrderController::class, 'check']); // 预览检测订单
+                    Route::post('getprice', [OrderController::class, 'getprice']); // 获取价格列表
                     Route::patch('orders/{order}', [OrderController::class, 'update']); // 更新订单支付凭证
 
                     Route::resource('recharge', 'RechargeController'); // 充值

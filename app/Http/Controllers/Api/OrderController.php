@@ -282,4 +282,28 @@ class OrderController extends Controller
 
         return $data;
     }
+
+    /**
+     * 获取产品价格列表
+     * @param Request $request
+     * @return array
+     */
+    public function getprice(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id', // 产品 ID
+            'number' => 'required|numeric|min:1', // 购买数量
+        ]);
+
+        // 获取产品信息
+        $product = Product::find($request->product_id);
+
+        $data['price'] = $product->price * $request->number;
+        $data['price_usdt'] = $product->price_usdt * $request->number;
+        $data['price_coin'] = $product->price_coin * $request->number;
+        $data['number'] = $request->number;
+        $data['product_id'] = $request->product_id;
+
+        return $data;
+    }
 }
