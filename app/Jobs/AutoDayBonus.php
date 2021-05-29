@@ -93,7 +93,7 @@ class AutoDayBonus implements ShouldQueue
             foreach ($lists as $k => $v) {
                 $checkmybonus = UserBonus::where('day', '=', $day)
                     ->where('user_id', '=', $v->user_id) // 未执行的
-                    ->where('bonus_id', '=', $bonus->id) // 未执行的
+                    ->where('day_bonus_id', '=', $bonus->id) // 未执行的
                     ->where('product_id', '=', $this->product_id)
                     ->first();// 查询用户分红记录是否存在
                 if ($checkmybonus) {
@@ -135,7 +135,7 @@ class AutoDayBonus implements ShouldQueue
                     $commission_balance = number_fixed($commission_balance - $coin_parent1); // 推荐剩余金额
                     //添加到用户余额 + 记录日志 filecoin_balance
                     $remark1 = "推荐分红1代";
-                    $logService->userLog(User::BALANCE_FILECOIN, $parent1_uid, $coin_parent1, $user->id, $day, UserWalletLog::FROM_COMMISSION, $remark1, 0, 0, 0, Order::TYPE_CLOUD);
+                    $logService->userLog($parent1_uid, $product->wallet_type_id, $coin_parent1, $user->id, $day, UserWalletLog::FROM_COMMISSION, $remark1);
                     // 2代：1代用户上级 ID 大于 0
                     if ($parent1_user->parent_id > 0 && $coin_parent2 > 0) {
                         $parent2_uid = $parent1_user->parent_id; // 2代推荐人用户 ID
@@ -143,8 +143,7 @@ class AutoDayBonus implements ShouldQueue
                         $commission_balance = number_fixed($commission_balance - $coin_parent2); // 推荐剩余金额
                         //添加到用户余额 + 记录日志 filecoin_balance
                         $remark2 = "推荐分红2代";
-                        $logService->userLog(User::BALANCE_FILECOIN, $parent2_uid, $coin_parent2, $parent1_uid, $day, UserWalletLog::FROM_COMMISSION, $remark2, 0, 0, 0, Order::TYPE_CLOUD);
-                        // $UserWalletService
+                        $logService->userLog($parent2_uid, $product->wallet_type_id, $coin_parent2, $parent1_uid, $day, UserWalletLog::FROM_COMMISSION, $remark2);
                     }
                 }
 
@@ -155,9 +154,9 @@ class AutoDayBonus implements ShouldQueue
                 $team_c = number_fixed($coins * $product->bonus_team_c / 100, 5); // 分红池C
 
                 $coin_risk = number_fixed($risk - $team_a - $team_b - $team_c); // 风控池实际金额 = 风控池 - 分红池A - 分红池B - 分红池C
-                // TODO
+                // 系统钱包记录需要单独写 TODO
                 $remark_system = "每日分红";
-                $logService->CloudSystemLog($this->product_id, $risk, $team_a, $team_b, $team_c, $commission_balance, $day, $v->user_id, $remark_system);
+                $logService->SystemLog($product->wallet_type_id, $team_a, $team_b, $team_c, $risk, $commission_balance, $day, $v->user_id, $remark_system);
 
                 // 个人收益
                 $pay_user_rate = $product->pay_user_rate; // 每日收益比例
@@ -218,7 +217,7 @@ class AutoDayBonus implements ShouldQueue
                             }
                             //添加到用户余额 + 记录日志 filecoin_balance TODO
                             $remark_freed = "每日线性释放(O)第" . $already_day . "天,释放" . $value->coin_freed_day;
-                            $logService->userLog(User::BALANCE_FILECOIN, $v->user_id, $value->coin_freed_day, 0, $value->day, UserWalletLog::FROM_FREED75, $remark_freed, 0, $value->id, 0, Order::TYPE_CLOUD);
+                            $logService->userLog($v->user_id, $product->wallet_type_id, $value->coin_freed_day, 0, $value->day, UserWalletLog::FROM_FREED75, $remark_freed);
                         }
                     }
                 }
@@ -230,7 +229,7 @@ class AutoDayBonus implements ShouldQueue
                 // 用户每日分成 ;
                 $user_bonuses = UserBonus::create([
                     'day' => $day,
-                    'bonus_id' => $bonus->id,
+                    'day_bonus_id' => $bonus->id,
                     'user_id' => $v->user_id,
                     'product_id' => $this->product_id,
                     'bonus_coin_add' => $bonus->coin_add,
@@ -262,8 +261,7 @@ class AutoDayBonus implements ShouldQueue
 
                 // 线性释放金额记录到用户日志 TODO
                 $remark_day = "用户每日新增可用资产" . $coin_now;
-                $logService->userLog(User::BALANCE_FILECOIN, $v->user_id, $coin_now, 0, $day, UserWalletLog::FROM_FREED, $remark_day, $user_bonuses->id, 0, 0, Order::TYPE_CLOUD);
-
+                $logService->userLog($v->user_id, $product->wallet_type_id, $coin_now, 0, $day, UserWalletLog::FROM_FREED, $remark_day);
                 // 如果 线性释放比例大于 0
                 if ($freed_rate > 0) {
                     // 线性释放列表
@@ -293,13 +291,14 @@ class AutoDayBonus implements ShouldQueue
                         'today' => 1,
                     ]);
                     $remark_freed_first = "每日线性释放(F)第1天,释放" . $coin_freed_day;
-                    $logService->userLog(User::BALANCE_FILECOIN, $v->user_id, $coin_freed_day, 0, $day, UserWalletLog::FROM_FREED75, $remark_freed_first, 0, $freeds->id, 0, Order::TYPE_CLOUD);
+                    $logService->userLog($v->user_id, $product->wallet_type_id, $coin_freed_day, 0, $day, UserWalletLog::FROM_FREED75, $remark_freed_first);
                 }
             }
             // 标记云算力分红为已执行
             $bonus->update(['status' => 1]);
         } catch (\Exception $e) {
-            Log::error(__METHOD__ . '|' . __METHOD__ . '执行失败', ['day' => $day, 'error' => $e->getMessage()]);
+//            Log::error(__METHOD__ . '|' . __METHOD__ . '执行失败', ['day' => $day, 'error' => $e->getMessage()]);
+            Log::error(__METHOD__ . '|' . __METHOD__ . '执行失败', ['day' => $day, 'error' => $e]);
         }
     }
 }

@@ -3,9 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\OrderResource;
+use App\Models\DayBonus;
+use App\Models\DayReward;
+use App\Models\Freed;
+use App\Models\Pledge;
 use App\Models\Product;
+use App\Models\Reward;
 use App\Models\User;
 use App\Models\UserBonus;
+use App\Models\UserWalletLog;
 use App\Models\WalletType;
 use Bavix\Wallet\Interfaces\Mathable;
 use Bavix\Wallet\Models\Transaction;
@@ -146,6 +152,8 @@ class UserController extends Controller
 //            return response()->json($data, 404);
 //        }
 
+        $system = DayBonus::find($bonus->day_bonus_id);
+
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
         $balance = $wallet->balanceFloat; // 钱包余额
@@ -156,18 +164,19 @@ class UserController extends Controller
             ->whereDate('created_at', '=', Carbon::yesterday())
 //            ->whereDate('created_at', '=', '2021-05-08')
             ->sum('amount');
-        $math = app(Mathable::class);
-        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
-        $yesterday_add = $math->div($yesterday_add, $decimalPlaces);
-        echo $yesterday_add;
-        exit();
+        if ($yesterday_add <= 0) {
+            $yesterday_add = 0;
+        } else {
+            $math = app(Mathable::class);
+            $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
+            $yesterday_add = $math->div($yesterday_add, $decimalPlaces);
+        }
 
-
-        $system = CloudBonus::findOrFail($bonus->bonus_id);
 
         $wait_reward = 0;
         $total_reward = 0;
-        $my_recharge_pledge = 0;
+        $my_pledge = 0;
+        $pledge_day = 0;
 
         // 查询奖励币
         $reward = Reward::where('user_id', '=', auth('api')->id())
@@ -185,53 +194,48 @@ class UserController extends Controller
             ->sum('coin');
 
         // 75% 未释放 总计
-        $coin_unfreed_day = Freed::where('user_id', '=', auth('api')->id())->sum('wait_coin');
+        $coin_unfreed_day = Freed::where('user_id', '=', auth('api')->id())
+            ->where('product_id', $product->id)
+            ->sum('wait_coin');
 
         // 质押币
-        $system_pledge_days = config('system.pledge_day'); // 释放天数
-        $now = Carbon::now();
-        // 自己的质押币 TODO
-        $my_recharge_pledge = CloudWalletLog::where('from_user_id', '=', auth('api')->id())
-            ->where('type', '=', 2)
-            ->sum('pledge_coin_add');
-        // 重置倒计时 TODO
-        $my_date = CloudWalletLog::where('from_user_id', '=', auth('api')->id())
-            ->where('type', '=', 2)
-            ->orderBy('id', 'desc')
+        $pledge = Pledge::where('user_id', '=', auth('api')->id())
+            ->where('product_id', $product->id)
             ->first();
-        if ($my_date) {
-            $created_at = $my_date->created_at;
+        $now = Carbon::now();
+        if ($pledge) {
+            $my_pledge = $pledge->coins;// 自己的质押币数量
+            // 倒计时天数
+            $created_at = $pledge->created_at;
             $check_day = $created_at->diffInDays($now); // 已经过去天数
-            $pledge_day = $system_pledge_days - $check_day;
+            $pledge_day = $pledge->pledge_days - $check_day;
             if ($pledge_day <= 0) {
                 $pledge_day = 0;
             }
-        } else {
-            $pledge_day = 0;
         }
 
-        $filecoin_total = UserBonus::where('user_id', '=', auth('api')->id())->sum('coin'); // FIL币累计产出
+        $coins_total = UserBonus::where('user_id', '=', auth('api')->id())
+            ->where('product_id', $product->id)
+            ->sum('coins'); // 累计产出
 
         $data = [
-            'filecoin_balance' => $user->filecoin_balance, //  可提币账户
-            'total' => (string)($user->filecoin_total), // 累计总资产 = FIL币累计获得
-            'yesterday_coin' => $bonus->coin_day, // 昨日增加
+            'coin_balance' => $balance, //  可提币账户
+            'yesterday_coin' => $yesterday_add, // 昨日增加
             'day_reward' => $day_reward, // 奖励币当日释放
             'wait_reward' => $wait_reward, // 奖励币未释放
             'coin_freed_day' => (string)($bonus->coin_freed_day + $bonus->coin_freed_other), // 当日 75 % 已释放总量
             'coin_unfreed_day' => (string)$coin_unfreed_day, //  75 % 未释放累计
-            'coin_rate_day' => (string)$bonus->coin_rate_day, // 当日 25 % 释放数量
-            'pledge_coin' => $my_recharge_pledge, // 质押币
+            'coin_rate_day' => (string)$bonus->coin_now, // 当日 25 % 释放数量
+            'pledge_coin' => $my_pledge, // 质押币
             'pledge_day' => $pledge_day, // 质押剩余天数
             'cost' => $system->efficiency - $system->cost, // GAS消耗  = 挖矿效率 - 挖矿成本
-            'filecoin_total' => $filecoin_total, // FIL币累计产出
-            'filecoin_type_id' => 1,
+            'coins_total' => $coins_total, // 累计产出
+            'coin_type_id' => $request->wallet_type_id,
             'reward_from_id' => UserWalletLog::FROM_REWARD, // 奖励币明细 from
             'freed75_from_id' => UserWalletLog::FROM_FREED75, // 75%明细 from
             'freed25_from_id' => UserWalletLog::FROM_FREED, // 25%明细 from
             'pledge_from_id' => UserWalletLog::FROM_PLEDGE, // 质押币 明细
-            'borrow_from_id' => UserWalletLog::FROM_BORROW, // GAS消耗明细
-            'balance_xch' => $user->balance_xch, //  XCH 可提币账户
+//            'gas_from_id' => UserWalletLog::FROM_BORROW,
         ];
 
         return $data;

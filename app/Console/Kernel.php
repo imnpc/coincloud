@@ -30,9 +30,9 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
 
         // 服务器
-        $schedule->job(new AutoCreateDayBonus)->dailyAt('0:02'); // 每天自动创建分红记录
-        $schedule->job(new ChangeOrderWaitStatus)->dailyAt('1:00'); // 更改订单等待状态
-        $schedule->job(new AutoProductBonus)->dailyAt('0:05'); // 产品自动分红
+        $schedule->job(new AutoCreateDayBonus)->dailyAt('0:01'); // 每天自动创建分红记录 0:01
+        $schedule->job(new ChangeOrderWaitStatus)->dailyAt('0:30'); // 更改订单等待状态 0:30
+        $schedule->job(new AutoProductBonus)->dailyAt('15:42'); // 产品自动分红 0:05
         // PowerBonusDaily
     }
 

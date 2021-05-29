@@ -16,7 +16,7 @@ class CreateUserBonusesTable extends Migration
         Schema::create('user_bonuses', function (Blueprint $table) {
             $table->id();
             $table->date('day')->comment('日期');
-            $table->integer('bonus_id')->comment('每日分红 ID');
+            $table->integer('day_bonus_id')->comment('每日分红 ID');
             $table->integer('user_id')->comment('所属用户 ID');
             $table->integer('product_id')->comment('所属产品 ID');
             $table->decimal('bonus_coin_add', 16, 5)->comment('系统当日产币总数');

@@ -44,4 +44,9 @@ class DayBonus extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    // 关联 用户分红
+    public function userbonus()
+    {
+        return $this->hasMany(UserBonus::class);
+    }
 }

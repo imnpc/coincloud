@@ -53,4 +53,24 @@ class UserWalletService
             }
         }
     }
+
+    // 获得用户指定钱包余额
+    public function checkbalance(int $uid, $wallet_type_id)
+    {
+        $user = User::find($uid);
+        $this->checkWallet($uid); // 检测用户是否创建过钱包
+        $wallet_type = WalletType::find($wallet_type_id);
+        $name = $wallet_type->slug;
+        $wallet = $user->getWallet($name);
+        // 如果钱包带小数点
+        if ($wallet->decimal_places > 0) {
+            $decimal = 1;
+        }
+        if ($decimal == 1) {
+            return $wallet->balanceFloat;
+        } else {
+            return $wallet->balance;
+        }
+    }
+
 }

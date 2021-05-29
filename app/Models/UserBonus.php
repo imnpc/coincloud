@@ -19,7 +19,7 @@ class UserBonus extends Model
      * @var array
      */
     protected $fillable = [
-        'day', 'bonus_id', 'user_id', 'product_id', 'bonus_coin_add', 'valid_power', 'each_add', 'coins', 'pay_user_rate',
+        'day', 'day_bonus_id', 'user_id', 'product_id', 'bonus_coin_add', 'valid_power', 'each_add', 'coins', 'pay_user_rate',
         'coin_for_user', 'now_rate', 'coin_now', 'freed_rate', 'coin_freed', 'coin_freed_day', 'coin_freed_other', 'coin_day',
         'balance', 'parent1_uid', 'parent1_rate', 'coin_parent1', 'parent2_uid', 'parent2_rate', 'coin_parent2', 'bonus_rate',
         'coin_bonus', 'risk_rate', 'coin_risk', 'status',
@@ -51,6 +51,12 @@ class UserBonus extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    // 关联 每日分红
+    public function daybonus()
+    {
+        return $this->belongsTo(DayBonus::class);
     }
 
     // 关联 线性释放

@@ -39,6 +39,8 @@ Route::prefix('v1')
         Route::middleware('throttle:' . config('api.rate_limits.access'))
             ->group(function () {
                 // 游客可以访问的接口
+                Route::get('test', [IndexController::class, 'test']); // test
+
                 Route::resource('announcement', AnnouncementController::class); // 公告
                 Route::resource('article', ArticleController::class); // 文章系统
                 Route::get('index', [IndexController::class, 'index']); // APP 首页
