@@ -101,6 +101,29 @@ class UserController extends Controller
     {
         $user = $request->user();
 
+        $list = Product::where('status', '=', 0)
+            ->orderBy('id', 'asc')
+            ->get();
+        //print_r($list->toArray());
+        foreach ($list as $k => $v) {
+            //
+            $data[$k]['name'] = $v->wallet_slug;
+            $data[$k]['freed'] = Freed::where('user_id', '=', auth('api')->id())
+                ->where('product_id', $v->id)
+                ->sum('wait_coin');
+            $data[$k]['freed'] = Freed::where('user_id', '=', auth('api')->id())
+                ->where('product_id', $v->id)
+                ->sum('wait_coin');
+
+            $data[$k]['yesterday_revenue'] = $v->yesterday_revenue;
+            $data[$k]['yesterday_gas'] = $v->yesterday_gas;
+            $data[$k]['yesterday_efficiency'] = $v->yesterday_efficiency;
+            $data[$k]['total_revenue_text'] = $v->total_revenue_text;
+            $data[$k]['yesterday_revenue_text'] = $v->yesterday_revenue_text;
+            $data[$k]['yesterday_gas_text'] = $v->yesterday_gas_text;
+            $data[$k]['yesterday_efficiency_text'] = $v->yesterday_efficiency_text;
+        }
+
         $data = [
             'total_power' => $user->cloud_power, // 总存储空间
             'wait_power' => 0, // 等待期算力
