@@ -56,7 +56,7 @@ Route::prefix('v1')
                     Route::get('user', [UserController::class, 'me']); // 当前登录用户信息
 
                     Route::get('my', [UserController::class, 'my']); // 我的
-                    Route::get('team', 'UserController@team'); // 我的团队
+                    Route::get('team', [UserController::class, 'team']); // 我的团队
                     Route::post('avatar', [UserController::class, 'avatar']); // 修改用户头像
                     Route::post('verify', [UserController::class, 'verify']); // 用户实名认证
                     Route::post('reset', [UserController::class, 'resetPassword']); // 重设密码

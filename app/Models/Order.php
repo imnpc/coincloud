@@ -104,11 +104,7 @@ class Order extends Model
     // 返回支付状态文本
     public function getPaidTextAttribute()
     {
-        if ($this->product_id < 3) {
-            return '已完成';
-        } else {
-            return self::$paidMap[$this->pay_status];
-        }
+        return self::$paidMap[$this->pay_status];
     }
 
     // 关联 用户
