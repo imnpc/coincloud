@@ -297,12 +297,12 @@ class OrderController extends Controller
 
         // 获取产品信息
         $product = Product::find($request->product_id);
-
         $data['price'] = $product->price * $request->number;
         $data['price_usdt'] = $product->price_usdt * $request->number;
         $data['price_coin'] = $product->price_coin * $request->number;
         $data['number'] = $request->number;
         $data['product_id'] = $request->product_id;
+        $data['price_coin_type'] = $product->wallet_slug;
 
         return $data;
     }

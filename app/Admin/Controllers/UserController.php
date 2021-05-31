@@ -140,7 +140,7 @@ class UserController extends AdminController
         }
         if ($form->isCreating()) {
             $form->mobile('mobile', __('Mobile'))->required();
-            $form->password('password', __('Password'))->default('123456789')->required()->help('默认密码 123456789');
+            $form->password('password', __('Password'))->default('123456')->required()->help('默认密码 123456');
         }
 
         $form->select('parent_id', __('Parent id'))->options(function ($id) {
