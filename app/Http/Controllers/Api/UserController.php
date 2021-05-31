@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\UserWalletLogResource;
 use App\Models\DayBonus;
 use App\Models\DayReward;
 use App\Models\Freed;
@@ -126,7 +127,7 @@ class UserController extends Controller
                 ->where('product_id', $v->id)
                 ->where('pay_status', 0)
                 ->where('status', 0)
-                ->sum('max_valid_power'); // 全部算力
+                ->sum('number'); // 全部算力
             $data[$k]['yesterday_add'] = $UserWalletService->yesterday($user->id, $v->wallet_type_id); // 昨日收益
             $data[$k]['total_revenue'] = $UserWalletService->total($user->id, $v->wallet_type_id); // 累计收益
             // 全网统计
@@ -134,6 +135,9 @@ class UserController extends Controller
             $data[$k]['network_average_revenue'] = $v->network_average_revenue; // 24小时平均挖矿收益
             $data[$k]['network_valid_power'] = $v->network_valid_power; // 全网有效算力
             $data[$k]['network_basic_rate'] = $v->network_basic_rate; // 当前基础费率
+            $list[$k]['wallet_type_id'] = $v->wallet_type_id;
+            $list[$k]['freed_from_id'] = UserWalletLog::FROM_FREED;
+            $list[$k]['unfreed_from_id'] = UserWalletLog::FROM_FREED75;
         }
 
         return $data;
@@ -267,7 +271,7 @@ class UserController extends Controller
             ->defaultSort('-created_at')
             ->with('product')
             ->where('user_id', '=', auth('api')->id())
-            ->select('id', 'product_id', 'order_sn', 'power', 'pay_money')
+            ->select('id', 'product_id', 'order_sn', 'number', 'pay_money')
             ->paginate();
         foreach ($orders as $key => $value) {
             $orders[$key]['product_name'] = $value->product['name'];
@@ -289,12 +293,12 @@ class UserController extends Controller
 
         $logs = QueryBuilder::for(UserWalletLog::class)
             ->allowedFilters([
-                AllowedFilter::exact('type'),// 类型 0-现金 1-FIL币 2-抵押的FIL币 3-奖励币 4-股东分红 5-冻结的FIL币 6-收入的FIL币 7-冻结的奖励币 8-推荐分红
-                AllowedFilter::exact('from'),// 来源 0-正常 1-推荐 2-股东分红 3-转入 4-转出 5-线性释放 6-每日分红 7-奖励币 8-提币 9-提现 10-借币 11-75% 线性释放 12-质押币
+                AllowedFilter::exact('wallet_type_id'), // 钱包类型 ID
+                AllowedFilter::exact('from'),// 来源
             ])
             ->defaultSort('-id')
             ->where('user_id', '=', auth('api')->id())
-            ->select('id', 'type', 'from', 'day', 'add', 'remark', 'created_at')
+            ->select('id', 'wallet_type_id', 'from', 'day', 'add', 'remark', 'created_at')
             ->paginate();
 
         return UserWalletLogResource::collection($logs);
@@ -402,28 +406,6 @@ class UserController extends Controller
     {
         $user = $request->user();
         $data = [];
-        $commission = '0';
-        $dividends = '0';
-        $cash = '0';
-        //cloud_power_affiliate1
-        $data['cloud_power_affiliate1'] = $user->cloud_power_affiliate1;
-        $data['cloud_power_affiliate2'] = $user->cloud_power_affiliate2;
-        // 佣金 commission
-        $commission = $user->cloud_power_reward;
-        $data['commission'] = $commission;
-        // 股东分红 dividends
-        $dividends = UserWalletLog::where('user_id', '=', auth('api')->id())
-            ->where('type', '=', User::BALANCE_FILECOIN)
-            ->where('from', '=', UserWalletLog::FROM_TEAM_DIVIDENDS)
-            ->sum('add');
-        $data['dividends'] = $dividends;
-        // 奖励产币
-        $cash = UserWalletLog::where('user_id', '=', auth('api')->id())
-            ->where('type', '=', User::BALANCE_FILECOIN)
-            ->where('from', '=', UserWalletLog::FROM_REWARD_DAY)
-            ->sum('add');
-        $data['cash'] = $cash;
-        // 我的账户  下级下单记录
         // 查询我的下级
         $parent = User::with('sons')
             ->find(auth('api')->id())
@@ -434,44 +416,52 @@ class UserController extends Controller
             $users_son1[] = $value['id'];
         }
         $users1 = array_values($users_son1);
-        $orders1_total = 0;
-        $orders2_total = 0;
 
-        // 查询 1 级订单
-        $orders1 = QueryBuilder::for(Order::class)
-            ->defaultSort('-created_at')
-            ->with('user')
-            ->whereIn('user_id', $users1)
-            ->where('product_id', '=', 3)
-            ->where('pay_status', '=', Order::PAID_COMPLETE)
-            ->select('id', 'user_id', 'power', 'product_id', 'pay_status', 'created_at')
+        $data = Product::where('status', '=', 0)
+            ->orderBy('id', 'asc')
             ->get();
-        foreach ($orders1 as $key => $value) {
-            $orders1[$key]['username'] = $value->user['nickname'];
-            $orders1_total += $value['power'];
-            unset($value->user);
+        foreach ($data as $k => $v) {
+            $orders1_total = 0;
+            $list[$k]['name'] = $v->name;
+            $list[$k]['wallet_slug'] = $v->wallet_slug;
+            // 奖励算力 TODO
+            $list[$k]['reward_power'] = 0;
+            // 分红账户
+            $bonus = UserWalletLog::where('user_id', '=', $user->id)
+                ->where('wallet_type_id', '=', $v->wallet_type_id)
+                ->where('from', '=', UserWalletLog::FROM_TEAM_DIVIDENDS)
+                ->sum('add');
+            $list[$k]['bonus'] = $bonus;
+            // 奖励产币
+            $reward = UserWalletLog::where('user_id', '=', $user->id)
+                ->where('wallet_type_id', '=', $v->wallet_type_id)
+                ->where('from', '=', UserWalletLog::FROM_COMMISSION)
+                ->sum('add');
+            $list[$k]['reward'] = $reward;
+            // 查询 1 级订单
+            $orders1 = QueryBuilder::for(Order::class)
+                ->defaultSort('-created_at')
+                ->with('user')
+                ->whereIn('user_id', $users1)
+                ->where('product_id', '=', $v->id)
+                ->where('pay_status', '=', Order::PAID_COMPLETE)
+                ->select('id', 'user_id', 'max_valid_power', 'product_id', 'pay_status', 'created_at')
+                ->get();
+            foreach ($orders1 as $key => $value) {
+                $orders1[$key]['username'] = $value->user['nickname'];
+                $orders1[$key]['order_time'] = $value->created_at->format('Y-m-d');
+                $orders1_total += $value['max_valid_power'];
+                unset($value->user);
+            }
+            $list[$k]['orders_list'] = $orders1;
+//            $list[$k]['orders1_total'] = $orders1_total;
+            $list[$k]['wallet_type_id'] = $v->wallet_type_id;
+            $list[$k]['reward_power_from_id'] = 0;
+            $list[$k]['bonus_from_id'] = UserWalletLog::FROM_TEAM_DIVIDENDS;
+            $list[$k]['reward_from_id'] = UserWalletLog::FROM_COMMISSION;
         }
 
-        $orders2 = QueryBuilder::for(Order::class)
-            ->defaultSort('-created_at')
-            ->with('user')
-            ->whereIn('user_id', $users1)
-            ->where('product_id', '=', 4)
-            ->where('pay_status', '=', Order::PAID_COMPLETE)
-            ->select('id', 'user_id', 'power', 'product_id', 'pay_status', 'created_at')
-            ->get();
-        foreach ($orders2 as $key => $value) {
-            $orders2[$key]['username'] = $value->user['nickname'];
-            $orders2_total += $value['power'];
-            unset($value->user);
-        }
-
-        $data['orders1_total'] = $orders1_total;
-        $data['orders_level1'] = $orders1;
-        $data['orders2_total'] = $orders2_total;
-        $data['orders_level2'] = $orders2;
-
-        return $data;
+        return $list;
     }
 
     // 上传和修改头像

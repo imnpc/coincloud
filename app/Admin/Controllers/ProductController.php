@@ -203,7 +203,10 @@ class ProductController extends AdminController
         $form->text('yesterday_revenue_text', __('Yesterday revenue text'))->default('昨日产量');
         $form->text('yesterday_gas_text', __('Yesterday gas text'))->default('昨日消耗GAS');
         $form->text('yesterday_efficiency_text', __('Yesterday efficiency text'))->default('昨日挖矿效率');
-
+        $form->decimal('network_revenue', __('Network revenue'))->default(0.00000);
+        $form->decimal('network_average_revenue', __('Network average revenue'))->default(0.00000);
+        $form->decimal('network_valid_power', __('Network valid power'))->default(0.00000);
+        $form->decimal('network_basic_rate', __('Network basic rate'))->default(0.00000);
         $form->image('thumb', __('Thumb'))->required();
 //        $form->textarea('desc', __('Desc'));
         $form->editor('content', __('Content'))->required();

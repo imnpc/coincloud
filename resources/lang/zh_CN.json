@@ -221,5 +221,10 @@
     "Total revenue text": "矿池总产量-文字",
     "Yesterday revenue text": "昨日产量-文字",
     "Yesterday gas text": "昨日消耗GAS-文字",
-    "Yesterday efficiency text": "昨日挖矿效率-文字"
+    "Yesterday efficiency text": "昨日挖矿效率-文字",
+    "Network revenue": "全网24小时产出",
+    "Network average revenue": "24小时平均挖矿收益",
+    "Network valid power": "全网有效算力",
+    "Network basic rate": "当前基础费率"
 }
+

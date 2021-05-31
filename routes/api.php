@@ -63,9 +63,9 @@ Route::prefix('v1')
                     Route::get('invite', [UserController::class, 'invite']); // 邀请码
 
                     Route::get('mypower', [UserController::class, 'mypower']); // 算力管理
-                    Route::get('myorder', 'UserController@myorder'); // 我的订单
+                    Route::get('myorder', [UserController::class, 'myorder']); // 我的订单
                     Route::get('account', [UserController::class, 'account']); // 我的资产
-                    Route::get('walletlog', 'UserController@walletLog'); // 我的资产流水
+                    Route::get('walletlog', [UserController::class, 'walletLog']); // 我的资产流水
                     Route::get('rewardwalletlog', 'UserController@RewardwalletLog'); // 奖励算力资产流水
 
                     Route::resource('withdraw', WithdrawController::class); // 提币
