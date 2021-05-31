@@ -62,7 +62,7 @@ Route::prefix('v1')
                     Route::post('reset', [UserController::class, 'resetPassword']); // 重设密码
                     Route::get('invite', [UserController::class, 'invite']); // 邀请码
 
-                    Route::get('mypower', 'UserController@mypower'); // 算力管理
+                    Route::get('mypower', [UserController::class, 'mypower']); // 算力管理
                     Route::get('myorder', 'UserController@myorder'); // 我的订单
                     Route::get('account', [UserController::class, 'account']); // 我的资产
                     Route::get('walletlog', 'UserController@walletLog'); // 我的资产流水

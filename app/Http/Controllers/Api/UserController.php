@@ -6,6 +6,7 @@ use App\Http\Resources\OrderResource;
 use App\Models\DayBonus;
 use App\Models\DayReward;
 use App\Models\Freed;
+use App\Models\Order;
 use App\Models\Pledge;
 use App\Models\Product;
 use App\Models\Reward;
@@ -13,6 +14,7 @@ use App\Models\User;
 use App\Models\UserBonus;
 use App\Models\UserWalletLog;
 use App\Models\WalletType;
+use App\Services\UserWalletService;
 use Bavix\Wallet\Interfaces\Mathable;
 use Bavix\Wallet\Models\Transaction;
 use Bavix\Wallet\Services\WalletService;
@@ -100,41 +102,39 @@ class UserController extends Controller
     public function mypower(Request $request)
     {
         $user = $request->user();
+        $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
 
         $list = Product::where('status', '=', 0)
             ->orderBy('id', 'asc')
             ->get();
-        //print_r($list->toArray());
         foreach ($list as $k => $v) {
-            //
             $data[$k]['name'] = $v->wallet_slug;
-            $data[$k]['freed'] = Freed::where('user_id', '=', auth('api')->id())
+            // 收益信息
+            $data[$k]['freed'] = UserBonus::where('user_id', '=', $user->id)
                 ->where('product_id', $v->id)
-                ->sum('wait_coin');
-            $data[$k]['freed'] = Freed::where('user_id', '=', auth('api')->id())
+                ->sum('coin_day'); // 已到账  = 25% 立即释放 + 已经线性释放
+            $data[$k]['unfreed'] = Freed::where('user_id', '=', $user->id)
                 ->where('product_id', $v->id)
-                ->sum('wait_coin');
-
-            $data[$k]['yesterday_revenue'] = $v->yesterday_revenue;
-            $data[$k]['yesterday_gas'] = $v->yesterday_gas;
-            $data[$k]['yesterday_efficiency'] = $v->yesterday_efficiency;
-            $data[$k]['total_revenue_text'] = $v->total_revenue_text;
-            $data[$k]['yesterday_revenue_text'] = $v->yesterday_revenue_text;
-            $data[$k]['yesterday_gas_text'] = $v->yesterday_gas_text;
-            $data[$k]['yesterday_efficiency_text'] = $v->yesterday_efficiency_text;
+                ->sum('wait_coin'); // 等待到账的 180天 线性释放的
+            // 挖矿数据
+            $data[$k]['vaild_power'] = Order::where('user_id', '=', $user->id)
+                ->where('product_id', $v->id)
+                ->where('pay_status', 0)
+                ->where('status', 0)
+                ->sum('valid_power'); // 有效算力
+            $data[$k]['max_valid_power'] = Order::where('user_id', '=', $user->id)
+                ->where('product_id', $v->id)
+                ->where('pay_status', 0)
+                ->where('status', 0)
+                ->sum('max_valid_power'); // 全部算力
+            $data[$k]['yesterday_add'] = $UserWalletService->yesterday($user->id, $v->wallet_type_id); // 昨日收益
+            $data[$k]['total_revenue'] = $UserWalletService->total($user->id, $v->wallet_type_id); // 累计收益
+            // 全网统计
+            $data[$k]['network_revenue'] = $v->network_revenue; // 全网24小时产出
+            $data[$k]['network_average_revenue'] = $v->network_average_revenue; // 24小时平均挖矿收益
+            $data[$k]['network_valid_power'] = $v->network_valid_power; // 全网有效算力
+            $data[$k]['network_basic_rate'] = $v->network_basic_rate; // 当前基础费率
         }
-
-        $data = [
-            'total_power' => $user->cloud_power, // 总存储空间
-            'wait_power' => 0, // 等待期算力
-            'max_power' => $user->cloud_valid_power, // 上限有效算力
-            'valid_power' => $user->cloud_valid_power, // 目前有效算力
-            'progress' => @number_fixed($user->cloud_valid_power / $user->cloud_power * 100, 2), // 进度
-            'chia_total_power' => $user->chia_power, // 起亚算力
-            'chia_wait_power' => 0, // 起亚算力
-            'chia_max_power' => $user->chia_power, // 上限有效算力
-            'chia_valid_power' => $user->chia_power, // 目前有效算力
-        ];
 
         return $data;
     }
@@ -148,10 +148,12 @@ class UserController extends Controller
     {
         // wallet_type_id
         $user = $request->user();
+        $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
         $day = Carbon::now()->subDay()->toDateString();// 获得前一天日期
 
         // wallet_type_id 钱包类型/slug/获取对应钱包 TODO
         $wallet_type = WalletType::find($request->wallet_type_id);
+
         if (empty($wallet_type) || $wallet_type->is_enblened = 0) {
             $data['message'] = "不支持该类型！";
             return response()->json($data, 403);
@@ -182,19 +184,7 @@ class UserController extends Controller
         $balance = $wallet->balanceFloat; // 钱包余额
         //echo $balance;
         // 昨日增加
-        $yesterday_add = $wallet->transactions()
-            ->where('type', '=', Transaction::TYPE_DEPOSIT)
-            ->whereDate('created_at', '=', Carbon::yesterday())
-//            ->whereDate('created_at', '=', '2021-05-08')
-            ->sum('amount');
-        if ($yesterday_add <= 0) {
-            $yesterday_add = 0;
-        } else {
-            $math = app(Mathable::class);
-            $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
-            $yesterday_add = $math->div($yesterday_add, $decimalPlaces);
-        }
-
+        $yesterday_add = $UserWalletService->yesterday($user->id, $request->wallet_type_id);
 
         $wait_reward = 0;
         $total_reward = 0;

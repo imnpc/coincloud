@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\WalletType;
+use Bavix\Wallet\Interfaces\Mathable;
+use Bavix\Wallet\Models\Transaction;
+use Bavix\Wallet\Services\WalletService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -70,6 +73,54 @@ class UserWalletService
             return $wallet->balanceFloat;
         } else {
             return $wallet->balance;
+        }
+    }
+
+    // 获得用户指定钱包余额
+    public function yesterday(int $uid, $wallet_type_id)
+    {
+        $user = User::find($uid);
+        $this->checkWallet($uid); // 检测用户是否创建过钱包
+        $wallet_type = WalletType::find($wallet_type_id);
+        $name = $wallet_type->slug;
+        $wallet = $user->getWallet($name);
+
+        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
+        $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
+
+        // 昨日增加
+        $data = $wallet->transactions()
+            ->where('type', '=', Transaction::TYPE_DEPOSIT)
+            ->where('wallet_id', '=', $wallet->id)
+            ->whereDate('created_at', '=', Carbon::yesterday())
+//            ->whereDate('created_at', '=', '2021-05-08')
+            ->sum('amount');
+        if ($data <= 0) {
+            return 0;
+        } else {
+            return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+        }
+    }
+
+    public function total(int $uid, $wallet_type_id)
+    {
+        $user = User::find($uid);
+        $this->checkWallet($uid); // 检测用户是否创建过钱包
+        $wallet_type = WalletType::find($wallet_type_id);
+        $name = $wallet_type->slug;
+        $wallet = $user->getWallet($name);
+
+        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
+        $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
+
+        $data = $wallet->transactions()
+            ->where('type', '=', Transaction::TYPE_DEPOSIT)
+            ->where('wallet_id', '=', $wallet->id)
+            ->sum('amount');
+        if ($data <= 0) {
+            return 0;
+        } else {
+            return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
         }
     }
 

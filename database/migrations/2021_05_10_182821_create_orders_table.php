@@ -25,8 +25,8 @@ class CreateOrdersTable extends Migration
             $table->tinyInteger('wait_status')->default(0)->comment('等待状态 0-已生效 1-等待中');
             $table->integer('valid_days')->default(0)->comment('有效天数');
             $table->decimal('valid_rate', 8, 2)->default(0.00)->comment('有效T数比例');
-            $table->decimal('valid_power', 16, 2)->comment('当前有效T数');
-            $table->decimal('max_valid_power', 16, 2)->comment('最大有效T数');
+            $table->decimal('valid_power', 32, 5)->comment('当前有效T数');
+            $table->decimal('max_valid_power', 32, 5)->comment('最大有效T数');
             $table->decimal('package_rate', 8, 2)->default(0.00)->comment('封装比例');
             $table->decimal('package_already', 32, 5)->comment('已封装数量');
             $table->decimal('package_wait', 32, 5)->comment('等待封装数量');
