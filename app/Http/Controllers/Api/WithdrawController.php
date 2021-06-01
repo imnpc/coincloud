@@ -10,6 +10,7 @@ use App\Models\Withdraw;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class WithdrawController extends Controller
@@ -24,6 +25,9 @@ class WithdrawController extends Controller
         AnonymousResourceCollection::wrap('list');// 资源列表默认返回 data 更换为 list
 
         $logs = QueryBuilder::for(Withdraw::class)
+            ->allowedFilters([
+                AllowedFilter::exact('wallet_type_id'), // 钱包类型 ID
+            ])
             ->defaultSort('-created_at')
             ->where('user_id', '=', auth('api')->id())
             ->select('id', 'wallet_type_id', 'coin', 'status', 'reason', 'created_at')
