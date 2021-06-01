@@ -110,6 +110,7 @@ class UserController extends Controller
             ->get();
         foreach ($list as $k => $v) {
             $data[$k]['name'] = $v->wallet_slug;
+            $data[$k]['wallet_type_id'] = $v->wallet_type_id;
             // 收益信息
             $data[$k]['freed'] = UserBonus::where('user_id', '=', $user->id)
                 ->where('product_id', $v->id)
