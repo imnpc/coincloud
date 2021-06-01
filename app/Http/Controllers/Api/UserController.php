@@ -110,7 +110,6 @@ class UserController extends Controller
             ->get();
         foreach ($list as $k => $v) {
             $data[$k]['name'] = $v->wallet_slug;
-            $data[$k]['wallet_type_id'] = $v->wallet_type_id;
             // 收益信息
             $data[$k]['freed'] = UserBonus::where('user_id', '=', $user->id)
                 ->where('product_id', $v->id)
@@ -136,9 +135,9 @@ class UserController extends Controller
             $data[$k]['network_average_revenue'] = $v->network_average_revenue; // 24小时平均挖矿收益
             $data[$k]['network_valid_power'] = $v->network_valid_power; // 全网有效算力
             $data[$k]['network_basic_rate'] = $v->network_basic_rate; // 当前基础费率
-            $list[$k]['wallet_type_id'] = $v->wallet_type_id;
-            $list[$k]['freed_from_id'] = UserWalletLog::FROM_FREED;
-            $list[$k]['unfreed_from_id'] = UserWalletLog::FROM_FREED75;
+            $data[$k]['wallet_type_id'] = $v->wallet_type_id;
+            $data[$k]['freed_from_id'] = UserWalletLog::FROM_FREED;
+            $data[$k]['unfreed_from_id'] = UserWalletLog::FROM_FREED75;
         }
 
         return $data;
