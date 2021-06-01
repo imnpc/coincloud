@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Reward extends Model
+class RechargeAccountLog extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -19,8 +19,8 @@ class Reward extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'order_id', 'product_id', 'wallet_type_id', 'power', 'reward_base', 'coin_freed', 'coin_freed_day', 'days',
-        'already_day', 'already_coin', 'wait_coin', 'status',
+        'recharge_id', 'user_id', 'wallet_type_id', 'day', 'power', 'day_pledge', 'day_gas', 'pledge', 'gas', 'total',
+        'used', 'day_limit', 'remark',
     ];
 
     /**
@@ -42,27 +42,14 @@ class Reward extends Model
         }
     }
 
-    // 关联 用户
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // 关联 订单
-    public function order()
+    public function recharge()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Recharge::class);
     }
 
-    // 关联 奖励币每日线性释放记录
-    public function dayreward()
-    {
-        return $this->hasMany(DayReward::class);
-    }
-
-    // 关联 钱包类型
-    public function wallettype()
-    {
-        return $this->belongsTo(WalletType::class);
-    }
 }

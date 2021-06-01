@@ -31,4 +31,6 @@ Route::group([
     $router->resource('feedback', FeedbackController::class); // 问题反馈
     $router->resource('verify', VerifyController::class); // 实名认证
     $router->resource('withdraws', WithdrawController::class); // 提币
+    $router->resource('recharges', RechargeController::class); // 充币
+    $router->resource('recharge-account-logs', RechargeAccountLogController::class); // 充币封装记录
 });

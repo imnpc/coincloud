@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\IndexController;
+use App\Http\Controllers\Api\RechargeController;
 use App\Http\Controllers\Api\WithdrawController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -81,10 +82,9 @@ Route::prefix('v1')
                     Route::post('getprice', [OrderController::class, 'getprice']); // 获取价格列表
                     Route::patch('orders/{order}', [OrderController::class, 'update']); // 更新订单支付凭证
 
-                    Route::resource('recharge', 'RechargeController'); // 充值
-                    Route::get('myrecharge', 'RechargeController@my'); // 我的充值页面
+                    Route::resource('recharge', RechargeController::class); // 充值
+                    Route::get('myrecharge', [RechargeController::class, 'my']); // 我的充值页面
                     Route::get('powerlog', 'RechargeController@powerlog'); // 算力封装记录
-                    Route::get('companyborrow', 'RechargeController@companyBorrow'); // 公司代充记录
 
                     Route::resource('lend', 'LendController'); // 出借
                     Route::get('mylend', 'LendController@my'); // 我的出借页面

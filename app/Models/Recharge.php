@@ -14,6 +14,16 @@ class Recharge extends Model
     use SoftDeletes;
     use dateTrait;
 
+    // 支付类型 1-充值 2-账户转入
+    public const PAY_RECHARGE = 1;
+    public const PAY_TRANSFER = 2;
+    public const PAY_COMPANY = 3;
+    public static $paymentMap = [
+        self::PAY_RECHARGE => '充值',
+        self::PAY_TRANSFER => '账户转入',
+        self::PAY_COMPANY => '公司充值',
+    ];
+
     // 支付状态 0-未提交 1-审核中 2-已完成
     public const STATUS_CANCEL = -1; // 已取消
     public const STATUS_WAIT = 0; // 未提交
@@ -33,8 +43,9 @@ class Recharge extends Model
      * @var array
      */
     protected $fillable = [
-        'order_sn', 'user_id', 'wallet_type_id', 'coin', 'pay_type', 'pay_image', 'pay_time', 'confirm_time', 'pay_status',
-        'schedule', 'schedule_time', 'used_coin', 'is_return', 'return_coin', 'reason', 'canceled_time',
+        'order_sn', 'user_id', 'wallet_type_id', 'coin', 'used_coin', 'pledge', 'gas_fee', 'pay_type', 'pay_image', 'pay_time',
+        'confirm_time', 'pay_status', 'schedule', 'schedule_time', 'finished_time', 'is_return', 'return_coin', 'reason',
+        'remark', 'canceled_time',
     ];
 
     /**
@@ -43,7 +54,7 @@ class Recharge extends Model
      * @var array
      */
     protected $appends = [
-        'pay_image_url', 'pay_status_text',
+        'pay_image_url', 'pay_status_text', 'wallet_slug',
     ];
 
     /**
@@ -60,6 +71,15 @@ class Recharge extends Model
         'schedule_time',
     ];
 
+    // 获取钱包类型的名称
+    public function getWalletSlugAttribute()
+    {
+        if ($this->wallet_type_id > 0) {
+            return WalletType::find($this->wallet_type_id)->slug;
+        } else {
+            return '';
+        }
+    }
 
     public function getPayImageUrlAttribute()
     {
@@ -86,9 +106,9 @@ class Recharge extends Model
         return $this->hasMany(Recharge::class);
     }
 
-//    // 关联 用户充值封装记录
-//    public function rechargeaccountlog()
-//    {
-//        return $this->hasMany(RechargeAccountLog::class);
-//    }
+    // 关联 用户充值封装记录
+    public function rechargeaccountlog()
+    {
+        return $this->hasMany(RechargeAccountLog::class);
+    }
 }

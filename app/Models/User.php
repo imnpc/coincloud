@@ -140,6 +140,12 @@ class User extends Authenticatable implements Wallet, WalletFloat
         return $this->hasMany(UserWalletLog::class);
     }
 
+    // 关联 用户充值封装记录
+    public function rechargeaccountlog()
+    {
+        return $this->hasMany(RechargeAccountLog::class);
+    }
+
     // 用户总数
     public static function count()
     {
