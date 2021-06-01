@@ -10,9 +10,11 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Recharge;
 use App\Models\RechargeAccountLog;
+use App\Models\UserWalletLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Spatie\QueryBuilder\AllowedFilter;
 use Storage;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -28,6 +30,9 @@ class RechargeController extends Controller
         AnonymousResourceCollection::wrap('list');// 资源列表默认返回 data 更换为 list
 
         $logs = QueryBuilder::for(Recharge::class)
+            ->allowedFilters([
+                AllowedFilter::exact('wallet_type_id'), // 钱包类型 ID
+            ])
             ->defaultSort('-created_at')
             ->where('user_id', '=', auth('api')->id())
             ->select('id', 'order_sn', 'wallet_type_id', 'pay_type', 'coin', 'reason', 'pay_status', 'created_at')
@@ -159,6 +164,7 @@ class RechargeController extends Controller
             'max' => $max,
             'pledge_days' => $pledge_days,
             'list_num' => $list_num,
+            'wallet_slug' => $product->wallet_slug,
             //'day_limit' => $day_limit,
         ];
 
@@ -177,7 +183,7 @@ class RechargeController extends Controller
         $logs = QueryBuilder::for(RechargeAccountLog::class)
             ->defaultSort('-created_at')
             ->where('user_id', '=', auth('api')->id())
-            ->select('id', 'recharge_id', 'user_id', 'day', 'power', 'pledge', 'gas', 'total')
+            ->select('id', 'recharge_id', 'user_id', 'day', 'power', 'pledge', 'gas', 'total', 'wallet_type_id')
             ->paginate();
 
         foreach ($logs as $k => $v) {

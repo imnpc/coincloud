@@ -84,7 +84,7 @@ Route::prefix('v1')
 
                     Route::resource('recharge', RechargeController::class); // 充值
                     Route::get('myrecharge', [RechargeController::class, 'my']); // 我的充值页面
-                    Route::get('powerlog', 'RechargeController@powerlog'); // 算力封装记录
+                    Route::get('powerlog', [RechargeController::class, 'powerlog']); // 算力封装记录
 
                     Route::resource('lend', 'LendController'); // 出借
                     Route::get('mylend', 'LendController@my'); // 我的出借页面
