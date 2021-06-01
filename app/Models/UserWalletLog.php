@@ -97,6 +97,25 @@ class UserWalletLog extends Model
     protected $casts = [
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'wallet_slug',
+    ];
+
+    // 获取钱包类型的名称
+    public function getWalletSlugAttribute()
+    {
+        if ($this->wallet_type_id > 0) {
+            return WalletType::find($this->wallet_type_id)->slug;
+        } else {
+            return '';
+        }
+    }
+
     // 关联 用户
     public function user()
     {
