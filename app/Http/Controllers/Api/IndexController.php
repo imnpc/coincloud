@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Models\Article;
 use App\Models\ArticleCategory;
 use App\Models\DayBonus;
 use App\Models\DayFreed;
@@ -90,6 +91,12 @@ class IndexController extends Controller
 
         $data['product'] = $product;
 
+        return $data;
+    }
+
+    public function aboutus(Request $request)
+    {
+        $data = Article::where('article_category_id', '=', 7)->where('status', 1)->first();
         return $data;
     }
 
