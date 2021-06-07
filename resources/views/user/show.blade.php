@@ -48,11 +48,8 @@
                 </div>
               @endif
             @endforeach
-
               <img src="{{ $config['reg_qrcode'] }}" alt="{{ $user->name }}" class="gravatar"/>
-
-            <h2><a href="{{ $config['download_url'] }}">APP直接下载</a></h2>
-            <h4>请长按识别以上二维码 或者 点击上方 APP直接下载</h4>
+            <h2>点击右上角三个点,选择 在浏览器打开并下载</h2>
           </section>
         </div>
       </div>
