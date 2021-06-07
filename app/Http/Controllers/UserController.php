@@ -34,7 +34,6 @@ class UserController extends Controller
         if (empty($request->parent_id)) {
             session()->flash('error', '邀请码不正确');
         }
-echo \Hashids::encode(1);
 
         $parent_id = $request->parent_id;
 
