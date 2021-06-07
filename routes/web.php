@@ -28,6 +28,7 @@ Route::get('/users/register', [UserController::class, 'create']); // 注册表�
 Route::post('/users/store', [UserController::class, 'store'])->name('userregister'); // 注册动作
 Route::post("sendcode", [UserController::class, 'sendcode'])->name('sendcode');//发送验证码
 Route::get('/users/{user}', [UserController::class, 'show'])->name('user.show');
+Route::get('/download', [UserController::class, 'download'])->name('download');
 
 Route::get('/user/reg', [RegController::class, 'create']); // 注册表单
 Route::post("/users/regstore", [RegController::class, 'store'])->name('regstore');;//注册动作

@@ -85,7 +85,8 @@ class UserController extends Controller
             'parent_id' => $parent_id,
         ]);
         //session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
-        return redirect()->route('user.show', [$user]);
+//        return redirect()->route('user.show', [$user]);
+        return redirect()->route('download');
     }
 
     /**
@@ -100,7 +101,20 @@ class UserController extends Controller
         $config['reg_qrcode'] = Storage::disk('oss')->url(config('user.reg_qrcode'));
         $config['download_url'] = config('user.download_url');
 
-        return view('user.show', compact('user','config'));
+        return view('user.show', compact('user', 'config'));
+    }
+
+    /**
+     * 直接下载页面
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function download()
+    {
+        // 图片需要使用 OSS 来获取
+        $config['reg_qrcode'] = Storage::disk('oss')->url(config('user.reg_qrcode'));
+        $config['download_url'] = config('user.download_url');
+
+        return view('download', compact('config'));
     }
 
     /**
