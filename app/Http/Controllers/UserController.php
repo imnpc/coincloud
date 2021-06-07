@@ -114,7 +114,7 @@ class UserController extends Controller
         $config['reg_qrcode'] = Storage::disk('oss')->url(config('user.reg_qrcode'));
         $config['download_url'] = config('user.download_url');
 
-        return view('download', compact('config'));
+        return view('user.download', compact('config'));
     }
 
     /**
