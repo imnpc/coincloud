@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\UserBonus;
 use App\Models\UserWalletLog;
 use App\Models\WalletType;
+use App\Notifications\VerificationCode;
 use App\Services\UserWalletService;
 use Bavix\Wallet\Interfaces\Mathable;
 use Bavix\Wallet\Models\Transaction;
@@ -26,6 +27,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Leonis\Notifications\EasySms\Channels\EasySmsChannel;
+use Notification;
+use Overtrue\EasySms\PhoneNumber;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -559,7 +563,13 @@ class UserController extends Controller
         $data['code'] = $code;
         $data['url'] = $url;
 
-        $path = 'qrcode/' . $code . '.png'; // 二维码图片名称路径
+//        $path = 'qrcode/' . $code . '.png'; // 二维码图片名称路径
+        if (config('app.env') == 'local') {
+            $path = 'qrcode/dev/' . $code . '.png'; // 二维码图片名称路径 TODO
+        } else {
+            $path = 'qrcode/' . $code . '.png'; // 二维码图片名称路径
+        }
+
         $exists = Storage::disk('oss')->exists($path); // 查询文件是否存在
         if (!$exists) {
             // 不存在就生成并上传二维码图片

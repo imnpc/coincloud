@@ -52,6 +52,7 @@ Route::prefix('v1')
 //                Route::resource('product', ProductController::class); // 产品资源
                 Route::get('product', [ProductController::class, 'index']); // 产品列表
                 Route::get('product/{product}', [ProductController::class, 'show']); // 产品详情
+                Route::post('sms', [UserController::class, 'sms']); // 发送短信
 
                 // 登录后可以访问的接口
                 Route::middleware('auth:api')->group(function () {

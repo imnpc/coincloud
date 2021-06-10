@@ -7,6 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Leonis\Notifications\EasySms\Channels\EasySmsChannel;
 use Leonis\Notifications\EasySms\Messages\EasySmsMessage;
+use Illuminate\Support\Facades\Log;
+use Overtrue\EasySms\Message;
 
 class VerificationCode extends Notification implements ShouldQueue
 {
@@ -27,7 +29,7 @@ class VerificationCode extends Notification implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function via($notifiable)
@@ -38,20 +40,25 @@ class VerificationCode extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toEasySms($notifiable)
     {
-        return (new EasySmsMessage)
-            ->setTemplate(env('ALIYUN_SMS_TEMPLATE'))
-            ->setData(['code' => $this->code]);
+
+        try {
+            return (new EasySmsMessage)
+                ->setTemplate(config('easysms.aliyun_sms_template'))
+                ->setData(['code' => $this->code]);
+        } catch (\Exception $e) {
+            Log::error(__METHOD__ . '|' . __METHOD__ . '执行失败', ['error' => $e]);
+        }
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function toArray($notifiable)

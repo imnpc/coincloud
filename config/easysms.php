@@ -22,12 +22,13 @@ return [
             'errorlog',
         ],
     ],
+    'aliyun_sms_template' => env('ALIYUN_SMS_TEMPLATE'),
 
     // 可用的网关配置
     'gateways' => [
         // 失败日志
         'errorlog' => [
-            'channel' => 'daily',
+            'channel' => 'smslog',
         ],
 
         // 阿里云
