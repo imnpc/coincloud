@@ -24,10 +24,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Leonis\Notifications\EasySms\Channels\EasySmsChannel;
+use Mews\Captcha\Captcha;
 use Notification;
 use Overtrue\EasySms\PhoneNumber;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -581,5 +583,190 @@ class UserController extends Controller
         $data['qrcode'] = Storage::disk('oss')->url($path); // 返回图片 URL
 
         return $data;
+    }
+
+    /**
+     * 设置资金密码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function setMoneyPassword(Request $request)
+    {
+        $this->validate($request, [
+            'password' => 'required|string|min:6|confirmed', // 需要字段 password_confirmation
+            'code' => 'required', // 短信验证码
+        ]);
+        $user = $request->user();
+        $mobile = $user->mobile;
+        $key = 'verificationCode_' . $mobile;
+
+        $verifyData = \Cache::get($key);
+        if (!$verifyData) {
+            abort(403, '验证码已失效');// 验证码失效
+        }
+
+        if (!hash_equals($verifyData['code'], $request->code)) {
+            abort(401, '验证码不正确');// 验证码不正确
+        }
+
+        $user->update(['money_password' => bcrypt($request->password)]);
+        $data['message'] = "资金密码设置成功";
+        return response()->json($data, 200);
+    }
+
+    /**
+     * 向已登录用户发送短信验证码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function usersms(Request $request)
+    {
+        $user = $request->user();
+        $mobile = $user->mobile;
+
+        $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT); // 生成6位随机数，左侧补0
+
+        $key = 'verificationCode_' . $mobile;
+        $expiredAt = now()->addMinutes(30);
+
+        $verifyData = \Cache::get($key);
+        if ($verifyData) {
+            abort(403, '已经发送过验证码了');
+        }
+
+        Notification::route(
+            EasySmsChannel::class,
+            new PhoneNumber($mobile)
+        )->notify(new VerificationCode($code));// 发送短信验证码
+
+        \Cache::put($key, ['mobile' => $mobile, 'code' => $code], $expiredAt); // 缓存验证码 30 分钟过期。
+
+        $data['message'] = "验证码发送成功";
+        return response()->json($data, 200);
+    }
+
+    // 修改昵称
+    public function nickname(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'nickname' => 'required|string|unique:users', // 昵称
+        ]);
+
+        $attributes['nickname'] = $request->nickname;
+        $user->update($attributes);
+
+        $data['message'] = "昵称修改成功";
+        return response()->json($data, 200);
+    }
+
+    /**
+     * 手机号重设密码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function forgetPassword(Request $request)
+    {
+        $this->validate($request, [
+            'mobile' => 'required|numeric|exists:users',
+            'code' => 'required|numeric',
+            'password' => 'required|string|min:6|confirmed', // 需要字段 password_confirmation
+        ]);
+
+        $mobile = $request->mobile;
+        $key = 'verificationCode_' . $mobile;
+
+        $verifyData = \Cache::get($key);
+        if (!$verifyData) {
+            abort(403, '短信验证码已失效');// 验证码失效
+        }
+        if (!hash_equals($verifyData['code'], $request->code)) {
+            abort(401, '短信验证码不正确');// 验证码不正确
+        }
+
+        // 查询该手机号用户 重设密码  bcrypt($request->password)
+        $user = User::where('mobile', '=', $request->mobile)->first();
+        if ($user) {
+            \Cache::forget($key);
+            $user->update(['password' => bcrypt($request->password)]);
+            $data['message'] = "密码重设成功";
+            return response()->json($data, 200);
+        } else {
+            $data['message'] = "用户不存在";
+            return response()->json($data, 404);
+        }
+    }
+
+    /**
+     * 使用手机号获取图形验证码
+     * @param Request $request
+     * @param Captcha $captchaBuilder
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function captcha(Request $request, Captcha $captcha)
+    {
+        $this->validate($request, [
+            'mobile' => 'required|numeric|exists:users',
+        ]);
+
+        $key = 'captcha-' . Str::random(15);
+        $mobile = $request->mobile;
+
+        $captcha = $captcha->create('flat', true);
+
+        $expiredAt = now()->addMinutes(10); // 有效时间 10 分钟
+
+        \Cache::put($key, [
+            'mobile' => $mobile,
+            'captcha' => $captcha['key'],
+        ], $expiredAt);
+
+        $result = [
+            'captcha_key' => $key,
+            'expired_at' => $expiredAt->toDateTimeString(),
+            'captcha_img' => $captcha['img']
+        ];
+
+        return response()->json($result)->setStatusCode(201);
+    }
+
+    public function captchasms(Request $request)
+    {
+        $captchaData = \Cache::get($request->captcha_key);
+
+        if (!$captchaData) {
+            abort(403, '图片验证码已失效');
+        }
+
+        if (!captcha_api_check($request->captcha_code, $captchaData['captcha'], 'flat')) {
+            Cache::forget($request->captcha_key);
+            abort(403, '验证码错误');
+        }
+
+        $mobile = $captchaData['mobile'];
+
+        $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT); // 生成6位随机数，左侧补0
+
+        $key = 'verificationCode_' . $mobile;
+        $expiredAt = now()->addMinutes(30);
+
+        $verifyData = \Cache::get($key);
+        if ($verifyData) {
+            abort(200, '已经发送过验证码了');
+        }
+
+        Notification::route(
+            EasySmsChannel::class,
+            new PhoneNumber($mobile)
+        )->notify(new VerificationCode($code));// 发送短信验证码
+
+        \Cache::put($key, ['mobile' => $mobile, 'code' => $code], $expiredAt); // 缓存验证码 30 分钟过期。
+
+        $data['message'] = "验证码发送成功";
+        return response()->json($data, 200);
     }
 }

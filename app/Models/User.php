@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Mrlaozhou\Extend\Unlimitedable;
 use Storage;
 use Laravel\Passport\HasApiTokens;
 use Overtrue\EasySms\PhoneNumber;
@@ -24,6 +25,21 @@ class User extends Authenticatable implements Wallet, WalletFloat
     use HasWallet, HasWallets;
     use HasWalletFloat;
     use dateTrait;
+    use Unlimitedable;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+    }
+
+    /**
+     * 缓存key
+     * @return string
+     */
+    protected static function unlimitedCacheKey()
+    {
+        return 'users.parent';
+    }
 
     // 钱包列表
     public const WALLETSLIST = [
@@ -40,7 +56,7 @@ class User extends Authenticatable implements Wallet, WalletFloat
      */
     protected $fillable = [
         'name', 'email', 'password', 'mobile', 'nickname', 'parent_id', 'status', 'last_login_at', 'last_login_ip', 'avatar',
-        'real_name', 'id_number', 'id_front', 'id_back', 'is_verify',
+        'real_name', 'id_number', 'id_front', 'id_back', 'is_verify', 'money_password',
     ];
 
     /**

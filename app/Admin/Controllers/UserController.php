@@ -2,7 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\Destroy;
+use App\Admin\Actions\Restore;
 use App\Models\User;
+use Encore\Admin\Actions\Action;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -28,6 +31,7 @@ class UserController extends AdminController
         $grid = new Grid(new User());
 
         $grid->filter(function ($filter) {
+            $filter->scope('trashed', '回收站')->onlyTrashed();
             // 去掉默认的id过滤器
             $filter->disableIdFilter();
             // 在这里添加字段过滤器
@@ -77,10 +81,20 @@ class UserController extends AdminController
         $grid->disableExport(); // 禁用导出数据
         $grid->disableColumnSelector();// 禁用行选择器
         $grid->actions(function ($actions) {
-            $actions->disableDelete();// 去掉删除
+            if ($actions->row['is_verify'] == 1) {
+                $actions->disableDelete();// 去掉删除
+            }
+
             $actions->disableView();// 去掉查看
 //            $actions->disableEdit();// 去掉编辑
+            if (\request('_scope_') == 'trashed') {
+                $actions->disableDelete();// 去掉删除
+                $actions->disableEdit();// 去掉编辑
+                $actions->add(new Restore());
+                $actions->add(new Destroy());
+            }
         });
+
         $grid->model()->orderBy('id', 'desc');// 按照 ID 倒序
 
         return $grid;

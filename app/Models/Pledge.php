@@ -20,6 +20,7 @@ class Pledge extends Model
      */
     protected $fillable = [
         'user_id', 'order_id', 'product_id', 'wallet_type_id', 'power', 'pledge_fee', 'coins', 'pledge_days', 'status',
+        'gas_fee', 'gas_coins',
     ];
 
     // 关联 用户

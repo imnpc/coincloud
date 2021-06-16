@@ -54,6 +54,10 @@ Route::prefix('v1')
                 Route::get('product/{product}', [ProductController::class, 'show']); // 产品详情
                 Route::post('sms', [UserController::class, 'sms']); // 发送短信
 
+                Route::post('captcha', [UserController::class, 'captcha']); // 使用手机号获取图片验证码
+                Route::post('captchasms', [UserController::class, 'captchasms']); // 使用图片验证码获取短信验证码
+                Route::post('forget', [UserController::class, 'forgetPassword']); // 找回重置密码
+
                 // 登录后可以访问的接口
                 Route::middleware('auth:api')->group(function () {
                     Route::get('user', [UserController::class, 'me']); // 当前登录用户信息
@@ -64,6 +68,9 @@ Route::prefix('v1')
                     Route::post('verify', [UserController::class, 'verify']); // 用户实名认证
                     Route::post('reset', [UserController::class, 'resetPassword']); // 重设密码
                     Route::get('invite', [UserController::class, 'invite']); // 邀请码
+
+                    Route::post('moneypassword', [UserController::class, 'setMoneyPassword']); // 设置资金密码
+                    Route::post('usersms', [UserController::class, 'usersms']); // 向已登录用户发送短信验证码
 
                     Route::get('mypower', [UserController::class, 'mypower']); // 算力管理
                     Route::get('myorder', [UserController::class, 'myorder']); // 我的订单

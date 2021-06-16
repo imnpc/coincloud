@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a27bf6bf82c950f12ca11c0edad0a029",
+    "content-hash": "281ce94710e752f00f06ab5c8c7e217d",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -4573,6 +4573,63 @@
             "time": "2020-12-14T13:15:25+00:00"
         },
         {
+            "name": "mrlaozhou/laravel-extend",
+            "version": "v1.3.5",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:Mrlaozhou/laravel-extend.git",
+                "reference": "eea6466a3e5ae71b48ea5a23d51bd668abc91321"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Mrlaozhou/laravel-extend/zipball/eea6466a3e5ae71b48ea5a23d51bd668abc91321",
+                "reference": "eea6466a3e5ae71b48ea5a23d51bd668abc91321",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 7.0",
+                "spatie/url": "^1.3"
+            },
+            "require-dev": {
+                "laravel/framework": "5.6.*",
+                "phpunit/phpunit": "~7.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Mrlaozhou\\Extend\\ExtendServiceProvider"
+                    ],
+                    "aliases": {
+                        "Expand": "Mrlaozhou\\Extend\\Facades\\Expand"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mrlaozhou\\Extend\\": "src"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Mrlaozhou",
+                    "email": "zgsself@163.com"
+                }
+            ],
+            "description": "Laravel extend.",
+            "keywords": [
+                "collection",
+                "extend",
+                "laravel",
+                "mrlaozhou"
+            ],
+            "time": "2019-11-29T03:00:46+00:00"
+        },
+        {
             "name": "myclabs/php-enum",
             "version": "1.8.0",
             "source": {
@@ -6333,6 +6390,108 @@
                 }
             ],
             "time": "2021-05-24T10:13:32+00:00"
+        },
+        {
+            "name": "spatie/macroable",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/macroable.git",
+                "reference": "7a99549fc001c925714b329220dea680c04bfa48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/macroable/zipball/7a99549fc001c925714b329220dea680c04bfa48",
+                "reference": "7a99549fc001c925714b329220dea680c04bfa48",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2|^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.0|^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Macroable\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A trait to dynamically add methods to a class",
+            "homepage": "https://github.com/spatie/macroable",
+            "keywords": [
+                "macroable",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/macroable/issues",
+                "source": "https://github.com/spatie/macroable/tree/1.0.1"
+            },
+            "time": "2020-11-03T10:15:05+00:00"
+        },
+        {
+            "name": "spatie/url",
+            "version": "1.3.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/url.git",
+                "reference": "3633de58e0709ea98cecceff61ee51caf1fde7e3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/url/zipball/3633de58e0709ea98cecceff61ee51caf1fde7e3",
+                "reference": "3633de58e0709ea98cecceff61ee51caf1fde7e3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2|^8.0",
+                "psr/http-message": "^1.0",
+                "spatie/macroable": "^1.0.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.0|^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Url\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Parse, build and manipulate URL's",
+            "homepage": "https://github.com/spatie/url",
+            "keywords": [
+                "spatie",
+                "url"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/url/issues",
+                "source": "https://github.com/spatie/url/tree/1.3.5"
+            },
+            "time": "2020-11-03T10:36:20+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -12659,5 +12818,5 @@
         "php": "^7.3|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }

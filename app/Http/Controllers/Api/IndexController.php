@@ -10,6 +10,7 @@ use App\Models\DayBonus;
 use App\Models\DayFreed;
 use App\Models\Freed;
 use App\Models\Order;
+use App\Models\Pledge;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserBonus;
@@ -102,6 +103,29 @@ class IndexController extends Controller
 
     public function test()
     {
+        $orders = Order::where('pay_status', '=', Order::PAID_COMPLETE)
+            ->get(); // 支付状态 0-已完成
+        foreach ($orders as $k => $v) {
+            $check_pledge = Pledge::where('user_id', '=', $v->user_id)
+                ->where('product_id', '=', $v->product_id)
+                ->where('order_id', '=', $v->id)
+                ->first();
+            if (!$check_pledge) {
+                echo $v->product->pledge_fee;
+                exit();
+            }
+        }
+//        $id = 1;
+//        $ids = User::unlimitedCollectionById($id);
+////        $users_son1 = [];
+////
+////        foreach ($ids as $key => $value) {
+////            $users_son1[] = $value['id'];
+////        }
+////        $users1 = array_values($users_son1);
+//        print_r($ids);
+
+        exit();
         $day = Carbon::yesterday()->toDateString();// 获得日期
         $today = Carbon::now()->toDateString();// 获得日期
 

@@ -42,6 +42,7 @@ class ProductController extends AdminController
         $grid->column('price', __('Price'));
         $grid->column('price_usdt', __('Price usdt'));
         $grid->column('price_coin', __('Price coin'));
+        $grid->column('unit', __('Unit'));
 //        $grid->column('coin_wallet_address', __('Coin wallet address'));
 //        $grid->column('coin_wallet_qrcode', __('Coin wallet qrcode'));
         $grid->column('wallet_type_id', __('Wallet type id'));
@@ -114,6 +115,7 @@ class ProductController extends AdminController
         $show->field('price', __('Price'));
         $show->field('price_usdt', __('Price usdt'));
         $show->field('price_coin', __('Price coin'));
+        $show->field('unit', __('Unit'));
         $show->field('coin_wallet_address', __('Coin wallet address'));
         $show->field('coin_wallet_qrcode', __('Coin wallet qrcode'));
         $show->field('wallet_type_id', __('Wallet type id'));
@@ -166,6 +168,7 @@ class ProductController extends AdminController
         $form->decimal('price', __('Price'))->default(0)->required()->help('人民币价格，可填写为0');
         $form->decimal('price_usdt', __('Price usdt'))->default(0)->required()->help('USDT 价格，可填写为0');
         $form->decimal('price_coin', __('Price coin'))->default(0)->required()->help('虚拟币价格，可填写为0');
+        $form->text('unit', __('Unit'))->required()->help('单位，默认为 T，可以填写中文: 台,节点');
         $form->text('coin_wallet_address', __('Coin wallet address'));
         $form->image('coin_wallet_qrcode', __('Coin wallet qrcode'));
         $form->select('wallet_type_id', __('Wallet type id'))->options(WalletType::where('is_enblened',1)->get()->pluck('slug', 'id'))->required();

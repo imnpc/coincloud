@@ -2,10 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\Destroy;
+use App\Admin\Actions\Restore;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
+use Encore\Admin\Actions\Action;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -57,6 +60,7 @@ class OrderController extends AdminController
 ";
         });
         $grid->filter(function ($filter) {
+            $filter->scope('trashed', '回收站')->onlyTrashed();
             // 去掉默认的id过滤器
             $filter->disableIdFilter();
             // 在这里添加字段过滤器
@@ -151,6 +155,14 @@ class OrderController extends AdminController
             if ($actions->row['pay_status'] == 0) {
                 $actions->disableDelete();// 去掉删除
             }
+            if (\request('_scope_') == 'trashed') {
+                $actions->disableDelete();// 去掉删除
+                $actions->disableView();// 去掉查看
+                $actions->disableEdit();// 去掉编辑
+                $actions->add(new Restore());
+                $actions->add(new Destroy());
+            }
+
             //$actions->disableDelete();// 去掉删除
             //$actions->disableView();// 去掉查看
             //$actions->disableEdit();// 去掉编辑
