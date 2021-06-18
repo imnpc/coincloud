@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\WalletType;
 use Bavix\Wallet\Interfaces\Mathable;
 use Bavix\Wallet\Models\Transaction;
+use Bavix\Wallet\Models\Wallet;
 use Bavix\Wallet\Services\WalletService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -76,7 +77,7 @@ class UserWalletService
         }
     }
 
-    // 获得用户指定钱包余额
+    // 获得用户昨日增加金额
     public function yesterday(int $uid, $wallet_type_id)
     {
         $user = User::find($uid);
@@ -102,6 +103,7 @@ class UserWalletService
         }
     }
 
+    // 获取用户指定类型钱包累计收入
     public function total(int $uid, $wallet_type_id)
     {
         $user = User::find($uid);
@@ -124,4 +126,51 @@ class UserWalletService
         }
     }
 
+    // 获取指定类型钱包当前总余额
+    public function walletBalance($wallet_type_id)
+    {
+        $wallet_type = WalletType::find($wallet_type_id);
+        $name = $wallet_type->slug;
+
+        $data = Wallet::where('slug', $name)
+            ->sum('balance');
+        $wallet = Wallet::where('slug', $name)->first();
+
+        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
+        $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
+
+        if ($data <= 0) {
+            return 0;
+        } else {
+            return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+        }
+    }
+
+    // 获取指定类型钱包累计收入
+    public function walletTotal($wallet_type_id)
+    {
+        $wallet_type = WalletType::find($wallet_type_id);
+        $name = $wallet_type->slug;
+
+        $wallet = Wallet::where('slug', $name)->first();
+        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
+        $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
+
+        $list = Wallet::where('slug', $name)->get();
+        $ids = [];
+
+        foreach ($list as $key => $value) {
+            $ids[] = $value['id'];
+        }
+        $ids = array_values($ids);
+        print_r($ids);
+        $data = Transaction::where('type', '=', Transaction::TYPE_DEPOSIT)
+            ->whereIn('wallet_id', $ids)
+            ->sum('amount');
+        if ($data <= 0) {
+            return 0;
+        } else {
+            return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+        }
+    }
 }

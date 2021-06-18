@@ -5,10 +5,10 @@ use Illuminate\Routing\Router;
 Admin::routes();
 
 Route::group([
-    'prefix'        => config('admin.route.prefix'),
-    'namespace'     => config('admin.route.namespace'),
-    'middleware'    => config('admin.route.middleware'),
-    'as'            => config('admin.route.prefix') . '.',
+    'prefix' => config('admin.route.prefix'),
+    'namespace' => config('admin.route.namespace'),
+    'middleware' => config('admin.route.middleware'),
+    'as' => config('admin.route.prefix') . '.',
 ], function (Router $router) {
 
     $router->get('/', 'HomeController@index')->name('home');
@@ -33,4 +33,6 @@ Route::group([
     $router->resource('withdraws', WithdrawController::class); // 提币
     $router->resource('recharges', RechargeController::class); // 充币
     $router->resource('recharge-account-logs', RechargeAccountLogController::class); // 充币封装记录
+    $router->resource('weeklies', WeeklyController::class); // 每周统计
+    $router->resource('weekly-logs', WeeklyLogController::class); // 每周统计详细数据
 });

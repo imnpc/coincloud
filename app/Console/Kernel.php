@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Jobs\AutoCreateDayBonus;
 use App\Jobs\AutoProductBonus;
+use App\Jobs\AutoProductWeeklyReport;
 use App\Jobs\ChangeOrderWaitStatus;
 use App\Jobs\PledgeDay;
 use Illuminate\Console\Scheduling\Schedule;
@@ -34,7 +35,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(new AutoCreateDayBonus)->dailyAt('0:01'); // 每天自动创建分红记录 0:01
         $schedule->job(new ChangeOrderWaitStatus)->dailyAt('0:30'); // 更改订单等待状态 0:30
         $schedule->job(new AutoProductBonus)->dailyAt('0:05'); // 产品自动分红 0:05
-//        $schedule->job(new PledgeDay)->dailyAt('0:40'); // 自动处理质押币 0:40
+        $schedule->job(new AutoProductWeeklyReport)->weekly()->mondays()->at('0:30'); // 产品每周自动统计报告 每周一 凌晨 0 点 30 执行
+//        $schedule->job(new PledgeDay)->dailyAt('0:40'); // 自动处理质押币 0:40 TODO
         // PowerBonusDaily
     }
 

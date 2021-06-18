@@ -103,6 +103,11 @@ class IndexController extends Controller
 
     public function test()
     {
+        // 3 4 5
+        $wallet_type_id = 5;
+        $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
+        echo $UserWalletService->walletTotal($wallet_type_id);
+        exit();
         $orders = Order::where('pay_status', '=', Order::PAID_COMPLETE)
             ->get(); // 支付状态 0-已完成
         foreach ($orders as $k => $v) {
