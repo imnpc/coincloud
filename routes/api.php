@@ -41,6 +41,7 @@ Route::prefix('v1')
             ->group(function () {
                 // 游客可以访问的接口
                 Route::get('test', [IndexController::class, 'test']); // test
+                Route::get('demo', [IndexController::class, 'demo']); // test
 
                 Route::resource('announcement', AnnouncementController::class); // 公告
                 Route::resource('article', ArticleController::class); // 文章系统

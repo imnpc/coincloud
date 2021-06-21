@@ -63,9 +63,10 @@ class WeeklyReport implements ShouldQueue
             // 获取上周周数  日期
             $date = Carbon::now();
             // 只在周一执行 需要修改为 1
-            if ($date->dayOfWeekIso == 1) {
+            if ($date->dayOfWeekIso == 6) {
                 // 获得上周信息
                 $lastweek = Carbon::now()->subWeek();
+
                 $year = $lastweek->startOfWeek()->year; // 按照该周开始日期确定所在年份 避免跨年问题
                 $week = $lastweek->weekOfYear; // 上周周数
 
@@ -93,7 +94,6 @@ class WeeklyReport implements ShouldQueue
                 $reward = 0; // 奖励币
                 $total = 0; // 总计
 
-                //'product_id', 'wallet_type_id',
                 // 预创建每周记录
                 $weekly = Weekly::create([
                     'product_id' => $this->product_id,
@@ -116,9 +116,9 @@ class WeeklyReport implements ShouldQueue
                     $value['reward'] = 0; // 奖励币
 
                     // 查询上周用户钱包日志
-                    $logs = UserWalletLog::where('type', '=', 1)
-                        ->where('add', '>', 0)
+                    $logs = UserWalletLog::where('add', '>', 0)
                         ->where('user_id', '=', $value['id'])
+                        ->where('wallet_type_id', '=', $product->wallet_type_id)
                         ->whereBetween('created_at', [$begin_time, $end_time])
                         ->get()
                         ->toArray();
@@ -131,22 +131,25 @@ class WeeklyReport implements ShouldQueue
                     }
                     $value['total'] = $value['freed'] + $value['freed75'] + $value['reward'];
                     // 用户上周记录
-                    WeeklyLog::create([
-                        'product_id' => $weekly->product_id,
-                        'wallet_type_id' => $weekly->wallet_type_id,
-                        'user_id' => $value['id'],
-                        'weekly_id' => $weekly->id,
-                        'year' => $year,
-                        'week' => $week,
-                        'begin' => $begin,
-                        'end' => $end,
-                        'begin_time' => $begin_time,
-                        'end_time' => $end_time,
-                        'freed' => $value['freed'],
-                        'freed75' => $value['freed75'],
-                        'reward' => $value['reward'],
-                        'total' => $value['total'],
-                    ]);
+                    if($value['total'] > 0){
+                        WeeklyLog::create([
+                            'product_id' => $weekly->product_id,
+                            'wallet_type_id' => $weekly->wallet_type_id,
+                            'user_id' => $value['id'],
+                            'weekly_id' => $weekly->id,
+                            'year' => $year,
+                            'week' => $week,
+                            'begin' => $begin,
+                            'end' => $end,
+                            'begin_time' => $begin_time,
+                            'end_time' => $end_time,
+                            'freed' => $value['freed'],
+                            'freed75' => $value['freed75'],
+                            'reward' => $value['reward'],
+                            'total' => $value['total'],
+                        ]);
+                    }
+
                     // 系统上周数据
                     $freed += $value['freed'];
                     $freed75 += $value['freed75'];

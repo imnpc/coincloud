@@ -6,6 +6,7 @@ use App\Models\DayBonus;
 use App\Models\DayFreed;
 use App\Models\Freed;
 use App\Models\Order;
+use App\Models\Pledge;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserBonus;
@@ -97,6 +98,17 @@ class AutoDayBonus implements ShouldQueue
                     ->first();// 查询用户分红记录是否存在
                 if ($checkmybonus) {
                     continue;
+                }
+
+                // $product->package_type == 1 如果没有质押币 就不产币 TODO
+                if ($product->package_type == 1) {
+                    $pledge = Pledge::where('user_id', '=', $v->user_id)
+                        ->where('product_id', $this->product_id)
+                        ->where('order_id', $v->id)
+                        ->first();
+                    if (!$pledge) {
+                        continue;
+                    }
                 }
 
                 $coin_parent1 = 0; // 一级推广金额

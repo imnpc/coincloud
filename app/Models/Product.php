@@ -114,4 +114,17 @@ class Product extends Model
     {
         return $this->hasMany(DayFreed::class);
     }
+
+    // 关联 每周统计报表
+    public function weekly()
+    {
+        return $this->hasMany(Weekly::class);
+    }
+
+    // 关联 每周统计详细
+    public function weeklylog()
+    {
+        return $this->hasMany(WeeklyLog::class);
+    }
+
 }

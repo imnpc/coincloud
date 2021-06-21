@@ -195,6 +195,9 @@ class ProductController extends AdminController
         $form->decimal('gas_fee', __('Gas fee'))->default(0.00000)->required();
         $form->decimal('pledge_fee', __('Pledge fee'))->default(0.00000)->required();
         $form->number('pledge_days', __('Pledge days'))->default(1)->required();
+
+        $form->radioCard('package_type', __('Package type'))->options(['0' => '默认封装', '1'=> '客户封装'])->default('0')->required()->help('质押币封装模式,0-默认:价格里面已包含,1-客户封装:客户需要支付质押币和gas费以后才能产币');
+
         $form->decimal('valid_rate', __('Valid rate'))->default(0.00)->required();
         $form->decimal('package_rate', __('Package rate'))->default(0.00)->required();
 

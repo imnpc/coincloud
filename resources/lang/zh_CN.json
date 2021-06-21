@@ -226,6 +226,9 @@
     "Network average revenue": "24小时平均挖矿收益",
     "Network valid power": "全网有效算力",
     "Network basic rate": "当前基础费率",
-    "Unit": "单位"
+    "Unit": "单位",
+    "Product": "产品",
+    "Wallet slug": "钱包别名",
+    "Package type": "质押币封装模式"
 }
 

@@ -34,4 +34,10 @@ class WeeklyLog extends Model
     {
         return $this->belongsTo(Weekly::class);
     }
+
+    // 关联 产品
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
