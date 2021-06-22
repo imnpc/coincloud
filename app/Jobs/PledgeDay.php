@@ -73,19 +73,23 @@ class PledgeDay implements ShouldQueue
                 if (!$check_pledge) {
                     if ($v->product->pledge_fee > 0 || $v->product->gas_fee > 0) {
                         // 产品质押币封装模式为 0 的 才执行
-                        if($v->product->package_type == 0){
-                            Pledge::create([
+                        if ($v->product->package_type == 0) {
+                            $pledge = Pledge::create([
                                 'user_id' => $v->user_id,
                                 'order_id' => $v->id,
                                 'product_id' => $v->product_id,
                                 'wallet_type_id' => $v->wallet_type_id,
                                 'power' => $v->number,
                                 'pledge_fee' => $v->product->pledge_fee,
-                                'coins' => $v->number * $v->product->pledge_fee,
+                                'pledge_coins' => $v->number * $v->product->pledge_fee,
                                 'pledge_days' => $v->product->pledge_days,
                                 'gas_fee' => $v->product->gas_fee,
                                 'gas_coins' => $v->number * $v->product->gas_fee,
                             ]);
+                            // 更新订单字段 是否产生质押记录 is_pledge TODO
+                            if ($pledge) {
+                                $orders[$k]->update(['is_pledge' => 1]);
+                            }
                         }
                     }
                     continue;
@@ -101,8 +105,8 @@ class PledgeDay implements ShouldQueue
                     if ($pledge_day <= 0) {
                         $pledge_day = 0;
                         // 需要修改 TODO
-                        $remark_day = "质押币退回 " . $check_pledge->coins;
-                        $logService->userLog($v->user_id, $v->wallet_type_id, $check_pledge->coins, 0, $day, UserWalletLog::FROM_PLEDGE, $remark_day);
+                        $remark_day = "质押币退回 " . $check_pledge->pledge_coins;
+                        $logService->userLog($v->user_id, $v->wallet_type_id, $check_pledge->pledge_coins, 0, $day, UserWalletLog::FROM_PLEDGE, $remark_day);
 
                         $check_pledge->update(['wait_days' => $pledge_day, 'status' => 1]);
                     } else {

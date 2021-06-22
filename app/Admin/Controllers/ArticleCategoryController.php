@@ -124,7 +124,7 @@ class ArticleCategoryController extends AdminController
 //        $form->switch('parent_id', __('Parent id'));
 //        $form->switch('order', __('Order'));
         $form->text('title', __('Title'));
-        $form->image('icon', __('Icon'));
+        $form->image('icon', __('Icon'))->move('article/icon')->uniqueName();
         $form->radioCard('status', __('是否显示'))->options(['0' => '不显示', '1' => '显示'])->default('0')->required();
         //$form->switch('status', __('Status'));
 

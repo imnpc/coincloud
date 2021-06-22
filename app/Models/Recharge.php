@@ -43,7 +43,7 @@ class Recharge extends Model
      * @var array
      */
     protected $fillable = [
-        'order_sn', 'user_id', 'wallet_type_id', 'coin', 'used_coin', 'pledge', 'gas_fee', 'pay_type', 'pay_image', 'pay_time',
+        'order_sn', 'user_id', 'wallet_type_id', 'coin', 'used_coin', 'pledge_fee', 'gas_fee', 'pay_type', 'pay_image', 'pay_time',
         'confirm_time', 'pay_status', 'schedule', 'schedule_time', 'finished_time', 'is_return', 'return_coin', 'reason',
         'remark', 'canceled_time',
     ];

@@ -227,7 +227,7 @@ class UserController extends Controller
             ->first();
         $now = Carbon::now();
         if ($pledge) {
-            $my_pledge = $pledge->coins;// 自己的质押币数量
+            $my_pledge = $pledge->pledge_coins;// 自己的质押币数量
             // 倒计时天数
             $created_at = $pledge->created_at;
             $check_day = $created_at->diffInDays($now); // 已经过去天数

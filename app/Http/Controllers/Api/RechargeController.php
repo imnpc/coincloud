@@ -113,7 +113,7 @@ class RechargeController extends Controller
             'pay_image' => $pay_image,
             'confirm_time' => $confirm_time,
             'pay_status' => $pay_status,
-            'pledge' => $product->pledge_fee,
+            'pledge_fee' => $product->pledge_fee,
             'gas_fee' => $product->gas_fee,
         ]);
 
@@ -182,8 +182,8 @@ class RechargeController extends Controller
         $data = [
             'wallet_address' => $wallet_address,
             'wallet_qrcode' => $wallet_qrcode,
-            'pledge' => $pledge_fee,
-            'gas' => $gas_fee,
+            'pledge_fee' => $pledge_fee,
+            'gas_fee' => $gas_fee,
             'each_fee' => $each_fee,
             'wait_power' => $can_pledge,
             'max' => $max,

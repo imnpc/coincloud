@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Jobs\AutoCreatePledge;
 use App\Models\Recharge;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\AdminController;
@@ -40,7 +41,7 @@ class RechargeController extends AdminController
         $grid->column('wallet_slug', __('Wallet slug'));
         $grid->column('coin', __('Coin'));
         $grid->column('used_coin', __('Used coin'));
-        $grid->column('pledge', __('Pledge'));
+        $grid->column('pledge_fee', __('Pledge'));
         $grid->column('gas_fee', __('Gas fee'));
 //        $grid->column('pay_type', __('Pay type'))->using(['1' => '充值', '2' => '账户转入', '3' => '公司代充值']);
 //        $grid->column('pay_image', __('Pay image'));
@@ -117,7 +118,7 @@ class RechargeController extends AdminController
         $show->field('wallet_type_id', __('Wallet type id'));
         $show->field('coin', __('Coin'));
         $show->field('used_coin', __('Used coin'));
-        $show->field('pledge', __('Pledge'));
+        $show->field('pledge_fee', __('Pledge'));
         $show->field('gas_fee', __('Gas fee'));
         $show->field('pay_type', __('Pay type'));
         $show->field('pay_image', __('Pay image'));
@@ -208,6 +209,8 @@ class RechargeController extends AdminController
                     $order = Recharge::find($form->model()->id);
                     $order->confirm_time = Carbon::now(); // 标记订单确认时间
                     $order->save();
+                    // 派发到计划任务执行 $form->model()->id  TODO
+                    AutoCreatePledge::dispatch($form->model()->id);
                 }
             });
 

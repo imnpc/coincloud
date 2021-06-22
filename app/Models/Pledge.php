@@ -19,7 +19,7 @@ class Pledge extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'order_id', 'product_id', 'wallet_type_id', 'power', 'pledge_fee', 'coins', 'pledge_days', 'status',
+        'user_id', 'order_id', 'product_id', 'wallet_type_id', 'power', 'pledge_fee', 'pledge_coins', 'pledge_days', 'status',
         'gas_fee', 'gas_coins',
     ];
 
