@@ -56,7 +56,7 @@ class HomeController extends Controller
                         ->where('pay_status', '=', Order::PAID_COMPLETE)
                         ->sum('number'); // 购买 T 数
                     $pledge_fee = Pledge::where('product_id', '=', $v->id)
-                        ->sum('coins'); // 质押币
+                        ->sum('pledge_coins'); // 质押币
                     $gas_fee = Pledge::where('product_id', '=', $v->id)
                         ->sum('gas_coins'); // GAS 费
 

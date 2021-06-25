@@ -325,4 +325,25 @@ class OrderController extends AdminController
 
         return $form;
     }
+
+    /**
+     * 轮询判断有没有新订单
+     *
+     * @return void
+     */
+    public function sendNotice()
+    {
+        $count = Order::where('status', 0)
+            ->where('pay_status', 2)
+            ->count();
+        $getCount = session()->get('count');
+
+        if ($count > $getCount) {
+            session()->put('count', $count); // 存session
+            return ['code' => 200, 'msg' => '您有新的订单请及时处理'];
+        }
+        // 不成立的话则存最新的值
+        session()->put('count', $count);
+        return ['code' => 201];
+    }
 }

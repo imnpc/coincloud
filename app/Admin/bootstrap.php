@@ -19,6 +19,7 @@
  */
 use App\Admin\Actions;
 use App\Admin\Extensions\Nav;
+use App\Models\Order;
 use App\Models\User;
 use Encore\Admin\Facades\Admin;
 
@@ -29,6 +30,10 @@ Admin::navbar(function (\Encore\Admin\Widgets\Navbar $navbar) {
             $total = User::where('is_verify', '=', 0)
                 ->whereNotNull('real_name')
                 ->count();
+            $orders = Order::where('status', 0)
+                ->where('pay_status', 2)
+                ->count();
+            $navbar->right(Nav\Link::make('待处理订单'.'(<font color=red>'.$orders.'</font>)', 'orders','fa-reorder'));
             $navbar->right(Nav\Link::make('实名待审核'.'(<font color=red>'.$total.'</font>)', 'verify','fa-shield'));
             $navbar->right(Nav\Link::make('设置', 'configx/edit'));
         }

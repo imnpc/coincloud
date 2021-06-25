@@ -15,6 +15,7 @@ Route::group([
 
     $router->get('api/users', 'UserController@users');// API 用户列表
 
+    $router->get('api/sendNotice', 'OrderController@sendNotice');// API 发送消息提醒
     $router->resource('users', UserController::class); // 用户
     $router->resource('wallet-types', WalletTypeController::class); // 钱包类型
     $router->resource('products', ProductController::class); // 产品
