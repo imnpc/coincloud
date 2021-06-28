@@ -170,7 +170,7 @@ class ProductController extends AdminController
         $form->decimal('price_coin', __('Price coin'))->default(0)->required()->help('虚拟币价格，可填写为0');
         $form->text('unit', __('Unit'))->required()->help('单位，默认为 T，可以填写中文: 台,节点');
         $form->text('coin_wallet_address', __('Coin wallet address'));
-        $form->image('coin_wallet_qrcode', __('Coin wallet qrcode'));
+        $form->image('coin_wallet_qrcode', __('Coin wallet qrcode'))->required()->move('products')->uniqueName();
         $form->select('wallet_type_id', __('Wallet type id'))->options(WalletType::where('is_enblened',1)->get()->pluck('slug', 'id'))->required();
         $form->number('wait_days', __('Wait days'))->default(0)->required();
         $form->number('valid_days', __('Valid days'))->default(0)->required();
@@ -213,7 +213,7 @@ class ProductController extends AdminController
         $form->decimal('network_average_revenue', __('Network average revenue'))->default(0.00000);
         $form->decimal('network_valid_power', __('Network valid power'))->default(0.00000);
         $form->decimal('network_basic_rate', __('Network basic rate'))->default(0.00000);
-        $form->image('thumb', __('Thumb'))->required();
+        $form->image('thumb', __('Thumb'))->required()->move('products')->uniqueName();
 //        $form->textarea('desc', __('Desc'));
         $form->editor('content', __('Content'))->required();
         $states = [
