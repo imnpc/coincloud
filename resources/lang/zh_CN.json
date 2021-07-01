@@ -229,6 +229,7 @@
     "Unit": "单位",
     "Product": "产品",
     "Wallet slug": "钱包别名",
-    "Package type": "质押币封装模式"
+    "Package type": "质押币封装模式",
+    "Is show text": "显示算力文字提示"
 }
 

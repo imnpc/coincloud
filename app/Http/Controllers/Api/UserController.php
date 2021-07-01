@@ -144,6 +144,8 @@ class UserController extends Controller
             $data[$k]['wallet_type_id'] = $v->wallet_type_id;
             $data[$k]['freed_from_id'] = UserWalletLog::FROM_FREED;
             $data[$k]['unfreed_from_id'] = UserWalletLog::FROM_FREED75;
+            $data[$k]['is_show_text'] = $v->is_show_text;
+
         }
 
         return $data;
