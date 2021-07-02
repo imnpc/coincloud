@@ -77,14 +77,14 @@ Route::prefix('v1')
                     Route::get('myorder', [UserController::class, 'myorder']); // 我的订单
                     Route::get('account', [UserController::class, 'account']); // 我的资产
                     Route::get('walletlog', [UserController::class, 'walletLog']); // 我的资产流水
-                    Route::get('rewardwalletlog', 'UserController@RewardwalletLog'); // 奖励算力资产流水
+//            Route::get('rewardwalletlog', 'UserController@RewardwalletLog'); // 奖励算力资产流水
 
                     Route::resource('withdraw', WithdrawController::class); // 提币
                     Route::get('mycoin', [WithdrawController::class, 'my']); // 我的提币
 
-                    Route::resource('withdrawmoney', 'WithdrawMoneyController'); // 提现
-                    Route::get('mymoney', 'WithdrawMoneyController@my'); // 我的提现
-                    Route::resource('bankcard', 'BankcardController'); // 银行卡
+//            Route::resource('withdrawmoney', 'WithdrawMoneyController'); // 提现
+//            Route::get('mymoney', 'WithdrawMoneyController@my'); // 我的提现
+//            Route::resource('bankcard', 'BankcardController'); // 银行卡
                     Route::resource('feedback', FeedbackController::class); // 问题反馈
 
                     Route::resource('order', OrderController::class); // 订单
@@ -96,8 +96,8 @@ Route::prefix('v1')
                     Route::get('myrecharge', [RechargeController::class, 'my']); // 我的充值页面
                     Route::get('powerlog', [RechargeController::class, 'powerlog']); // 算力封装记录
 
-                    Route::resource('lend', 'LendController'); // 出借
-                    Route::get('mylend', 'LendController@my'); // 我的出借页面
+//            Route::resource('lend', 'LendController'); // 出借
+//            Route::get('mylend', 'LendController@my'); // 我的出借页面
                 });
             });
     });
