@@ -370,6 +370,50 @@ class IndexController extends Controller
 
     public function demo()
     {
+
+        $day = Carbon::yesterday()->toDateString();// 获得日期
+        $today = Carbon::now()->toDateString();// 获得日期
+
+
+        // 获取 封装状态 大于 0 的订单 封装状态 0-封装完成 1-等待封装 2-封装中
+        $lists = Order::where('package_status', '>', 0)
+            ->where('pay_status', '=', 0) // 支付状态 0-已完成 1-未提交 2-审核中
+            ->where('status', '=', 0) // 订单状态 0-有效 1-无效
+            ->get();
+        $now = Carbon::now()->toDateTimeString();
+        foreach ($lists as $k => $v) {
+            //  $table->decimal('max_valid_power', 32, 5)->comment('最大有效T数');
+//            $table->decimal('package_rate', 8, 2)->default(0.00)->comment('封装比例');
+//            $table->decimal('package_already', 32, 5)->comment('已封装数量');
+//            $table->decimal('package_wait', 32, 5)->comment('等待封装数量');
+//            $table->tinyInteger('package_status')->default(0)->comment('封装状态 0-封装完成 1-等待封装 2-封装中');
+
+            $each = number_fixed($v->max_valid_power * $v->package_rate / 100); // 每天封装数量
+            $package_already = $v->package_already + $each; // 已封装数量
+            $valid_power = $v->valid_power + $each; // 当前有效T数
+            if ($package_already >= $v->max_valid_power) {
+                $package_already = $v->max_valid_power;
+            }
+            if ($valid_power >= $v->max_valid_power) {
+                $valid_power = $v->max_valid_power;
+            }
+
+            $package_wait = number_fixed($v->max_valid_power - $package_already); // 等待封装数量
+            if ($package_wait <= 0) {
+                $package_wait = 0;
+                $package_status = 0;
+            } else {
+                $package_status = 2;
+            }
+            $lists[$k]->update([
+                'package_status' => $package_status,
+                'valid_power' => $valid_power,
+                'package_already' => $package_already,
+                'package_wait' => $package_wait,
+            ]); // 标记封装状态 封装完成
+        }
+
+exit();
         $product_id = 1;
         $this->product_id = $product_id;
         // 获取上周周数  日期
