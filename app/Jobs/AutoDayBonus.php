@@ -118,7 +118,7 @@ class AutoDayBonus implements ShouldQueue
                 $other_fee = 0;
                 $system_coin = 0;
 
-                $each_add = $bonus->efficiency - $bonus->cost; // 当日每T产币量 = 挖矿效率 - 挖矿成本
+                $each_add = number_fixed($bonus->efficiency - $bonus->cost); // 当日每T产币量 = 挖矿效率 - 挖矿成本
                 $coins = number_fixed($each_add * $v->valid_power, 5); // 当日产币量 = 挖矿效率 * 订单实际有效算力
 
                 if ($bonus->fee > 0) {
