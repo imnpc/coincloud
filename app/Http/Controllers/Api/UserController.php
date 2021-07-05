@@ -185,10 +185,10 @@ class UserController extends Controller
             ->where('product_id', $product->id)
             ->first();
         // 临时禁用 TODO
-//        if (!$bonus) {
-//            $data['message'] = "Data Not Found.";
-//            return response()->json($data, 404);
-//        }
+        if (!$bonus) {
+            $data['message'] = "当前产品暂无当日数据,请稍后再试";
+            return response()->json($data, 404);
+        }
 
         $system = DayBonus::find($bonus->day_bonus_id);
 
