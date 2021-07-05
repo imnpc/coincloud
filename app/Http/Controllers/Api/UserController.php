@@ -203,6 +203,7 @@ class UserController extends Controller
         $total_reward = 0;
         $my_pledge = 0;
         $pledge_day = 0;
+        $is_show_freed = 1;
 
         // 查询奖励币
         $reward = Reward::where('user_id', '=', auth('api')->id())
@@ -239,7 +240,9 @@ class UserController extends Controller
                 $pledge_day = 0;
             }
         }
-
+        if($product->freed_rate <= 0){
+            $is_show_freed = 0;
+        }
         $coins_total = UserBonus::where('user_id', '=', auth('api')->id())
             ->where('product_id', $product->id)
             ->sum('coins'); // 累计产出
@@ -262,6 +265,9 @@ class UserController extends Controller
             'freed25_from_id' => UserWalletLog::FROM_FREED, // 25%明细 from
             'pledge_from_id' => UserWalletLog::FROM_PLEDGE, // 质押币 明细
 //            'gas_from_id' => UserWalletLog::FROM_BORROW,
+            'now_rate' => $product->now_rate, // 立即释放比例
+            'freed_rate' => $product->freed_rate, // 线性释放比例
+            'is_show_freed' => $is_show_freed, // 是否显示线性释放 0-不显示 1-显示
         ];
 
         return $data;
