@@ -45,6 +45,7 @@ Route::prefix('v1')
 
                 Route::resource('announcement', AnnouncementController::class); // 公告
                 Route::resource('article', ArticleController::class); // 文章系统
+                Route::get('category', [ArticleController::class, 'category']); // 文章分类
                 Route::get('index', [IndexController::class, 'index']); // APP 首页
                 Route::get('aboutus', [IndexController::class, 'aboutus']); // 关于我们
                 Route::get('version', [VersionController::class, 'index']); // 检测最新版本

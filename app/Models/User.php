@@ -174,6 +174,12 @@ class User extends Authenticatable implements Wallet, WalletFloat
         return self::all()->count();
     }
 
+    // 已购T数
+    public static function buypower()
+    {
+        return 0;
+    }
+
     // 用户推荐下级列表
     public function sons()
     {

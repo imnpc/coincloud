@@ -4,6 +4,10 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Actions\Destroy;
 use App\Admin\Actions\Restore;
+use App\Admin\Actions\User\Money;
+use App\Admin\Actions\User\WalletLog;
+use App\Admin\Extensions\ShowOrder;
+use App\Admin\Extensions\ShowTeam;
 use App\Models\User;
 use Encore\Admin\Actions\Action;
 use Encore\Admin\Controllers\AdminController;
@@ -52,12 +56,12 @@ class UserController extends AdminController
             }
             return $icon; // 标题添加strong标签
         });
-        $grid->column('name', __('Name'));
+        $grid->column('name', __('Name'))->modal('用户的团队列表', ShowTeam::class);
 //        $grid->column('email', __('Email'));
 //        $grid->column('email_verified_at', __('Email verified at'));
 //        $grid->column('password', __('Password'));
 //        $grid->column('remember_token', __('Remember token'));
-        $grid->column('mobile', __('Mobile'));
+        $grid->column('mobile', __('Mobile'))->modal('用户订单', ShowOrder::class);
 //        $grid->column('nickname', __('Nickname'));
         $grid->column('parent_id', __('Parent id'));
         $grid->column('is_verify', __('是否实名认证'))->bool(['0' => false, '1' => true]);
@@ -80,11 +84,11 @@ class UserController extends AdminController
 //        $grid->disableActions(); // 禁用行操作列
         $grid->disableExport(); // 禁用导出数据
         $grid->disableColumnSelector();// 禁用行选择器
+
         $grid->actions(function ($actions) {
             if ($actions->row['is_verify'] == 1) {
                 $actions->disableDelete();// 去掉删除
             }
-
             $actions->disableView();// 去掉查看
 //            $actions->disableEdit();// 去掉编辑
             if (\request('_scope_') == 'trashed') {
@@ -93,6 +97,8 @@ class UserController extends AdminController
                 $actions->add(new Restore());
                 $actions->add(new Destroy());
             }
+            $actions->add(new WalletLog);
+            $actions->add(new Money);
         });
 
         $grid->model()->orderBy('id', 'desc');// 按照 ID 倒序

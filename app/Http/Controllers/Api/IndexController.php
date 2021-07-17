@@ -15,11 +15,13 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\UserBonus;
 use App\Models\UserWalletLog;
+use App\Models\WalletType;
 use App\Models\Weekly;
 use App\Models\WeeklyLog;
 use App\Services\LogService;
 use App\Services\UserWalletService;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Storage;
@@ -105,6 +107,47 @@ class IndexController extends Controller
 
     public function test()
     {
+        $list = WalletType::all();
+
+        $options = [];
+        foreach ($list as $key => $value) {
+            $options[$value->id] = $value->slug;
+        }
+        print_r($options);
+        exit();
+        // 获得上月信息
+        $lastmonth = Carbon::now()->subMonth();
+        $year = $lastmonth->year;
+        $month = $lastmonth->month;
+        $begin_time = $lastmonth->startOfMonth()->toDateTimeString(); // 上月开始时间
+        $end_time = $lastmonth->endOfMonth()->toDateTimeString(); // 上月结束时间
+        echo $month.'*'.$year.'*'.$begin_time.'*'.$end_time;
+        exit();
+        //
+        //$res = Good::where('deleted_at', null)
+        //            ->selectRaw('count(good_id) as count_good, good_id')
+        //            ->groupBy('good_id')
+        //            ->with(['good' => function ($query) {
+        //                return $query->select('id', 'goods_name');
+        //            }])
+        //            ->orderBy('count_good', 'desc')
+        //            ->get()
+        //            ->toArray();
+        //
+        //   dd($res);
+        $lists = Order::where('deleted_at', null)
+            ->selectRaw('product_id,sum(number) as num')
+            ->where('status', '=', 0)
+            ->where('pay_status', '=', 0)
+            ->groupBy('product_id')
+            ->pluck('num','product_id');
+//           ->get();
+        //->pluck('product_id', 'num');
+        print_r($lists);
+        foreach ($lists as $k => $v) {
+            echo '产品ID-'.$k.'->数量：'.$v;
+        }
+        exit();
         // 3 4 5
         $wallet_type_id = 5;
         $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化

@@ -524,7 +524,7 @@ class UserController extends Controller
 
         $request->validate([
             'real_name' => 'required|string', // 真实姓名
-            'id_number' => 'required|numeric', // 身份证号码
+            'id_number' => 'required|string', // 身份证号码
             'id_front' => 'required|mimes:' . $image, // 身份证正面
             'id_back' => 'required|mimes:' . $image, // 身份证反面
         ]);

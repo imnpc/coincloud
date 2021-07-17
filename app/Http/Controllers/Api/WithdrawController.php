@@ -92,7 +92,7 @@ class WithdrawController extends Controller
         $request->validate([
             'image' => 'required|mimes:' . $image, // 缩略图
             'wallet_address' => 'required|string', // 钱包地址
-	    'money_password' => 'required|string', // 资金密码
+	        'money_password' => 'required|string', // 资金密码
             'wallet_type_id' => 'required|exists:wallet_types,id', // 钱包类型
             'coin' => 'required|numeric|not_in:0|min:' . $min . '|max:' . $balance, // 提币金额
         ]);
