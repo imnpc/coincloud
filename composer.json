@@ -47,6 +47,7 @@
         "barryvdh/laravel-ide-helper": "^2.10",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
+        "jormin/laravel-ddoc": "^1.1",
         "laravel/sail": "^1.0.1",
         "laravel/ui": "^3.0",
         "mockery/mockery": "^1.4.2",
