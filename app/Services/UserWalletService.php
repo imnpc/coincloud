@@ -135,14 +135,17 @@ class UserWalletService
         $data = Wallet::where('slug', $name)
             ->sum('balance');
         $wallet = Wallet::where('slug', $name)->first();
+        if ($wallet) {
+            $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
+            $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
 
-        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
-        $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
-
-        if ($data <= 0) {
-            return 0;
+            if ($data <= 0) {
+                return 0;
+            } else {
+                return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+            }
         } else {
-            return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+            return 0;
         }
     }
 
