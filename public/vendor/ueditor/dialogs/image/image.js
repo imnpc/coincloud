@@ -777,6 +777,7 @@
                     _src: prefix + data.url,
                     title: data.title,
                     alt: data.original,
+                    width: '100%',
                     floatStyle: align
                 });
             }
