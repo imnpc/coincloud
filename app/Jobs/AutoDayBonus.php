@@ -174,7 +174,7 @@ class AutoDayBonus implements ShouldQueue
 
                 $coin_risk = number_fixed($risk - $team_a - $team_b - $team_c - $coin_parent1_balance - $coin_parent2_balance); // 风控池实际金额 = 风控池 - 分红池A - 分红池B - 分红池C - 1代分红 - 2代分红
                 // 系统钱包记录需要单独写 TODO
-                $remark_system = "每日分红";
+                $remark_system = "系统每日分红";
                 $logService->SystemLog($product->wallet_type_id, $team_a, $team_b, $team_c, $risk, $commission_balance, $service_fee, $day, $v->user_id, $remark_system);
 
                 // 个人收益
