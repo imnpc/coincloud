@@ -19,7 +19,7 @@ class SystemWallet extends Model
      * @var array
      */
     protected $fillable = [
-        'product_id', 'wallet_type_id', 'team_a', 'team_b', 'team_c', 'risk', 'commission_balance',
+        'product_id', 'wallet_type_id', 'team_a', 'team_b', 'team_c', 'risk', 'commission_balance', 'service_fee',
     ];
 
     // 关联 系统钱包日志

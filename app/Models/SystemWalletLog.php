@@ -20,8 +20,9 @@ class SystemWalletLog extends Model
      */
     protected $fillable = [
         'system_wallet_id', 'product_id', 'wallet_type_id', 'day', 'old_team_a', 'old_team_b', 'old_team_c', 'old_risk',
-        'old_commission_balance', 'team_a_add', 'team_b_add', 'team_c_add', 'risk_add', 'commission_balance_add', 'team_a',
-        'team_b', 'team_c', 'risk', 'commission_balance', 'from_user_id', 'order_id', 'remark',
+        'old_commission_balance', 'old_service_fee', 'team_a_add', 'team_b_add', 'team_c_add', 'risk_add', 'commission_balance_add',
+        'service_fee_add', 'team_a', 'team_b', 'team_c', 'risk', 'commission_balance', 'service_fee', 'from_user_id', 'order_id',
+        'remark',
     ];
 
     // 关联 系统钱包
