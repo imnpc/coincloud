@@ -42,13 +42,16 @@ class HomeController extends Controller
                 $product = Product::all();
                 // 产品数据：累计产币量 累计可提币  未释放 未提币 有效T数 购买T数 质押币 GAS费
                 foreach ($product as $k => $v) {
+                    $coin_balance = 0;
                     $total = UserBonus::where('product_id', $v->id)
                         ->sum('coins'); // 总的累计产币量
                     $total_revenue = UserBonus::where('product_id', $v->id)
                         ->sum('coin_day'); // 累计可提币
                     $wait_coin = Freed::where('product_id', $v->id)
                         ->sum('wait_coin'); // 未释放
-                    $coin_balance = $UserWalletService->walletBalance($v->wallet_type_id);// 未提币
+                    if($v->wallet_type_id){
+                        $coin_balance = $UserWalletService->walletBalance($v->wallet_type_id);// 未提币
+                    }
                     $valid_power = Order::where('product_id', '=', $v->id)
                         ->where('pay_status', '=', Order::PAID_COMPLETE)
                         ->sum('valid_power'); // 有效 T 数

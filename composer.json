@@ -39,6 +39,7 @@
         "overtrue/laravel-lang": "~5.0",
         "propaganistas/laravel-phone": "^4.3",
         "spatie/laravel-query-builder": "^3.3",
+        "torann/currency": "^1.1",
         "torann/geoip": "^3.0",
         "vinkla/hashids": "^9.1",
         "zhuzhichao/bank-card-info": "^2.1"
