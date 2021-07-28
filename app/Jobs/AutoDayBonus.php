@@ -137,12 +137,16 @@ class AutoDayBonus implements ShouldQueue
                 $parent2_uid = 0; // 2代推荐人 UID
                 $commission_balance = number_fixed($coin_parent1 + $coin_parent2); // 推荐剩余金额
 
+                $coin_parent1_balance = 0; // 1代推荐奖励
+                $coin_parent2_balance = 0; // 2代推荐奖励
+
                 $user = User::find($v->user_id);
 
                 // 1代：用户上级 ID 大于 0
                 if ($user->parent_id > 0 && $coin_parent1 > 0) {
                     $parent1_uid = $user->parent_id; // 1代推荐人用户 ID
                     $parent1_user = User::find($parent1_uid); // 1代推荐人用户信息
+                    $coin_parent1_balance = $coin_parent1;
                     $commission_balance = number_fixed($commission_balance - $coin_parent1); // 推荐剩余金额
                     //添加到用户余额 + 记录日志 filecoin_balance
                     $remark1 = "推荐分红1代";
@@ -151,6 +155,7 @@ class AutoDayBonus implements ShouldQueue
                     if ($parent1_user->parent_id > 0 && $coin_parent2 > 0) {
                         $parent2_uid = $parent1_user->parent_id; // 2代推荐人用户 ID
                         $parent2_user = User::find($parent2_uid); // 2代推荐人用户信息
+                        $coin_parent2_balance = $coin_parent2;
                         $commission_balance = number_fixed($commission_balance - $coin_parent2); // 推荐剩余金额
                         //添加到用户余额 + 记录日志 filecoin_balance
                         $remark2 = "推荐分红2代";
@@ -158,16 +163,19 @@ class AutoDayBonus implements ShouldQueue
                     }
                 }
 
+                // 公司服务费 service_rate 2021-07-27 TODO
+                $service_fee = number_fixed($coins * $product->service_rate / 100, 5); // 公司服务费
+
                 // 云算力系统钱包日志
                 $risk = number_fixed($coins * $product->risk_rate / 100, 5); // 风控池
                 $team_a = number_fixed($coins * $product->bonus_team_a / 100, 5); // 分红池A
                 $team_b = number_fixed($coins * $product->bonus_team_b / 100, 5); // 分红池B
                 $team_c = number_fixed($coins * $product->bonus_team_c / 100, 5); // 分红池C
 
-                $coin_risk = number_fixed($risk - $team_a - $team_b - $team_c); // 风控池实际金额 = 风控池 - 分红池A - 分红池B - 分红池C
+                $coin_risk = number_fixed($risk - $team_a - $team_b - $team_c - $coin_parent1_balance - $coin_parent2_balance); // 风控池实际金额 = 风控池 - 分红池A - 分红池B - 分红池C - 1代分红 - 2代分红
                 // 系统钱包记录需要单独写 TODO
                 $remark_system = "每日分红";
-                $logService->SystemLog($product->wallet_type_id, $team_a, $team_b, $team_c, $risk, $commission_balance, $day, $v->user_id, $remark_system);
+                $logService->SystemLog($product->wallet_type_id, $team_a, $team_b, $team_c, $risk, $commission_balance, $service_fee, $day, $v->user_id, $remark_system);
 
                 // 个人收益
                 $pay_user_rate = $product->pay_user_rate; // 每日收益比例

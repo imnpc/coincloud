@@ -57,7 +57,7 @@ class LogService
      * @param int $from_uid 来自用户ID
      * @param string $remark 备注
      */
-    public function SystemLog(int $wallet_type_id, $team_a = 0, $team_b = 0, $team_c = 0, $risk = 0, $commission_balance = 0, $day = 0, $from_uid = 0, $remark = '')
+    public function SystemLog(int $wallet_type_id, $team_a = 0, $team_b = 0, $team_c = 0, $risk = 0, $commission_balance = 0, $service_fee = 0, $day = 0, $from_uid = 0, $remark = '')
     {
         $wallet = SystemWallet::where('wallet_type_id', $wallet_type_id)->first();
         if (!$wallet) {
@@ -73,6 +73,7 @@ class LogService
         $new_team_c = number_fixed($wallet->team_c + $team_c);
         $new_risk = number_fixed($wallet->risk + $risk);
         $new_commission_balance = number_fixed($wallet->commission_balance + $commission_balance);
+        $new_service_fee = number_fixed($wallet->service_fee + $service_fee);
 
         $log = SystemWalletLog::create([
             'system_wallet_id' => $wallet->id,
@@ -84,18 +85,21 @@ class LogService
             'old_team_c' => $wallet->team_c,
             'old_risk' => $wallet->risk,
             'old_commission_balance' => $wallet->commission_balance,
+            'old_service_fee' => $wallet->service_fee,
 
             'team_a_add' => $team_a,
             'team_b_add' => $team_b,
             'team_c_add' => $team_c,
             'risk_add' => $risk,
             'commission_balance_add' => $commission_balance,
+            'service_fee_add' => $service_fee,
 
             'team_a' => $new_team_a,
             'team_b' => $new_team_b,
             'team_c' => $new_team_c,
             'risk' => $new_risk,
             'commission_balance' => $new_commission_balance,
+            'service_fee' => $new_service_fee,
 
             'from_user_id' => $from_uid,
             'remark' => $remark,
@@ -107,6 +111,7 @@ class LogService
             'team_c' => $new_team_c,
             'risk' => $new_risk,
             'commission_balance' => $new_commission_balance,
+            'service_fee' => $new_service_fee,
         ]);
     }
 }
