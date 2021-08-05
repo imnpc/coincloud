@@ -166,7 +166,7 @@ class UserWalletService
             $ids[] = $value['id'];
         }
         $ids = array_values($ids);
-        print_r($ids);
+
         $data = Transaction::where('type', '=', Transaction::TYPE_DEPOSIT)
             ->whereIn('wallet_id', $ids)
             ->sum('amount');

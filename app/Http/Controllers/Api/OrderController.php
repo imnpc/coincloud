@@ -64,14 +64,16 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        // 获取产品信息
+        $product = Product::find($request->product_id);
+
         $request->validate([
             'product_id' => 'required|exists:products,id', // 产品 ID
-            'number' => 'required|numeric|min:1', // 购买数量
+            'number' => 'required|numeric|min:'.$product->min_buy, // 购买数量
             'payment' => 'required|numeric|in:1,2,3', // 支付方式 1-银行转账 2-USDT 3-其他虚拟币
         ]);
 
-        // 获取产品信息
-        $product = Product::find($request->product_id);
+
         // 获取产品单价
         if ($request->payment == Order::PAY_BANK) {
             // 人民币支付
@@ -231,14 +233,15 @@ class OrderController extends Controller
      */
     public function check(Request $request)
     {
+        // 获取产品信息
+        $product = Product::find($request->product_id);
+
         $request->validate([
             'product_id' => 'required|exists:products,id', // 产品 ID
-            'number' => 'required|numeric|min:1', // 购买数量
+            'number' => 'required|numeric|min:'.$product->min_buy, // 购买数量
             'payment' => 'required|numeric|in:1,2,3', // 支付方式 1-银行转账 2-USDT 3-其他虚拟币
         ]);
 
-        // 获取产品信息
-        $product = Product::find($request->product_id);
         // 获取产品单价
         if ($request->payment == Order::PAY_BANK) {
             // 人民币支付
@@ -290,13 +293,14 @@ class OrderController extends Controller
      */
     public function getprice(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id', // 产品 ID
-            'number' => 'required|numeric|min:1', // 购买数量
-        ]);
-
         // 获取产品信息
         $product = Product::find($request->product_id);
+
+        $request->validate([
+            'product_id' => 'required|exists:products,id', // 产品 ID
+            'number' => 'required|numeric|min:'.$product->min_buy, // 购买数量
+        ]);
+
         $data['price'] = $product->price * $request->number;
         $data['price_usdt'] = $product->price_usdt * $request->number;
         $data['price_coin'] = $product->price_coin * $request->number;

@@ -27,6 +27,7 @@ class ProductController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Product());
+        $grid->sortable();
 
         $grid->column('id', __('Id'));
         $grid->column('thumb', __('Thumb'))->display(function ($value) {
@@ -56,6 +57,7 @@ class ProductController extends AdminController
         $grid->column('now_rate', __('Now rate'));
         $grid->column('freed_rate', __('Freed rate'));
         $grid->column('freed_days', __('Freed days'));
+        $grid->column('stock', __('Stock'));
 //        $grid->column('parent1_rate', __('Parent1 rate'));
 //        $grid->column('parent2_rate', __('Parent2 rate'));
 //        $grid->column('invite_rate', __('Invite rate'));
@@ -94,7 +96,7 @@ class ProductController extends AdminController
             $actions->disableView();// 去掉查看
 //            $actions->disableEdit();// 去掉编辑
         });
-        $grid->model()->orderBy('id', 'desc');// 按照 ID 倒序
+//        $grid->model()->orderBy('sort', 'desc');// 按照 ID 倒序
 
         return $grid;
     }
@@ -169,6 +171,8 @@ class ProductController extends AdminController
         $form->decimal('price_usdt', __('Price usdt'))->default(0)->required()->help('USDT 价格，可填写为0');
         $form->decimal('price_coin', __('Price coin'))->default(0)->required()->help('虚拟币价格，可填写为0');
         $form->text('unit', __('Unit'))->required()->help('单位，默认为 T，可以填写中文: 台,节点');
+        $form->number('min_buy', __('Min buy'))->default(1)->help('最低购买数量,默认1');
+        $form->number('stock', __('Stock'))->default(0)->help('库存数量,0为不限制');
         $form->text('coin_wallet_address', __('Coin wallet address'));
         $form->image('coin_wallet_qrcode', __('Coin wallet qrcode'))->required()->move('products')->uniqueName();
         $form->select('wallet_type_id', __('Wallet type id'))->options(WalletType::where('is_enblened',1)->get()->pluck('slug', 'id'))->required();
@@ -224,6 +228,15 @@ class ProductController extends AdminController
         ];
 
         $form->switch('status', __('Status'))->states($states);
+
+        $form->hidden('sort', __('Sort'));
+
+        if ($form->isCreating()) {
+            $form->saving(function (Form $form) {
+                $pid = Product::orderBy('created_at', 'desc')->first();
+                $form->sort = $pid->id + 1;
+            });
+        }
 
         $form->tools(function (Form\Tools $tools) {
 //            $tools->disableList(); // 去掉`列表`按钮

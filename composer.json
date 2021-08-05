@@ -24,6 +24,7 @@
         "kra8/laravel-snowflake": "^2.0",
         "laminas/laminas-diactoros": "^2.5",
         "laravel-admin-ext/config": "^1.1",
+        "laravel-admin-ext/grid-sortable": "^1.1",
         "laravel-admin-ext/helpers": "1.*",
         "laravel-admin-ext/scheduling": "^1.1",
         "laravel-admin-extensions/multi-language": "^0.0.6",

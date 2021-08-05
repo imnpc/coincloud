@@ -6,12 +6,21 @@ use App\Traits\dateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
+use Storage;
 
-class WalletType extends Model
+class WalletType extends Model implements Sortable
 {
     use HasFactory;
     use SoftDeletes;
     use dateTrait;
+    use SortableTrait;
+
+    public $sortable = [
+        'order_column_name' => 'sort',
+        'sort_when_creating' => true,
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +28,7 @@ class WalletType extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'slug', 'description', 'decimal_places', 'is_enblened',
+        'name', 'slug', 'description', 'decimal_places', 'is_enblened', 'sort',
     ];
 
     /**
@@ -37,6 +46,24 @@ class WalletType extends Model
      */
     protected $casts = [
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'icon_url',
+    ];
+
+    public function getIconUrlAttribute()
+    {
+        if ($this->icon) {
+            return Storage::disk('oss')->url($this->icon);
+        } else {
+            return '';
+        }
+    }
 
     // 关联 产品
     public function product()

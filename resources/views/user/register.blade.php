@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>邀请码注册</title>
+    <title>{{ config('app.name') }}-邀请码注册</title>
     <style>
         html {
             margin: 0;

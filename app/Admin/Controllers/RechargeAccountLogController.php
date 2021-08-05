@@ -15,7 +15,7 @@ class RechargeAccountLogController extends AdminController
      *
      * @var string
      */
-    protected $title = 'RechargeAccountLog';
+    protected $title = '充值封装记录';
 
     /**
      * Make a grid builder.
@@ -37,12 +37,25 @@ class RechargeAccountLogController extends AdminController
         $grid->column('pledge', __('Pledge'));
         $grid->column('gas', __('Gas'));
         $grid->column('total', __('Total'));
-        $grid->column('used', __('Used'));
-        $grid->column('day_limit', __('Day limit'));
+//        $grid->column('used', __('Used'));
+//        $grid->column('day_limit', __('Day limit'));
         $grid->column('remark', __('Remark'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
-        $grid->column('deleted_at', __('Deleted at'));
+//        $grid->column('deleted_at', __('Deleted at'));
+
+        $grid->disableExport(); // 禁用导出数据
+        $grid->disableColumnSelector();// 禁用行选择器
+        $grid->disableCreateButton(); // 禁用创建按钮
+        $grid->disableActions(); // 禁用行操作列
+
+        $grid->model()->orderBy('id', 'desc');// 按照 ID 倒序
+
+        $grid->actions(function ($actions) {
+            $actions->disableDelete();// 去掉删除
+            $actions->disableView();// 去掉查看
+            $actions->disableEdit();// 去掉编辑
+        });
 
         return $grid;
     }

@@ -226,6 +226,7 @@ class UserController extends Controller
             ->sum('wait_coin');
 
         // 质押币
+        $pledge_from_id = UserWalletLog::FROM_PLEDGE;
         $pledge = Pledge::where('user_id', '=', auth('api')->id())
             ->where('product_id', $product->id)
             ->first();
@@ -240,7 +241,14 @@ class UserController extends Controller
                 $pledge_day = 0;
             }
         }
-        if($product->freed_rate <= 0){
+        // 如果后台设置用户质押币为 不显示
+        if ($user->show_pledge == 0) {
+            $my_pledge = 0;
+            $pledge_day = 0;
+            $pledge_from_id = 0;
+        }
+
+        if ($product->freed_rate <= 0) {
             $is_show_freed = 0;
         }
         $coins_total = UserBonus::where('user_id', '=', auth('api')->id())
@@ -263,7 +271,7 @@ class UserController extends Controller
             'reward_from_id' => UserWalletLog::FROM_REWARD, // 奖励币明细 from
             'freed75_from_id' => UserWalletLog::FROM_FREED75, // 75%明细 from
             'freed25_from_id' => UserWalletLog::FROM_FREED, // 25%明细 from
-            'pledge_from_id' => UserWalletLog::FROM_PLEDGE, // 质押币 明细
+            'pledge_from_id' => $pledge_from_id, // 质押币 明细
 //            'gas_from_id' => UserWalletLog::FROM_BORROW,
             'now_rate' => $product->now_rate, // 立即释放比例
             'freed_rate' => $product->freed_rate, // 线性释放比例
@@ -777,5 +785,26 @@ class UserController extends Controller
 
         $data['message'] = "验证码发送成功";
         return response()->json($data, 200);
+    }
+
+    /**
+     * 我的产品列表
+     * @param Request $request
+     * @return array
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function myproduct(Request $request)
+    {
+        $user = $request->user();
+
+        $list = Product::where('status', '=', 0)
+            ->orderBy('id', 'asc')
+            ->get();
+        foreach ($list as $k => $v) {
+            $data[$k]['name'] = $v->wallet_slug;
+            $data[$k]['wallet_type_id'] = $v->wallet_type_id;
+        }
+
+        return $data;
     }
 }

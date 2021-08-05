@@ -7,13 +7,21 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 use Storage;
 
-class Product extends Model
+class Product extends Model implements Sortable
 {
     use HasFactory;
     use SoftDeletes;
     use dateTrait;
+    use SortableTrait;
+
+    public $sortable = [
+        'order_column_name' => 'sort',
+        'sort_when_creating' => true,
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +33,7 @@ class Product extends Model
         'wait_days', 'valid_days', 'valid_days_text', 'choose_reason', 'choose_reason_text', 'service_rate', 'day_customer_rate',
         'day_rate', 'freed_rate', 'freed_days', 'parent1', 'parent2', 'invite_rate', 'bonus_team_a', 'bonus_team_b', 'bonus_team_c',
         'upgrade_team_a', 'upgrade_team_b', 'upgrade_team_c', 'gas_fee', 'pledge_fee', 'pledge_days', 'valid_rate', 'package_rate',
-        'thumb', 'desc', 'content', 'status', 'is_show_text',
+        'thumb', 'desc', 'content', 'status', 'is_show_text', 'min_buy', 'stock', 'sort',
     ];
 
     /**
@@ -50,7 +58,7 @@ class Product extends Model
      * @var array
      */
     protected $appends = [
-        'thumb_url', 'wallet_slug',
+        'thumb_url', 'wallet_slug', 'wallet_icon',
     ];
 
     // 获取缩略图地址
@@ -68,6 +76,16 @@ class Product extends Model
     {
         if ($this->wallet_type_id > 0) {
             return WalletType::find($this->wallet_type_id)->slug;
+        } else {
+            return '';
+        }
+    }
+
+    // 获取钱包类型的名称
+    public function getWalletIconAttribute()
+    {
+        if ($this->wallet_type_id > 0) {
+            return WalletType::find($this->wallet_type_id)->icon_url;
         } else {
             return '';
         }

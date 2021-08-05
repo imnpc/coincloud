@@ -65,6 +65,7 @@ class UserController extends AdminController
 //        $grid->column('nickname', __('Nickname'));
         $grid->column('parent_id', __('Parent id'));
         $grid->column('is_verify', __('是否实名认证'))->bool(['0' => false, '1' => true]);
+        $grid->column('show_pledge', __('Show pledge'))->bool(['0' => false, '1' => true]);
         $grid->column('last_login_at', __('Last login at'));
         $grid->column('last_login_ip', __('Last login ip'));
         $grid->column('status', __('Status'))->using([
@@ -179,6 +180,7 @@ class UserController extends AdminController
             return "<img src='$value' width='100%'/>";
         });
         $form->radioCard('is_verify', __('Is verify'))->options(['0' => '未认证', '1' => '已认证'])->default('0');
+        $form->radioCard('show_pledge', __('Show pledge'))->options(['0' => '不显示', '1' => '显示'])->default('1');
 
         $states = [
             'on' => ['value' => 0, 'text' => '启用', 'color' => 'primary'],

@@ -25,8 +25,16 @@ class WalletTypeController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new WalletType());
+        $grid->sortable();
 
         $grid->column('id', __('Id'));
+        $grid->column('icon_url', __('Icon'))->display(function ($value) {
+            $icon = "";
+            if ($value) {
+                $icon = "<img src='$value' style='max-width:30px;max-height:30px;text-align: left' class='img'/>";
+            }
+            return $icon; // 标题添加strong标签
+        });
         $grid->column('name', __('Name'));
         $grid->column('slug', __('Slug'));
         $grid->column('description', __('Description'));
@@ -94,12 +102,22 @@ class WalletTypeController extends AdminController
         $form->text('slug', __('Slug'))->required()->help('钱包代码,英文大写,不能有空格和特殊字符,例如 USDT');
         $form->text('description', __('Description'))->help('钱包描述,可不填');
         $form->number('decimal_places', __('Decimal places'))->default(5)->required()->help('小数点位数,虚拟币默认5位');
+        $form->image('icon', __('Icon'))->move('wallet/icon')->uniqueName();
         //$form->number('is_enblened', __('Is enblened'));
         $states = [
             'on' => ['value' => 1, 'text' => '启用', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => '禁用', 'color' => 'danger'],
         ];
         $form->switch('is_enblened', __('Is enblened'))->states($states);
+
+        $form->hidden('sort', __('Sort'));
+
+        if ($form->isCreating()) {
+            $form->saving(function (Form $form) {
+                $pid = WalletType::orderBy('created_at', 'desc')->first();
+                $form->sort = $pid->id + 1;
+            });
+        }
 
         $form->tools(function (Form\Tools $tools) {
 //            $tools->disableList(); // 去掉`列表`按钮

@@ -230,6 +230,17 @@
     "Product": "产品",
     "Wallet slug": "钱包别名",
     "Package type": "质押币封装模式",
-    "Is show text": "显示算力文字提示"
+    "Is show text": "显示算力文字提示",
+    "Coin": "虚拟币金额",
+    "Reason": "原因",
+    "Canceled time": "取消时间",
+    "Used coin": "已使用",
+    "Pledge": "每T所需质押币",
+    "Return coin": "退回金额",
+    "Recharge id": "充值 ID",
+    "Day gas": "当天 GAS 费系数",
+    "Gas": "每T所需 GAS 费",
+    "Save order": "保存排序",
+    "Show pledge": "显示质押币"
 }
 
