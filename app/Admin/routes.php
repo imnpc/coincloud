@@ -37,4 +37,5 @@ Route::group([
     $router->resource('weeklies', WeeklyController::class); // 每周统计
     $router->resource('weekly-logs', WeeklyLogController::class); // 每周统计详细数据
     $router->resource('user-wallet-logs', UserWalletLogController::class); // 用户钱包日志
+    $router->resource('levels', LevelController::class); // 等级
 });

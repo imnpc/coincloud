@@ -33,9 +33,9 @@ class UserWalletService
         } elseif ($money > 0 && $decimal == 0) {
             $wallet->deposit($money, $remark); // 增加
         } elseif ($money < 0 && $decimal == 1) {
-            $wallet->withdrawFloat($money, $remark); // 减少
+            $wallet->withdrawFloat(abs($money), $remark); // 减少
         } elseif ($money < 0 && $decimal == 0) {
-            $wallet->withdraw($money, $remark); // 减少
+            $wallet->withdraw(abs($money), $remark); // 减少
         }
     }
 

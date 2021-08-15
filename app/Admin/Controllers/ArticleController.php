@@ -114,7 +114,7 @@ class ArticleController extends AdminController
 
         $form->select('article_category_id', __('Article category id'))->options(ArticleCategory::selectOptions())->required();
         $form->text('title', __('Title'))->required();
-        $form->image('thumb', __('Thumb'));
+        $form->image('thumb', __('Thumb'))->move('article/thumb')->uniqueName();
         $form->textarea('desc', __('Desc'));
         $form->editor('content', __('Content'))->required();
         // 设置text、color、和存储值

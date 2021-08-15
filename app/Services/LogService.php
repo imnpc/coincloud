@@ -31,6 +31,7 @@ class LogService
         $meta['new'] = $new;
         $meta['from'] = $from;
         $meta['remark'] = $remark;
+
         $UserWalletService->store($uid, $wallet_type_id, $add, $meta);// 写入数据到钱包
 
         UserWalletLog::create([

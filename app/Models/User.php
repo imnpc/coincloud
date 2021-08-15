@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Services\LogService;
 use App\Traits\dateTrait;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Interfaces\WalletFloat;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWalletFloat;
 use Bavix\Wallet\Traits\HasWallets;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -56,7 +58,7 @@ class User extends Authenticatable implements Wallet, WalletFloat
      */
     protected $fillable = [
         'name', 'email', 'password', 'mobile', 'nickname', 'parent_id', 'status', 'last_login_at', 'last_login_ip', 'avatar',
-        'real_name', 'id_number', 'id_front', 'id_back', 'is_verify', 'money_password',
+        'real_name', 'id_number', 'id_front', 'id_back', 'is_verify', 'money_password', 'level_id', 'team_id',
     ];
 
     /**
@@ -168,6 +170,12 @@ class User extends Authenticatable implements Wallet, WalletFloat
         return $this->hasMany(WeeklyLog::class);
     }
 
+    // 关联 等级
+    public function level()
+    {
+        return $this->belongsTo(Level::class);
+    }
+
     // 用户总数
     public static function count()
     {
@@ -209,4 +217,51 @@ class User extends Authenticatable implements Wallet, WalletFloat
 
         return self::where($credentials)->first();
     }
+
+    /**
+     * @param int $wallet_type_id 钱包类型ID
+     * @param int $user_id 用户 id
+     * @param float $user_coin 单用户每日产币总量
+     * @param int $level_id 上一轮等级
+     * @param int $last_rate 最后分润比例
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function JiCha(int $wallet_type_id, int $user_id, $user_coin, $level_id, $last_rate = 0)
+    {
+        $logService = app()->make(LogService::class);
+        $day = Carbon::now()->toDateTimeString();
+        $user = User::find($user_id);
+        $fix_rate = 0; // 修正的实际比例
+        // 判断当前用户team_id 是否大于0
+        if ($user->team_id > 0) {
+            // 团队长用户
+            $top_user = User::find($user->team_id);
+            // 团队长级别
+            $level = Level::find($top_user->level_id);
+            $reward_rate = $level->reward_rate;
+            $rate = $reward_rate - $last_rate;
+            if ($rate > 0) {
+                $fix_rate = $rate;
+                $team_bonus = number_fixed($user_coin * $rate / 100);
+                // 给团队长发提成
+                $remark = "团队分红-" . $fix_rate;
+                $logService->userLog($top_user->id, $wallet_type_id, $team_bonus, 0, $day, UserWalletLog::FROM_TEAM_BONUS, $remark);
+            }
+
+            // 最高等级的平级奖
+//            if ($level_id == 7 && $top_user->level_id == 7) {
+//                $peer = 10;
+//                $team_bonus = number_fixed($user_coin * $peer / 100);
+//                // 给团队长发提成
+//                $remark = "平级奖-" . $team_bonus;
+//                $logService->userLog($top_user->id, $wallet_type_id, $team_bonus, 0, $day, UserWalletLog::FROM_TEAM_BONUS, $remark);
+//            }
+            $last_rate = $last_rate + $fix_rate;
+            // 递归
+            if ($top_user->team_id > 0) {
+                self::JiCha($wallet_type_id, $top_user->id, $user_coin, $top_user->level_id, $last_rate);
+            }
+        }
+    }
+
 }

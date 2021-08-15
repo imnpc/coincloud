@@ -6,6 +6,7 @@ use App\Jobs\AutoCreateDayBonus;
 use App\Jobs\AutoProductBonus;
 use App\Jobs\AutoProductWeeklyReport;
 use App\Jobs\ChangeOrderWaitStatus;
+use App\Jobs\LevelAndTeam;
 use App\Jobs\OrderPackage;
 use App\Jobs\PledgeDay;
 use Illuminate\Console\Scheduling\Schedule;
@@ -41,6 +42,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('geoip:update')->weekly()->thursdays()->at('4:30'); // 更新GEO地理位置数据库 每周四 4:30
 
         $schedule->job(new AutoCreateDayBonus)->dailyAt('0:01'); // 每天自动创建分红记录 0:01
+        //$schedule->job(new LevelAndTeam)->dailyAt('0:08'); // 设置会员级别和所属团队
         $schedule->job(new ChangeOrderWaitStatus)->dailyAt('0:20'); // 更改订单等待状态 0:20
         $schedule->job(new OrderPackage)->dailyAt('0:25'); // 订单封装有效算力 0:25
         $schedule->job(new AutoProductBonus)->dailyAt('0:05'); // 产品自动分红 0:05

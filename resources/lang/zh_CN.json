@@ -240,7 +240,13 @@
     "Recharge id": "充值 ID",
     "Day gas": "当天 GAS 费系数",
     "Gas": "每T所需 GAS 费",
-    "Save order": "保存排序",
-    "Show pledge": "显示质押币"
+    "Show pledge": "显示质押币",
+    "Min": "业绩下限",
+    "Max": "业绩上限",
+    "Reward rate": "奖励比例(%)",
+    "Level id": "等级",
+    "Min buy": "最低购买数量",
+    "Stock": "库存",
+    "Save order": "保存排序"
 }
 

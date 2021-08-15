@@ -121,7 +121,7 @@ class IndexController extends Controller
         $month = $lastmonth->month;
         $begin_time = $lastmonth->startOfMonth()->toDateTimeString(); // 上月开始时间
         $end_time = $lastmonth->endOfMonth()->toDateTimeString(); // 上月结束时间
-        echo $month.'*'.$year.'*'.$begin_time.'*'.$end_time;
+        echo $month . '*' . $year . '*' . $begin_time . '*' . $end_time;
         exit();
         //
         //$res = Good::where('deleted_at', null)
@@ -140,12 +140,12 @@ class IndexController extends Controller
             ->where('status', '=', 0)
             ->where('pay_status', '=', 0)
             ->groupBy('product_id')
-            ->pluck('num','product_id');
+            ->pluck('num', 'product_id');
 //           ->get();
         //->pluck('product_id', 'num');
         print_r($lists);
         foreach ($lists as $k => $v) {
-            echo '产品ID-'.$k.'->数量：'.$v;
+            echo '产品ID-' . $k . '->数量：' . $v;
         }
         exit();
         // 3 4 5
@@ -413,6 +413,41 @@ class IndexController extends Controller
 
     public function demo()
     {
-//
+        $a = 9999;
+        echo number_fixed($a);
+        exit();
+        $licensekey = config('app.license_key');
+        $exists = Storage::disk('local')->exists('localkey.txt');
+        if (!$exists) {
+            $results = shy_check_license($licensekey);
+        } else {
+            $localkey = Storage::disk('local')->get('localkey.txt');
+            $results = shy_check_license($licensekey, $localkey);
+        }
+//        print_r($results);
+        // Interpret response
+        switch ($results['status']) {
+            case "Active":
+                // get new local key and save it somewhere
+                if(isset($results['localkey'])) {
+                    $localkeydata = $results['localkey'];
+                    Storage::disk('local')->put('localkey.txt', $localkeydata);
+                    die("Online License key is OK");
+                }
+                die("Local License key is OK");
+                break;
+            case "Invalid":
+                die("License key is Invalid");
+                break;
+            case "Expired":
+                die("License key is Expired");
+                break;
+            case "Suspended":
+                die("License key is Suspended");
+                break;
+            default:
+                die("Invalid Response");
+                break;
+        }
     }
 }

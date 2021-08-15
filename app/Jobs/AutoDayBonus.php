@@ -142,6 +142,10 @@ class AutoDayBonus implements ShouldQueue
 
                 $user = User::find($v->user_id);
 
+                // 极差分红
+                //$model = new \App\Models\User(); //实例化model
+                //$model->JiCha($product->wallet_type_id, $v->user_id, $coins, $user->level_id);
+
                 // 1代：用户上级 ID 大于 0
                 if ($user->parent_id > 0 && $coin_parent1 > 0) {
                     $parent1_uid = $user->parent_id; // 1代推荐人用户 ID

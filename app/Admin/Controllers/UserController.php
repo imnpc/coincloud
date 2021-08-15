@@ -64,6 +64,7 @@ class UserController extends AdminController
         $grid->column('mobile', __('Mobile'))->modal('用户订单', ShowOrder::class);
 //        $grid->column('nickname', __('Nickname'));
         $grid->column('parent_id', __('Parent id'));
+        $grid->column('level.name', __('Level id'));
         $grid->column('is_verify', __('是否实名认证'))->bool(['0' => false, '1' => true]);
         $grid->column('show_pledge', __('Show pledge'))->bool(['0' => false, '1' => true]);
         $grid->column('last_login_at', __('Last login at'));

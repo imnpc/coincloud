@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\WalletType;
 use App\Models\Withdraw;
 use Carbon\Carbon;
+use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -59,6 +60,7 @@ class WithdrawController extends Controller
             $data['message'] = "请先到会员中心进行实名认证！";
             return response()->json($data, 403);
         }
+
         if (empty($user->money_password)) {
             $data['message'] = "请先到会员中心设置资金密码！";
             return response()->json($data, 403);
@@ -92,7 +94,7 @@ class WithdrawController extends Controller
         $request->validate([
             'image' => 'required|mimes:' . $image, // 缩略图
             'wallet_address' => 'required|string', // 钱包地址
-	        'money_password' => 'required|string', // 资金密码
+            'money_password' => 'required|string', // 资金密码
             'wallet_type_id' => 'required|exists:wallet_types,id', // 钱包类型
             'coin' => 'required|numeric|not_in:0|min:' . $min . '|max:' . $balance, // 提币金额
         ]);
@@ -151,7 +153,7 @@ class WithdrawController extends Controller
             $data['message'] = "请先到会员中心设置资金密码！";
             return response()->json($data, 403);
         }
-	
+
         // wallet_type_id 钱包类型/slug/获取对应钱包 TODO
         $wallet_type = WalletType::find($request->wallet_type_id);
         if (empty($wallet_type) || $wallet_type->is_enblened = 0) {

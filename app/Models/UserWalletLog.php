@@ -41,6 +41,7 @@ class UserWalletLog extends Model
     public const FROM_CANCEL_WITHDRAW = 23; // 取消提币
     public const FROM_CANCEL_RECHARGE = 24; // 取消充值
     public const FROM_RECHARGE_RETURN = 25; // 返还剩余充值余额
+    public const FROM_TEAM_BONUS = 26; // 团队分红
 
     public static $fromMap = [
         self::FROM_ADMIN => '后台',
@@ -70,6 +71,7 @@ class UserWalletLog extends Model
         self::FROM_CANCEL_RECHARGE => '取消充值',
         self::FROM_RECHARGE_RETURN => '返还剩余充值余额',
         self::FROM_CANCEL_WITHDRAW => '取消提币',
+        self::FROM_TEAM_BONUS => '团队分红',
     ];
 
     /**
