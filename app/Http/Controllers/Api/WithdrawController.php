@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\WithdrawResource;
 use App\Models\User;
+use App\Models\UserWalletLog;
 use App\Models\WalletType;
 use App\Models\Withdraw;
+use App\Services\LogService;
 use Carbon\Carbon;
 use Hash;
 use Illuminate\Http\Request;
@@ -120,12 +122,9 @@ class WithdrawController extends Controller
             'real_coin' => $real_coin,
         ]);
         // 从用户钱包扣除对应金额
-        //$remark = "用户提币扣除" . $request->coin . ',手续费' . $fee . ',实际到账' . $real_coin;
-        $meta['old'] = $balance;
-        $meta['add'] = -$request->coin;
-        $meta['remark'] = "用户提币扣除" . $request->coin . ',手续费' . $fee . ',实际到账' . $real_coin;
-        $wallet->withdrawFloat($request->coin, $meta);
-        //$logService->userLog(User::BALANCE_FILECOIN, auth('api')->id(), -$request->coin, 0, $day, UserWalletLog::FROM_WITHDRAW, $remark);
+        $remark = "用户提币扣除" . $request->coin . ',手续费' . $fee . ',实际到账' . $real_coin;
+        $logService = app()->make(LogService::class); // 钱包服务初始化
+        $logService->userLog($user->id, $request->wallet_type_id, -$request->coin, 0, $day, UserWalletLog::FROM_WITHDRAW, $remark);
 
         $data['message'] = "提币申请提交成功,请等待审核!";
         return response()->json($data, 200);
