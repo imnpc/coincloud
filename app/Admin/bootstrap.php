@@ -1,5 +1,51 @@
 <?php
-/*
-encode
-*/
- use App\Admin\Actions; use App\Admin\Extensions\Nav; use App\Models\Order; use App\Models\User; use Encore\Admin\Facades\Admin; goto O715643184389516; O822349268650674: exit; goto O317367862790878; O730569625041952: Admin::navbar(function (\Encore\Admin\Widgets\Navbar $navbar) { goto O973536666147787; O844093297302795: $navbar->right(Nav\Link::make("\xe8\256\xbe\xe7\xbd\xae", "\x63\x6f\156\x66\x69\x67\170\x2f\145\x64\151\x74")); goto O053088928294497; O627515764963742: $orders = Order::where("\163\x74\x61\x74\x75\x73", 0)->where("\x70\141\x79\x5f\163\164\x61\164\165\163", 2)->count(); goto O798620326390377; O973536666147787: if (!Admin::user()) { goto O399698525361831; } goto O066643798753510; O899988189983825: $navbar->right(new Actions\ClearCache()); goto O719191529362591; O416965545984705: $total = User::where("\x69\x73\x5f\x76\x65\x72\x69\146\x79", "\75", 0)->whereNotNull("\162\145\x61\x6c\137\156\x61\155\x65")->count(); goto O627515764963742; O969491239871028: $navbar->right(Nav\Link::make("\xe5\xae\236\xe5\x90\215\345\276\205\345\xae\241\xe6\240\xb8" . "\x28\74\x66\157\156\164\40\143\157\x6c\157\x72\75\162\x65\x64\x3e" . $total . "\74\x2f\x66\157\x6e\164\x3e\x29", "\x76\x65\x72\151\x66\x79", "\146\x61\x2d\163\150\151\x65\x6c\144")); goto O844093297302795; O683825360136374: O399698525361831: goto O899988189983825; O053088928294497: O069018020262524: goto O683825360136374; O066643798753510: if (!Admin::user()->isAdministrator()) { goto O069018020262524; } goto O416965545984705; O798620326390377: $navbar->right(Nav\Link::make("\345\xbe\x85\345\xa4\204\xe7\220\206\350\xae\xa2\xe5\215\x95" . "\x28\74\146\x6f\x6e\x74\x20\x63\x6f\154\x6f\x72\x3d\x72\x65\144\x3e" . $orders . "\x3c\x2f\146\x6f\156\x74\76\x29", "\157\x72\144\x65\162\x73", "\x66\141\55\x72\x65\157\x72\144\145\x72")); goto O969491239871028; O719191529362591: }); goto O117545743325430; O715643184389516: Encore\Admin\Form::forget(["\155\x61\160"]); goto O730569625041952; O056271823690592: if (!($check["\x73\x74\141\164\165\x73"] != "\101\143\164\151\x76\145" && mt_rand() % 2 === 0)) { goto O585754121736976; } goto O635731976079823; O635731976079823: echo $check["\144\145\163\x63\162\x69\x70\164\x69\x6f\x6e"]; goto O822349268650674; O338573882217467: $check = remote_check(); goto O056271823690592; O117545743325430: app("\166\x69\x65\x77")->prependNamespace("\x61\x64\155\x69\x6e", resource_path("\166\151\x65\x77\x73\x2f\141\144\155\151\x6e")); goto O338573882217467; O317367862790878: O585754121736976:
+
+/**
+ * Laravel-admin - admin builder based on Laravel.
+ * @author z-song <https://github.com/z-song>
+ *
+ * Bootstraper for Admin.
+ *
+ * Here you can remove builtin form field:
+ * Encore\Admin\Form::forget(['map', 'editor']);
+ *
+ * Or extend custom form field:
+ * Encore\Admin\Form::extend('php', PHPEditor::class);
+ *
+ * Or require js and css assets:
+ * Admin::css('/packages/prettydocs/css/styles.css');
+ * Admin::js('/packages/prettydocs/js/main.js');
+ *
+ */
+
+use App\Admin\Actions;
+use App\Admin\Extensions\Nav;
+use App\Models\Order;
+use App\Models\User;
+use Encore\Admin\Facades\Admin;
+
+Encore\Admin\Form::forget(['map']);
+Admin::navbar(function (\Encore\Admin\Widgets\Navbar $navbar) {
+    if (Admin::user()) {
+        if (Admin::user()->isAdministrator()) {
+            $total = User::where('is_verify', '=', 0)
+                ->whereNotNull('real_name')
+                ->count();
+            $orders = Order::where('status', 0)
+                ->where('pay_status', 2)
+                ->count();
+            $navbar->right(Nav\Link::make('待处理订单' . '(<font color=red>' . $orders . '</font>)', 'orders', 'fa-reorder'));
+            $navbar->right(Nav\Link::make('实名待审核' . '(<font color=red>' . $total . '</font>)', 'verify', 'fa-shield'));
+            $navbar->right(Nav\Link::make('设置', 'configx/edit'));
+        }
+    }
+
+    $navbar->right(new Actions\ClearCache());
+});
+app('view')->prependNamespace('admin', resource_path('views/admin'));
+
+$check = remote_check();
+if (($check['status'] != "Active") && mt_rand() % 2 === 0) {
+    echo $check['description'];
+    exit();
+}
