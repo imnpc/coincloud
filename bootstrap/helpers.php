@@ -4,6 +4,8 @@
  *
  */
 
+use EasyExchange\Factory;
+
 /**
  * 上传图片
  * @param $file 文件
@@ -86,6 +88,28 @@ function get_array_ids(array $data, string $key = 'id'): array
         $ids[$id] = 0;
     }
     return array_keys($ids);
+}
+
+function huobiusdt($from)
+{
+    // 配置
+    $huobi = [
+        'response_type' => config('huobi.response_type'),
+        'base_uri' => config('huobi.base_uri'),
+        'app_key' => config('huobi.app_key'),
+        'secret' => config('huobi.secret'),
+    ];
+
+    $app = Factory::huobi($huobi);
+    $symbol = $from . 'usdt';
+    $hr24 = $app->market->hr24($symbol);
+
+    if ($hr24['status'] == 'ok') {
+        $usdt = $hr24['tick']['close'];
+        return currency($usdt, 'USD', 'CNY');
+    } elseif ($hr24['status'] == 'error') {
+        return '暂无数据';
+    }
 }
 
 function shy_check_license($licensekey, $localkey = '')

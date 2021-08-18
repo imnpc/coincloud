@@ -36,7 +36,7 @@
       text-align: center;
     }
     .exImg img{
-      margin-top: 18px;
+            margin-top: 1px;
     }
     .exInput{
       margin-top: 30px;
@@ -72,21 +72,26 @@
       border-radius: 0 7px 7px 0;
     }
 
+        .notice {
+            font-size: 18px;
+            color: red;
+        }
 
   </style>
 </head>
 <body>
 <div class="extension">
-  <div class="exImg">
-    <img src="{{ $config['reg_qrcode'] }}" alt="">
-  </div>
-  <div class="exInput">
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;下载链接</p>
-    <div>
-      <input type="text" id="url" class="sInput" value="{{ $config['download_url'] }}">
-      <input type="button"  class="btInput" value="复制链接" onClick="url.select();document.execCommand('Copy')">
-      <br/><br/>
+    <div class="exImg">
+        <img src="{{ $config['reg_qrcode'] }}" alt="" width="100%">
     </div>
+    <div class="exInput">
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;下载链接</p>
+        <div>
+            <input type="text" id="url" class="sInput" value="{{ $config['download_url'] }}">
+            <input type="button" class="btInput" value="复制链接" onClick="url.select();document.execCommand('Copy')">
+            <br/><br/>
+            <h4 class="notice">请长按识别以上二维码 或者 点击 复制链接，然后 使用浏览器 打开链接</h4>
+        </div>
 
   </div>
 </div>

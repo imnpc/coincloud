@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Jobs\AutoCreateDayBonus;
 use App\Jobs\AutoProductBonus;
 use App\Jobs\AutoProductWeeklyReport;
+use App\Jobs\AutoUpdateCoinPrice;
 use App\Jobs\ChangeOrderWaitStatus;
 use App\Jobs\LevelAndTeam;
 use App\Jobs\OrderPackage;
@@ -41,6 +42,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('currency:update -o')->everySixHours(); // 更新汇率 每隔6小时
         $schedule->command('geoip:update')->weekly()->thursdays()->at('4:30'); // 更新GEO地理位置数据库 每周四 4:30
 
+        //$schedule->job(new AutoUpdateCoinPrice)->everyTenMinutes(); // 更新实时币价  服务器 10分钟一次
         $schedule->job(new AutoCreateDayBonus)->dailyAt('0:01'); // 每天自动创建分红记录 0:01
         //$schedule->job(new LevelAndTeam)->dailyAt('0:08'); // 设置会员级别和所属团队
         $schedule->job(new ChangeOrderWaitStatus)->dailyAt('0:20'); // 更改订单等待状态 0:20

@@ -93,7 +93,7 @@ class UserWalletService
         $data = $wallet->transactions()
             ->where('type', '=', Transaction::TYPE_DEPOSIT)
             ->where('wallet_id', '=', $wallet->id)
-            ->whereDate('created_at', '=', Carbon::yesterday())
+            ->whereDate('created_at', '=', Carbon::today())
 //            ->whereDate('created_at', '=', '2021-05-08')
             ->sum('amount');
         if ($data <= 0) {
