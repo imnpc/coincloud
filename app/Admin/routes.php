@@ -38,4 +38,7 @@ Route::group([
     $router->resource('weekly-logs', WeeklyLogController::class); // 每周统计详细数据
     $router->resource('user-wallet-logs', UserWalletLogController::class); // 用户钱包日志
     $router->resource('levels', LevelController::class); // 等级
+    $router->resource('electric-charges', ElectricChargeController::class); // 电费
+    $router->resource('electriclog', ElectricChargeLogController::class); // 电费记录
+
 });

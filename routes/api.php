@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ElectricChargeLogController;
 use App\Http\Controllers\Api\IndexController;
 use App\Http\Controllers\Api\RechargeController;
 use App\Http\Controllers\Api\WithdrawController;
@@ -79,6 +80,7 @@ Route::prefix('v1')
                     Route::get('account', [UserController::class, 'account']); // 我的资产
                     Route::get('walletlog', [UserController::class, 'walletLog']); // 我的资产流水
 //            Route::get('rewardwalletlog', 'UserController@RewardwalletLog'); // 奖励算力资产流水
+                    Route::get('myproduct', [UserController::class, 'myproduct']); // 我的产品列表
 
                     Route::resource('withdraw', WithdrawController::class); // 提币
                     Route::get('mycoin', [WithdrawController::class, 'my']); // 我的提币
@@ -97,6 +99,8 @@ Route::prefix('v1')
                     Route::get('myrecharge', [RechargeController::class, 'my']); // 我的充值页面
                     Route::get('powerlog', [RechargeController::class, 'powerlog']); // 算力封装记录
 
+                    Route::resource('electricChargeLog', ElectricChargeLogController::class); // 订单
+                    Route::patch('electricCharge/{electricChargeLog}', [ElectricChargeLogController::class, 'update']); // 更新电费支付凭证
 //            Route::resource('lend', 'LendController'); // 出借
 //            Route::get('mylend', 'LendController@my'); // 我的出借页面
                 });

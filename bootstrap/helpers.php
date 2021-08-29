@@ -4,7 +4,9 @@
  *
  */
 
+use App\Gateways\QxtGateway;
 use EasyExchange\Factory;
+use Overtrue\EasySms\EasySms;
 
 /**
  * 上传图片
@@ -305,6 +307,10 @@ function remote_check()
         $results['description'] = "请填写授权码";
     }
 
+    if (empty($results['description'])) {
+        $results['description'] = "检测数据无效";
+    }
+
     if (isset($results['description'])) {
         $results['message'] = $results['description'];
     }
@@ -324,4 +330,26 @@ function get_ip(): string
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $data = curl_exec($ch);
     return trim($data);
+}
+
+/**
+ * 发送短信
+ * @param string $mobile 手机号
+ * @param int $code 验证码
+ * @throws \Overtrue\EasySms\Exceptions\InvalidArgumentException
+ * @throws \Overtrue\EasySms\Exceptions\NoGatewayAvailableException
+ */
+function send_sms($mobile, $code): array
+{
+    $sign = config('easysms.sms_sign_name');
+    $easySms = new EasySms(config('easysms'));
+    // 注册
+    $easySms->extend('qxt', function ($gatewayConfig) {
+        // $gatewayConfig 来自配置文件里的 `gateways.mygateway`
+        return new QxtGateway($gatewayConfig);
+    });
+    $text = '【' . $sign . '】您的验证码是：' . $code . '。请不要把验证码泄露给其他人。';
+    $result = $easySms->send($mobile, $text);
+
+    return $result;
 }

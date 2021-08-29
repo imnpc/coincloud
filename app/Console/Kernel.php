@@ -8,6 +8,7 @@ use App\Jobs\AutoProductWeeklyReport;
 use App\Jobs\AutoUpdateCoinPrice;
 use App\Jobs\ChangeOrderWaitStatus;
 use App\Jobs\LevelAndTeam;
+use App\Jobs\MonthElectricCharge;
 use App\Jobs\OrderPackage;
 use App\Jobs\PledgeDay;
 use Illuminate\Console\Scheduling\Schedule;
@@ -34,7 +35,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         // 本地测试
-
+//        $schedule->job(new AutoUpdateCoinPrice)->hourly(); // 更新实时币价  本地  60 分钟一次
         // 服务器
         $schedule->command('config:cache')->dailyAt('23:50'); // 更新缓存
         $schedule->command('queue:restart')->dailyAt('23:51');// 重启队列
@@ -42,7 +43,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('currency:update -o')->everySixHours(); // 更新汇率 每隔6小时
         $schedule->command('geoip:update')->weekly()->thursdays()->at('4:30'); // 更新GEO地理位置数据库 每周四 4:30
 
-        //$schedule->job(new AutoUpdateCoinPrice)->everyTenMinutes(); // 更新实时币价  服务器 10分钟一次
+//        $schedule->job(new AutoUpdateCoinPrice)->everyTenMinutes(); // 更新实时币价  服务器 10分钟一次
+//        $schedule->job(new MonthElectricCharge)->monthlyOn(1, '0:50'); // 生成电费记录 每月 1号 0:50
         $schedule->job(new AutoCreateDayBonus)->dailyAt('0:01'); // 每天自动创建分红记录 0:01
         //$schedule->job(new LevelAndTeam)->dailyAt('0:08'); // 设置会员级别和所属团队
         $schedule->job(new ChangeOrderWaitStatus)->dailyAt('0:20'); // 更改订单等待状态 0:20

@@ -182,6 +182,7 @@ class ProductController extends AdminController
         $form->textarea('choose_reason', __('Choose reason'))->required()->help('购买产品必选理由');
         $form->text('choose_reason_text', __('Choose reason text'))->default('必选理由');
         $form->decimal('service_rate', __('Service rate'))->default(0.00)->required();
+        $form->radioCard('show_service_rate', __('Show service rate'))->options(['0' => '否', '1'=> '是'])->default('1')->required()->help('是否在产品界面显示服务费');
         $form->decimal('pay_user_rate', __('Pay user rate'))->default(0.00)->required();
         $form->decimal('now_rate', __('Now rate'))->default(0.00)->required();
         $form->decimal('freed_rate', __('Freed rate'))->default(0.00)->required();
@@ -207,18 +208,18 @@ class ProductController extends AdminController
         $form->decimal('valid_rate', __('Valid rate'))->default(0.00)->required();
         $form->decimal('package_rate', __('Package rate'))->default(0.00)->required();
 
-        $form->decimal('total_revenue', __('Total revenue'))->default(0.00000);
-        $form->decimal('yesterday_revenue', __('Yesterday revenue'))->default(0.00000);
-        $form->decimal('yesterday_gas', __('Yesterday gas'))->default(0.00000);
-        $form->decimal('yesterday_efficiency', __('Yesterday efficiency'))->default(0.00000);
+        $form->text('total_revenue', __('Total revenue'))->default(0);
+        $form->text('yesterday_revenue', __('Yesterday revenue'))->default(0);
+        $form->text('yesterday_gas', __('Yesterday gas'))->default(0);
+        $form->text('yesterday_efficiency', __('Yesterday efficiency'))->default(0);
         $form->text('total_revenue_text', __('Total revenue text'))->default('矿池总产量');
         $form->text('yesterday_revenue_text', __('Yesterday revenue text'))->default('昨日产量');
         $form->text('yesterday_gas_text', __('Yesterday gas text'))->default('昨日消耗GAS');
         $form->text('yesterday_efficiency_text', __('Yesterday efficiency text'))->default('昨日挖矿效率');
-        $form->decimal('network_revenue', __('Network revenue'))->default(0.00000);
-        $form->decimal('network_average_revenue', __('Network average revenue'))->default(0.00000);
-        $form->decimal('network_valid_power', __('Network valid power'))->default(0.00000);
-        $form->decimal('network_basic_rate', __('Network basic rate'))->default(0.00000);
+        $form->text('network_revenue', __('Network revenue'))->default(0);
+        $form->text('network_average_revenue', __('Network average revenue'))->default(0);
+        $form->text('network_valid_power', __('Network valid power'))->default(0);
+        $form->text('network_basic_rate', __('Network basic rate'))->default(0);
         $form->image('thumb', __('Thumb'))->required()->move('products')->uniqueName();
 //        $form->textarea('desc', __('Desc'));
         $form->editor('content', __('Content'))->required();

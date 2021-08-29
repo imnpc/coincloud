@@ -1,62 +1,140 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+##环境要求
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+###基本要求: PHP 7.4 + MySql 5.7 + Redis
 
-## About Laravel
+Composer
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+PHP >= 7.4
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+MySql > 5.7
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Zip PHP Extension
 
-## Learning Laravel
+OpenSSL PHP Extension
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+PDOMysql PHP Extension
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Mbstring PHP Extension
 
-## Laravel Sponsors
+Tokenizer PHP Extension
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+XML PHP Extension
 
-### Premium Partners
+Fileinfo PHP Extension
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
+Redis PHP Extension
 
-## Contributing
+##安装步骤
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+###1.安装宝塔面板最新版,修改PHP配置
 
-## Code of Conduct
+```bash
+yum install -y wget && wget -O install.sh http://download.bt.cn/install/install_6.0.sh && sh install.sh
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+安装完毕以后登录到面板 选择 Nginx 1.18 + PHP 7.4 + MySql 5.7 进行安装,安装完毕前往 软件商店->运行环境,安装 Redis.
 
-## Security Vulnerabilities
+php配置:软件商店->运行环境->PHP 7.4->设置,
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+安装扩展->安装扩展 fileinfo opcache redis exif intl.
 
-## License
+禁用函数->需要删除的屏蔽函数 putenv proc_open symlink pcntl_signal pcntl_signal_dispatch pcntl_alarm
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+###2.建立网站和配置
+
+新建网站,然后将代码压缩包上传到网站根目录,解压.
+
+网站目录->关闭 防跨站攻击
+
+网站目录->运行目录->/public->保存
+
+伪静态->选择 laravel5
+
+SSL->按照需求申请一个SSL证书,推荐 Let's Encrypt 免费证书 不要开启强制 HTTPS
+
+
+###3.env 文件配置
+
+复制根目录的 .env.example 文件,改名为 .env，
+
+请务必配置好数据库和 OSS 相关资料
+
+修改以下选项(中文或者带空格请用双引号引入,例如 APP_NAME="My Site" )
+
+APP_NAME=website
+
+APP_URL=https://demo.com
+
+DB_DATABASE=数据库名称
+
+DB_USERNAME=数据库帐号
+
+DB_PASSWORD=数据库密码
+
+OSS_ACCESS_KEY_ID=阿里云ACCESS_KEY
+
+OSS_ACCESS_KEY_SECRET=阿里云ACCESS_SECRET
+
+OSS_ENDPOINT=OSS节点
+
+OSS_BUCKET=OSS存储名
+
+ALIYUN_OSS_CDN_BASE_URL=OSS绑定自有域名访问URL
+
+FILESYSTEM_DRIVER=oss
+
+ALIYUN_SMS_SIGN_NAME=阿里云短信签名
+
+ALIYUN_SMS_TEMPLATE=阿里云短信模版
+
+配置完毕以后访问后台: 网站地址/admin
+
+帐号 admin
+
+密码 admin
+
+###4.初始化参数和计划任务和守护进程
+例如网站是 test.demo.com
+
+####(1)ssh登录服务器
+
+执行初始化命令
+```bash
+cd /www/wwwroot/test.demo.com/
+
+php artisan migrate
+
+php artisan key:generate
+
+php artisan storage:link
+
+chmod -R  0777 storage
+```
+新增计划任务
+```bash
+crontab -u www -e
+```
+计划任务内容
+```bash
+*/1 * * * * /www/server/php/74/bin/php /www/wwwroot/test.demo.com/artisan schedule:run >> /www/wwwroot/test.demo.com/storage/logs/cron.log 2>&1
+```
+然后执行以下命令,查看是否生效
+```bash
+crontab -u www -l
+```
+####(2)守护进程
+宝塔后台,软件商店->系统工具->安装 Supervisor管理器,安装完毕点击打开 Supervisor管理器.
+
+添加守护进程
+
+->名称:cloud
+
+->启动用户:www
+
+->运行目录:选择当前网站根目录 /www/wwwroot/test.demo.com/
+
+->启动命令:/www/server/php/74/bin/php /www/wwwroot/test.demo.com/artisan horizon
+
+然后保存即可
+
+

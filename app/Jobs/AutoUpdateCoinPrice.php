@@ -59,6 +59,7 @@ class AutoUpdateCoinPrice implements ShouldQueue
         try {
             // 实时币价 需要缓存下
             $wallet = WalletType::where('id', '>', 3)
+                ->where('is_enblened', '=', 1)
                 ->orderBy('sort', 'asc')
                 ->get();
             foreach ($wallet as $k => $v) {

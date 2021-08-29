@@ -247,6 +247,11 @@
     "Level id": "等级",
     "Min buy": "最低购买数量",
     "Stock": "库存",
-    "Save order": "保存排序"
+  "Month": "月份",
+  "Electric charge": "电费单价",
+  "Total fee": "本月累计电费",
+  "Electric charge id": "电费 ID",
+    "Save order": "保存排序",
+    "Show service rate": "显示服务费"
 }
 
