@@ -251,7 +251,17 @@
   "Electric charge": "电费单价",
   "Total fee": "本月累计电费",
   "Electric charge id": "电费 ID",
-    "Save order": "保存排序",
-    "Show service rate": "显示服务费"
+  "Save order": "保存排序",
+      "Show service rate": "显示服务费",
+  "Freed wait days": "释放等待天数",
+  "Show service rate": "显示服务费",
+  "Pledge type": "质押处理模式",
+  "Pledge base": "基础质押金额",
+  "Pledge flow": "流量质押金额",
+  "Old service fee": "旧有服务费",
+  "Service fee add": "新增服务费",
+  "Service fee": "服务费",
+  "From user id": "来自用户",
+  "System wallet id": "系统钱包ID"
 }
 

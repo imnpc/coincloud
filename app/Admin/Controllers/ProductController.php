@@ -57,6 +57,7 @@ class ProductController extends AdminController
         $grid->column('now_rate', __('Now rate'));
         $grid->column('freed_rate', __('Freed rate'));
         $grid->column('freed_days', __('Freed days'));
+//        $grid->column('freed_wait_days', __('Freed wait days'));
         $grid->column('stock', __('Stock'));
 //        $grid->column('parent1_rate', __('Parent1 rate'));
 //        $grid->column('parent2_rate', __('Parent2 rate'));
@@ -187,6 +188,7 @@ class ProductController extends AdminController
         $form->decimal('now_rate', __('Now rate'))->default(0.00)->required();
         $form->decimal('freed_rate', __('Freed rate'))->default(0.00)->required();
         $form->number('freed_days', __('Freed days'))->default(0)->required();
+        $form->number('freed_wait_days', __('Freed wait days'))->default(0)->required();
         $form->decimal('parent1_rate', __('Parent1 rate'))->default(0.00)->required();
         $form->decimal('parent2_rate', __('Parent2 rate'))->default(0.00)->required();
         $form->decimal('invite_rate', __('Invite rate'))->default(0.00)->required();
@@ -197,13 +199,17 @@ class ProductController extends AdminController
         $form->number('upgrade_team_b', __('Upgrade team b'))->default(0)->required();
         $form->number('upgrade_team_c', __('Upgrade team c'))->default(0)->required();
         $form->decimal('risk_rate', __('Risk rate'))->default(0.00)->required();
-        $form->decimal('gas_fee', __('Gas fee'))->default(0.00000)->required();
-        $form->decimal('pledge_fee', __('Pledge fee'))->default(0.00000)->required();
+        $form->decimal('gas_fee', __('Gas fee'))->default(0)->required();
+        $form->decimal('pledge_fee', __('Pledge fee'))->default(0)->required();
         $form->number('pledge_days', __('Pledge days'))->default(1)->required();
 
-        $form->radioCard('package_type', __('Package type'))->options(['0' => '默认封装', '1'=> '客户封装'])->default('0')->required()->help('质押币封装模式,0-默认:价格里面已包含,1-客户封装:客户需要支付质押币和gas费以后才能产币');
+        $form->radioCard('package_type', __('Package type'))->options(['0' => '默认封装', '1' => '客户封装'])->default('0')->required()->help('质押币封装模式,0-默认:价格里面已包含,1-客户封装:客户需要支付质押币和gas费以后才能产币');
 
-        $form->radioCard('is_show_text', __('Is show text'))->options(['0' => '否', '1'=> '是'])->default('1')->required()->help('是否在算力详情界面显示算力文字提示');
+        $form->radioCard('is_show_text', __('Is show text'))->options(['0' => '否', '1' => '是'])->default('1')->required()->help('是否在算力详情界面显示算力文字提示');
+
+        $form->radioCard('pledge_type', __('Pledge type'))->options(['0' => '默认', '1' => '混合'])->default('0')->required()->help('质押处理模式,0-默认:1种到期自动处理,1-混合:包含基础质押和流量质押');
+        $form->decimal('pledge_base', __('Pledge base'))->default(0)->required();
+        $form->decimal('pledge_flow', __('Pledge flow'))->default(0)->required();
 
         $form->decimal('valid_rate', __('Valid rate'))->default(0.00)->required();
         $form->decimal('package_rate', __('Package rate'))->default(0.00)->required();

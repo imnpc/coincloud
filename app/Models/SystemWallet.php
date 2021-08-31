@@ -22,6 +22,12 @@ class SystemWallet extends Model
         'product_id', 'wallet_type_id', 'team_a', 'team_b', 'team_c', 'risk', 'commission_balance', 'service_fee',
     ];
 
+    // 关联 产品
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
     // 关联 系统钱包日志
     public function systemwalletlog()
     {

@@ -35,7 +35,7 @@ class ElectricChargeLogController extends AdminController
         $grid = new Grid(new ElectricChargeLog());
 
         $grid->column('id', __('Id'));
-//        $grid->column('user_id', __('User id'));
+        $grid->column('user_id', __('User id'));
         $grid->column('user.name', __('Name'));
 //        $grid->column('product_id', __('Product id'));
         $grid->column('product.name', __('Products'));

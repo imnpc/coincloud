@@ -86,8 +86,19 @@ class User extends Authenticatable implements Wallet, WalletFloat
      * @var array
      */
     protected $appends = [
-        'avatar_url', 'invite_code', 'id_front_url', 'id_back_url',
+        'avatar_url', 'invite_code', 'id_front_url', 'id_back_url', 'verify_text',
     ];
+
+    public function getVerifyTextAttribute()
+    {
+        if ($this->is_verify == 1) {
+            return '已实名';
+        } else if ($this->is_verify == 0 && $this->real_name) {
+            return '认证中';
+        } elseif ($this->is_verify == 0 && empty($this->real_name)) {
+            return '未实名';
+        }
+    }
 
     // 返回头像链接
     public function getAvatarUrlAttribute()

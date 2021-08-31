@@ -39,6 +39,63 @@ use Spatie\QueryBuilder\QueryBuilder;
 class UserController extends Controller
 {
     /**
+     * 手机号注册用户(需要处理邀请码)
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'phone' => 'required|phone:CN,mobile|unique:users,mobile',
+            'verify_code' => 'required|numeric',
+            'password' => 'required|string|min:6|confirmed',
+            'parent_id' => 'string',
+        ]);
+        // print_r($request->all());
+
+        $mobile = $request->phone;
+        $key = 'verificationCode_' . $mobile;
+
+        $verifyData = \Cache::get($key);
+        if (!$verifyData) {
+            $data['message'] = "短信验证码已失效！";
+            return response()->json($data, 403);
+        }
+        if (!hash_equals($verifyData['code'], $request->verify_code)) {
+            $data['message'] = "短信验证码不正确！";
+            return response()->json($data, 403);
+        }
+
+        if ($request->parent_id) {
+            $decode_id = \Hashids::decode($request->parent_id);// 解密传递的 ID
+            if (empty($decode_id)) {
+                $data['message'] = "邀请码不正确！";
+                return response()->json($data, 403);
+            }
+            $parent_id = $decode_id[0];// 解密后的 ID
+        } else {
+            $parent_id = 0;
+        }
+
+        // 创建用户 TODO
+        $user = User::create([
+            'mobile' => $mobile,
+            'name' => $mobile,
+            'nickname' => $mobile,
+            //'email' => $mobile . '@qq.com',
+            'password' => bcrypt($request->password),
+            'parent_id' => $parent_id,
+        ]);
+        //session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
+//        return redirect()->route('user.show', [$user]);
+
+        $data['message'] = "注册成功";
+        return response()->json($data, 200);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param \App\Models\User $user
@@ -82,7 +139,8 @@ class UserController extends Controller
         $user = $request->user();
 
         $list = Product::where('status', '=', 0)
-            ->orderBy('id', 'asc')
+            ->orderBy('sort', 'asc')
+//            ->orderBy('id', 'asc')
             ->select('id', 'wallet_type_id')
             ->get();
         foreach ($list as $k => &$v) {
@@ -95,6 +153,7 @@ class UserController extends Controller
 //            'nickname' => $user->nickname, // 昵称
             'name' => $user->name, // 账户
             'is_verify' => $user->is_verify, // 是否实名认证 0-未认证 1-已认证
+            'verify_text' => $user->verify_text, // 实名认证文字状态
             'power_list' => $list,
         ];
 
@@ -112,7 +171,8 @@ class UserController extends Controller
         $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
 
         $list = Product::where('status', '=', 0)
-            ->orderBy('id', 'asc')
+            ->orderBy('sort', 'asc')
+//            ->orderBy('id', 'asc')
             ->get();
         foreach ($list as $k => $v) {
             $data[$k]['name'] = $v->wallet_slug;
@@ -363,10 +423,7 @@ class UserController extends Controller
         $mobile = $request->mobile;
         $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT); // 生成6位随机数，左侧补0
         //Notification::route('mail', $request->email)->notify(new EmailVerify($code));// 发送邮件验证码
-        Notification::route(
-            EasySmsChannel::class,
-            new PhoneNumber($mobile)
-        )->notify(new VerificationCode($code));// 发送短信验证码
+
 
         $key = 'verificationCode_' . $mobile;
         $expiredAt = now()->addMinutes(30);
@@ -375,6 +432,11 @@ class UserController extends Controller
         if ($verifyData) {
             abort(403, '已经发送过验证码了');
         }
+//        send_sms($mobile, $code);
+        Notification::route(
+            EasySmsChannel::class,
+            new PhoneNumber($mobile)
+        )->notify(new VerificationCode($code));// 发送短信验证码
 
         \Cache::put($key, ['mobile' => $mobile, 'code' => $code], $expiredAt); // 缓存验证码 30 分钟过期。
 
@@ -434,14 +496,20 @@ class UserController extends Controller
             ->find(auth('api')->id())
             ->toArray();
         $users_son1 = [];
-
+        $users = [];
         foreach ($parent['sons'] as $key => $value) {
             $users_son1[] = $value['id'];
         }
+        foreach ($parent['sons'] as $key => $value) {
+            $users[$key]['nickname'] = $value['nickname'];
+            $users[$key]['created_at'] = $value['created_at'];
+        }
+
         $users1 = array_values($users_son1);
 
         $data = Product::where('status', '=', 0)
-            ->orderBy('id', 'asc')
+            ->orderBy('sort', 'asc')
+//            ->orderBy('id', 'asc')
             ->get();
         foreach ($data as $k => $v) {
             $orders1_total = 0;
@@ -468,7 +536,7 @@ class UserController extends Controller
                 ->whereIn('user_id', $users1)
                 ->where('product_id', '=', $v->id)
                 ->where('pay_status', '=', Order::PAID_COMPLETE)
-                ->select('id', 'user_id', 'max_valid_power', 'product_id', 'pay_status', 'created_at')
+                ->select('id', 'user_id', 'number', 'max_valid_power', 'product_id', 'pay_status', 'created_at')
                 ->get();
             foreach ($orders1 as $key => $value) {
                 $orders1[$key]['username'] = $value->user['nickname'];
@@ -476,12 +544,36 @@ class UserController extends Controller
                 $orders1_total += $value['max_valid_power'];
                 unset($value->user);
             }
+
+            $aff_users_total = count($users1); // 邀请人数
+            $aff_users_orders = Order::whereIn('user_id', $users1)
+                ->where('product_id', '=', $v->id)
+                ->where('pay_status', '=', Order::PAID_COMPLETE)
+                ->groupBy('user_id')
+                ->get()
+                ->count(); // 下单人数
+            $aff_users_buy = Order::whereIn('user_id', $users1)
+                ->where('product_id', '=', $v->id)
+                ->where('pay_status', '=', Order::PAID_COMPLETE)
+                ->sum('number'); // 累计购买
+            $aff_users_commission = UserWalletLog::where('user_id', '=', $user->id)
+                ->where('wallet_type_id', '=', $v->wallet_type_id)
+                ->where('from', '=', UserWalletLog::FROM_COMMISSION)
+                ->sum('add');
+
             $list[$k]['orders_list'] = $orders1;
+            $list[$k]['orders'] = $orders1;
+            $list[$k]['users'] = $users;
 //            $list[$k]['orders1_total'] = $orders1_total;
             $list[$k]['wallet_type_id'] = $v->wallet_type_id;
             $list[$k]['reward_power_from_id'] = 0;
             $list[$k]['bonus_from_id'] = UserWalletLog::FROM_TEAM_DIVIDENDS;
             $list[$k]['reward_from_id'] = UserWalletLog::FROM_COMMISSION;
+            $list[$k]['aff_users_total'] = $aff_users_total;
+            $list[$k]['aff_users_orders'] = $aff_users_orders;
+            $list[$k]['aff_users_buy'] = $aff_users_buy;
+            $list[$k]['aff_users_commission'] = $aff_users_commission;
+            $list[$k]['unit'] = $v->unit;
         }
 
         return $list;
@@ -543,7 +635,7 @@ class UserController extends Controller
         }
 
         $attributes = $request->only([
-            'real_name', 'id_number', 'id_front', 'id_back'
+            'real_name', 'id_number', 'id_front', 'id_back', 'is_verify'
         ]);
 
         if ($request->file('id_front')) {
@@ -653,6 +745,7 @@ class UserController extends Controller
             abort(403, '已经发送过验证码了');
         }
 
+//        send_sms($mobile, $code);
         Notification::route(
             EasySmsChannel::class,
             new PhoneNumber($mobile)
@@ -727,13 +820,13 @@ class UserController extends Controller
     public function captcha(Request $request, Captcha $captcha)
     {
         $this->validate($request, [
-            'mobile' => 'required|numeric|exists:users',
+            'mobile' => 'required|numeric',
         ]);
 
         $key = 'captcha-' . Str::random(15);
         $mobile = $request->mobile;
 
-        $captcha = $captcha->create('flat', true);
+        $captcha = $captcha->create('math', true);
 
         $expiredAt = now()->addMinutes(10); // 有效时间 10 分钟
 
@@ -776,6 +869,7 @@ class UserController extends Controller
             abort(200, '已经发送过验证码了');
         }
 
+//        send_sms($mobile, $code);
         Notification::route(
             EasySmsChannel::class,
             new PhoneNumber($mobile)
@@ -798,7 +892,8 @@ class UserController extends Controller
         $user = $request->user();
 
         $list = Product::where('status', '=', 0)
-            ->orderBy('id', 'asc')
+            ->orderBy('sort', 'asc')
+//            ->orderBy('id', 'asc')
             ->get();
         foreach ($list as $k => $v) {
             $data[$k]['name'] = $v->wallet_slug;

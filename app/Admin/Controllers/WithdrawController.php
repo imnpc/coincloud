@@ -44,7 +44,7 @@ class WithdrawController extends AdminController
         });
 
         $grid->column('id', __('Id'));
-//        $grid->column('user_id', __('User id'));
+        $grid->column('user_id', __('User id'));
         $grid->column('user.mobile', __('用户'));
 //        $grid->column('wallet_type_id', __('Wallet type id'));
         $grid->column('wallet_slug', __('Wallet slug'));

@@ -90,7 +90,7 @@ class OrderController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('order_sn', __('Order sn'));
-//        $grid->column('user_id', __('User id'));
+        $grid->column('user_id', __('User id'));
         $grid->column('user.mobile', __('Mobile'));
 //        $grid->column('product_id', __('Product id'));
         $grid->column('product.name', __('Products'));

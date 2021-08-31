@@ -27,7 +27,7 @@ class OrderController extends Controller
             ->defaultSort('-created_at')
             ->with('product')
             ->where('user_id', '=', auth('api')->id())
-            ->select('id', 'product_id', 'order_sn', 'number', 'pay_money', 'status', 'pay_status', 'payment', 'payment_type')
+            ->select('id', 'product_id', 'order_sn', 'number', 'pay_money', 'status', 'pay_status', 'payment', 'payment_type', 'confirm_time')
             ->paginate();
         $ext = '';
         foreach ($lists as $key => $value) {
@@ -39,6 +39,13 @@ class OrderController extends Controller
 
             $lists[$key]['pay_money'] = $value->pay_money . ' ' . $ext;
             $lists[$key]['product_name'] = $value->product['name'];
+            if ($value->confirm_time) {
+                $lists[$key]['after_days'] = $value->confirm_time->diffInDays($now); // 已经过去天数
+            } else {
+                $lists[$key]['after_days'] = 0;
+            }
+
+
             unset($value->product);
         }
 

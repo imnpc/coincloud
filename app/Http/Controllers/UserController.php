@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Leonis\Notifications\EasySms\Channels\EasySmsChannel;
+use Overtrue\EasySms\EasySms;
 use Overtrue\EasySms\PhoneNumber;
 use App\Exceptions\InvalidRequestException;
 
@@ -181,6 +182,7 @@ class UserController extends Controller
         }
 
         //Notification::route('mail', $request->email)->notify(new EmailVerify($code));// 发送邮件验证码
+//        send_sms($mobile, $code);
         Notification::route(
             EasySmsChannel::class,
             new PhoneNumber($mobile)

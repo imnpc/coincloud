@@ -6,6 +6,7 @@
 
 use App\Gateways\QxtGateway;
 use EasyExchange\Factory;
+use Lin\Mxc\MxcSpot;
 use Overtrue\EasySms\EasySms;
 
 /**
@@ -92,6 +93,11 @@ function get_array_ids(array $data, string $key = 'id'): array
     return array_keys($ids);
 }
 
+/**
+ * 火币数据接口
+ * @param $from
+ * @return string|\Torann\Currency\Currency|void
+ */
 function huobiusdt($from)
 {
     // 配置
@@ -111,6 +117,27 @@ function huobiusdt($from)
         return currency($usdt, 'USD', 'CNY');
     } elseif ($hr24['status'] == 'error') {
         return '暂无数据';
+    }
+}
+
+/**
+ *  抹茶数据接口
+ * @param $from
+ * @return string|\Torann\Currency\Currency|void
+ */
+function mxcusdt($from)
+{
+    $symbol = strtolower($from) . '_usdt';
+    $exchanges = new MxcSpot('', '', 'https://www.mexc.com');
+    $result = $exchanges->market()->getTicker([
+        'symbol' => $symbol
+    ]);
+
+    if ($result['code'] == '200') {
+        $usdt = $result['data'][0]['last'];
+        return currency($usdt, 'USD', 'CNY');
+    } else {
+        return '敬请期待';
     }
 }
 

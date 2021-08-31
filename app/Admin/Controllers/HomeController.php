@@ -31,7 +31,7 @@ class HomeController extends Controller
                 $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
                 $user_count = User::count();
                 $order_count = Order::all()->count();
-                $user_verify = User::where('is_verify',1)->count();
+                $user_verify = User::where('is_verify', 1)->count();
                 $order_complete = Order::where('pay_status', '=', Order::PAID_COMPLETE)->count();
 
                 $row->column(3, new Widgets\InfoBox('订单总数', 'shopping-cart', 'aqua', '', $order_count));
@@ -39,7 +39,7 @@ class HomeController extends Controller
                 $row->column(3, new Widgets\InfoBox('用户总数', 'users', 'aqua', '', $user_count));
                 $row->column(3, new Widgets\InfoBox('实名用户', 'users', 'aqua', '', $user_verify));
 
-                $product = Product::all();
+                $product = Product::where('status', '=', '0')->get();
                 // 产品数据：累计产币量 累计可提币  未释放 未提币 有效T数 购买T数 质押币 GAS费
                 foreach ($product as $k => $v) {
                     $coin_balance = 0;
@@ -49,7 +49,7 @@ class HomeController extends Controller
                         ->sum('coin_day'); // 累计可提币
                     $wait_coin = Freed::where('product_id', $v->id)
                         ->sum('wait_coin'); // 未释放
-                    if($v->wallet_type_id){
+                    if ($v->wallet_type_id) {
                         $coin_balance = $UserWalletService->walletBalance($v->wallet_type_id);// 未提币
                     }
                     $valid_power = Order::where('product_id', '=', $v->id)

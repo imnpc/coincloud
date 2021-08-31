@@ -40,5 +40,6 @@ Route::group([
     $router->resource('levels', LevelController::class); // 等级
     $router->resource('electric-charges', ElectricChargeController::class); // 电费
     $router->resource('electriclog', ElectricChargeLogController::class); // 电费记录
-
+    $router->resource('pledges', PledgeController::class); // 质押币
+    $router->resource('system-wallet-logs', SystemWalletLogController::class); // 系统钱包
 });

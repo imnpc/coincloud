@@ -36,7 +36,7 @@ class UserBonusController extends AdminController
         $grid->column('id', __('Id'));
         $grid->column('day', __('Day'));
 //        $grid->column('bonus_id', __('Bonus id'));
-//        $grid->column('user_id', __('User id'));
+        $grid->column('user_id', __('User id'));
         $grid->column('user.mobile', __('Users'));
 //        $grid->column('product_id', __('Product id'));
         $grid->column('product.name', __('Products'));

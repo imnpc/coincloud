@@ -67,6 +67,7 @@ class AutoDayBonus implements ShouldQueue
     {
         $day = Carbon::yesterday()->toDateString();// 获得日期
         $today = Carbon::now()->toDateString();// 获得日期
+        $now = Carbon::now()->toDateTimeString();
 
         try {
             $logService = app()->make(LogService::class); // 钱包服务初始化 TODO
@@ -111,9 +112,9 @@ class AutoDayBonus implements ShouldQueue
                     }
                 }
 
-                // 查询当前日期是否大于有效天数 超过天数不产币
-                $beigin = $v->confirm_time->addDays($v->valid_days)->toDateTimeString();
-                if ($day >= $beigin) {
+                // 查询当前日期是否大于有效天数  超过天数不产币
+                $begin = $v->confirm_time->addDays($v->valid_days)->toDateString();
+                if ($day > $begin) {
                     continue;
                 }
 
@@ -198,6 +199,15 @@ class AutoDayBonus implements ShouldQueue
                 $coin_freed = number_fixed($coin_freed - $other_fee); // 线性释放数量 = 线性释放数量 -其他扣费 TODO
                 $coin_freed_day = number_fixed($coin_freed / $product->freed_days, 5); // 当日线性释放数量
                 $already_coin = number_fixed($coin_freed_day); // 已释放数量
+                $need_coin_freed_day = number_fixed($coin_freed_day); // 已释放数量
+                $already_day = 1;
+                // 如果产品 释放等待天数大于 0
+                if ($product->freed_wait_days > 0) {
+                    $already_day = 0;
+                    $already_coin = 0;
+                    $coin_freed_day = 0;
+                }
+
                 $wait_coin = number_fixed($coin_freed - $coin_freed_day); // 等待释放数量
                 if ($wait_coin < 0) {
                     $wait_coin = 0; // 如果等待释放的数量小于0 标记为0 原因是:计算精度会有稍微差别 小数点最后2位可能会有问题
@@ -211,6 +221,14 @@ class AutoDayBonus implements ShouldQueue
                     ->get(); // 查询该用户的线性释放列表
                 if ($other_freeds) {
                     foreach ($other_freeds as $key => $value) {
+                        // 查询是否在额外等待期 TODO
+                        if ($value->freed_wait_days > 0) {
+                            $wait = $value->created_at->addDays($value->freed_wait_days)->toDateString();
+                            if ($day < $wait) {
+                                continue;
+                            }
+                        }
+                        // 需要处理等待周期的 没到时间自动跳过
                         // 查询今天是否已执行
                         $check_other = DayFreed::where('day', '=', $day)
                             ->where('user_id', '=', $v->user_id) // 用户
@@ -221,7 +239,7 @@ class AutoDayBonus implements ShouldQueue
                             continue;
                         }
 
-                        if ($value->already_day < $value->days) {
+                        if ($value->already_day <= $value->days) {
                             // 每日线性释放记录
                             $coin_freed_other += $value->coin_freed_day;
                             $already_day = $value->already_day + 1; // 最新释放天数
@@ -241,7 +259,7 @@ class AutoDayBonus implements ShouldQueue
                             ];
 
                             $other_freeds[$key]->update($data);
-                            if ($value->already_day + 1 == $value->days) {
+                            if ($already_day == $value->days) {
                                 $other_freeds[$key]->update(['status' => 1]);// 标记为释放完毕
                             }
                             //添加到用户余额 + 记录日志 filecoin_balance TODO
@@ -255,7 +273,7 @@ class AutoDayBonus implements ShouldQueue
                 $coin_day = number_fixed($coin_now + $coin_freed_day + $coin_freed_other);
                 $balance = $coin_day; // 余额
 
-                // 用户每日分成 ;
+                // 用户每日分成
                 $user_bonuses = UserBonus::create([
                     'day' => $day,
                     'day_bonus_id' => $bonus->id,
@@ -289,9 +307,12 @@ class AutoDayBonus implements ShouldQueue
                 ]);
 
                 // 线性释放金额记录到用户日志 TODO
-                $remark_day = "用户每日新增可用资产" . $coin_now;
-                $logService->userLog($v->user_id, $product->wallet_type_id, $coin_now, 0, $day, UserWalletLog::FROM_FREED, $remark_day);
-                // 如果 线性释放比例大于 0
+                if ($coin_now > 0) {
+                    $remark_day = "用户每日新增可用资产" . $coin_now;
+                    $logService->userLog($v->user_id, $product->wallet_type_id, $coin_now, 0, $day, UserWalletLog::FROM_FREED, $remark_day);
+                }
+
+                // 如果 线性释放比例大于 0 TODO
                 if ($freed_rate > 0) {
                     // 线性释放列表
                     $freeds = Freed::create([
@@ -302,25 +323,28 @@ class AutoDayBonus implements ShouldQueue
                         'coins' => $coin_for_user,
                         'freed_rate' => $freed_rate,
                         'coin_freed' => $coin_freed,
-                        'coin_freed_day' => $coin_freed_day,
+                        'coin_freed_day' => $need_coin_freed_day,
                         'other_fee' => $other_fee,
                         'days' => $product->freed_days,
-                        'already_day' => 1,
+                        'already_day' => $already_day,
                         'already_coin' => $already_coin,
                         'wait_coin' => $wait_coin,
+                        'freed_wait_days' => $product->freed_wait_days,
                     ]);
 
                     // 每日线性释放记录
-                    $day_freeds = DayFreed::create([
-                        'user_id' => $v->user_id,
-                        'freed_id' => $freeds->id,
-                        'product_id' => $this->product_id,
-                        'day' => $day,
-                        'coin' => $freeds->coin_freed_day,
-                        'today' => 1,
-                    ]);
-                    $remark_freed_first = "每日线性释放(F)第1天,释放" . $coin_freed_day;
-                    $logService->userLog($v->user_id, $product->wallet_type_id, $coin_freed_day, 0, $day, UserWalletLog::FROM_FREED75, $remark_freed_first);
+                    if ($freeds->freed_wait_days == 0) {
+                        $day_freeds = DayFreed::create([
+                            'user_id' => $v->user_id,
+                            'freed_id' => $freeds->id,
+                            'product_id' => $this->product_id,
+                            'day' => $day,
+                            'coin' => $freeds->coin_freed_day,
+                            'today' => 1,
+                        ]);
+                        $remark_freed_first = "每日线性释放(F)第1天,释放" . $coin_freed_day;
+                        $logService->userLog($v->user_id, $product->wallet_type_id, $coin_freed_day, 0, $day, UserWalletLog::FROM_FREED75, $remark_freed_first);
+                    }
                 }
             }
             // 标记云算力分红为已执行

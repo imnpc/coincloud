@@ -35,7 +35,7 @@ class RechargeController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('order_sn', __('Order sn'));
-//        $grid->column('user_id', __('User id'));
+        $grid->column('user_id', __('User id'));
 //        $grid->column('wallet_type_id', __('Wallet type id'));
         $grid->column('user.mobile', __('Mobile'));
         $grid->column('wallet_slug', __('Wallet slug'));

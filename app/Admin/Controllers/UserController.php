@@ -8,6 +8,7 @@ use App\Admin\Actions\User\Money;
 use App\Admin\Actions\User\WalletLog;
 use App\Admin\Extensions\ShowOrder;
 use App\Admin\Extensions\ShowTeam;
+use App\Models\Level;
 use App\Models\User;
 use Encore\Admin\Actions\Action;
 use Encore\Admin\Controllers\AdminController;
@@ -40,6 +41,7 @@ class UserController extends AdminController
             $filter->disableIdFilter();
             // 在这里添加字段过滤器
             $filter->equal('id', __('Id'));
+            $filter->equal('parent_id', __('Parent id'));
             $filter->like('real_name', __('Real name'));
             $filter->equal('is_verify', __('是否实名'))->radio([
                 '' => '所有',
@@ -165,13 +167,14 @@ class UserController extends AdminController
             $form->password('password', __('Password'))->default('123456')->required()->help('默认密码 123456');
         }
 
-        $form->select('parent_id', __('Parent id'))->options(function ($id) {
-            $user = User::find($id);
-            if ($user) {
-                return [$user->id => $user->mobile];
-            }
-        })->ajax('/admin/api/users');
-
+        $form->text('parent_id', __('Parent id'))->default(0);
+//        $form->select('parent_id', __('Parent id'))->options(function ($id) {
+//            $user = User::find($id);
+//            if ($user) {
+//                return [$user->id => $user->mobile];
+//            }
+//        })->ajax('/admin/api/users');
+        $form->select('level_id', __('Level id'))->options(Level::all()->pluck('name', 'id'))->required();
         $form->text('real_name', __('Real name'));
         $form->text('id_number', __('Id number'));
         $form->display('id_front_url', __('身份证正面'))->with(function ($value) {

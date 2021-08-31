@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\dateTrait;
+use Cache;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +34,7 @@ class Product extends Model implements Sortable
         'wait_days', 'valid_days', 'valid_days_text', 'choose_reason', 'choose_reason_text', 'service_rate', 'day_customer_rate',
         'day_rate', 'freed_rate', 'freed_days', 'parent1', 'parent2', 'invite_rate', 'bonus_team_a', 'bonus_team_b', 'bonus_team_c',
         'upgrade_team_a', 'upgrade_team_b', 'upgrade_team_c', 'gas_fee', 'pledge_fee', 'pledge_days', 'valid_rate', 'package_rate',
-        'thumb', 'desc', 'content', 'status', 'is_show_text', 'min_buy', 'stock', 'sort', 'show_service_rate',
+        'thumb', 'desc', 'content', 'status', 'is_show_text', 'min_buy', 'stock', 'sort', 'show_service_rate','freed_wait_days',
     ];
 
     /**
@@ -60,7 +61,7 @@ class Product extends Model implements Sortable
     protected $appends = [
         'thumb_url', 'wallet_slug', 'wallet_icon',
     ];
-
+//'realtime_price',
     // 获取缩略图地址
     public function getThumbUrlAttribute()
     {
@@ -89,6 +90,25 @@ class Product extends Model implements Sortable
         } else {
             return '';
         }
+    }
+
+    // 获取实时币价
+    public function getRealtimePriceAttribute()
+    {
+        $price = '敬请期待';
+        if ($this->wallet_slug) {
+            $name = 'product' . strtolower($this->wallet_slug);
+            if (Cache::has($name)) {
+                $price = Cache::get($name);// get from cahche 有缓存从缓存读取数据
+            } else {
+                if ($this->wallet_slug != 'ZKT') {
+                    $price = mxcusdt(strtolower($this->wallet_slug));
+                }
+                Cache::put($name, $price, 600);
+            }
+        }
+
+        return $price;
     }
 
     // 关联 钱包类型
@@ -145,4 +165,15 @@ class Product extends Model implements Sortable
         return $this->hasMany(WeeklyLog::class);
     }
 
+    // 关联 质押币
+    public function pledge()
+    {
+        return $this->hasMany(Pledge::class);
+    }
+
+    // 关联 系统钱包日志
+    public function systemwalletlog()
+    {
+        return $this->hasMany(SystemWalletLog::class);
+    }
 }

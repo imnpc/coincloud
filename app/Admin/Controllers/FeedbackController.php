@@ -36,7 +36,7 @@ class FeedbackController extends AdminController
 
 
         $grid->column('id', __('Id'));
-        //$grid->column('user_id', __('User id'));
+        $grid->column('user_id', __('User id'));
         $grid->column('user.mobile', __('用户'));
         $grid->column('content', __('Content'));
         $grid->column('reply', __('Reply'));

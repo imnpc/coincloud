@@ -35,7 +35,7 @@ class FreedController extends AdminController
         });
 
         $grid->column('id', __('Id'));
-//        $grid->column('user_id', __('User id'));
+        $grid->column('user_id', __('User id'));
         $grid->column('user_bonus_id', __('User bonus id'));
         $grid->column('user.mobile', __('Users'));
 //        $grid->column('product_id', __('Product id'));

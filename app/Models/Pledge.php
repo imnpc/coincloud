@@ -20,13 +20,19 @@ class Pledge extends Model
      */
     protected $fillable = [
         'user_id', 'order_id', 'product_id', 'wallet_type_id', 'power', 'pledge_fee', 'pledge_coins', 'pledge_days', 'status',
-        'gas_fee', 'gas_coins',
+        'gas_fee', 'gas_coins', 'wait_days',
     ];
 
     // 关联 用户
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // 关联 产品
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 
     // 关联 订单
