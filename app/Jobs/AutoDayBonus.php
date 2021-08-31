@@ -111,6 +111,12 @@ class AutoDayBonus implements ShouldQueue
                     }
                 }
 
+                // 查询当前日期是否大于有效天数 超过天数不产币
+                $beigin = $v->confirm_time->addDays($v->valid_days)->toDateTimeString();
+                if ($now >= $beigin) {
+                    continue;
+                }
+
                 $coin_parent1 = 0; // 一级推广金额
                 $coin_parent2 = 0; // 一级推广金额
                 $commission_balance = 0; // 推荐金额

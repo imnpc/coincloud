@@ -1,6 +1,6 @@
-##环境要求
+## 环境要求
 
-###基本要求: PHP 7.4 + MySql 5.7 + Redis
+### 基本要求: PHP 7.4 + MySql 5.7 + Redis
 
 Composer
 
@@ -24,9 +24,9 @@ Fileinfo PHP Extension
 
 Redis PHP Extension
 
-##安装步骤
+## 安装步骤
 
-###1.安装宝塔面板最新版,修改PHP配置
+### 1.安装宝塔面板最新版,修改PHP配置
 
 ```bash
 yum install -y wget && wget -O install.sh http://download.bt.cn/install/install_6.0.sh && sh install.sh
@@ -40,7 +40,7 @@ php配置:软件商店->运行环境->PHP 7.4->设置,
 
 禁用函数->需要删除的屏蔽函数 putenv proc_open symlink pcntl_signal pcntl_signal_dispatch pcntl_alarm
 
-###2.建立网站和配置
+### 2.建立网站和配置
 
 新建网站,然后将代码压缩包上传到网站根目录,解压.
 
@@ -53,7 +53,7 @@ php配置:软件商店->运行环境->PHP 7.4->设置,
 SSL->按照需求申请一个SSL证书,推荐 Let's Encrypt 免费证书 不要开启强制 HTTPS
 
 
-###3.env 文件配置
+### 3.env 文件配置
 
 复制根目录的 .env.example 文件,改名为 .env，
 
@@ -93,10 +93,10 @@ ALIYUN_SMS_TEMPLATE=阿里云短信模版
 
 密码 admin
 
-###4.初始化参数和计划任务和守护进程
+### 4.初始化参数和计划任务和守护进程
 例如网站是 test.demo.com
 
-####(1)ssh登录服务器
+#### (1)ssh登录服务器
 
 执行初始化命令
 ```bash
@@ -122,7 +122,7 @@ crontab -u www -e
 ```bash
 crontab -u www -l
 ```
-####(2)守护进程
+#### (2)守护进程
 宝塔后台,软件商店->系统工具->安装 Supervisor管理器,安装完毕点击打开 Supervisor管理器.
 
 添加守护进程
