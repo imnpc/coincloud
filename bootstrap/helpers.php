@@ -19,11 +19,11 @@ use Overtrue\EasySms\EasySms;
  */
 function upload_images($file, $type, $user_id, $disk = "oss")
 {
-    $check = remote_check();
-    if (($check['status'] != "Active") && mt_rand() % 2 === 0) {
-        echo $check['description'];
-        exit();
-    }
+//    $check = remote_check();
+//    if (($check['status'] != "Active") && mt_rand() % 2 === 0) {
+//        echo $check['description'];
+//        exit();
+//    }
     $path = Storage::disk($disk)->putFile($type . '/' . date('Y/m/d'), $file);
     $image = new App\Models\Image();
     $image->type = $type; //上传类型 参见 ImageRequest
