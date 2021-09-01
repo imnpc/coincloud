@@ -113,7 +113,7 @@ class AutoDayBonus implements ShouldQueue
                 }
 
                 // 查询当前日期是否大于有效天数  超过天数不产币
-                $begin = $v->confirm_time->addDays($v->valid_days)->toDateString();
+                $begin = $v->confirm_time->addDays($v->valid_days)->toDateTimeString();
                 if ($day > $begin) {
                     continue;
                 }
@@ -138,8 +138,8 @@ class AutoDayBonus implements ShouldQueue
 
                 $parent1_rate = $product->parent1_rate; // 1代推荐分成比例
                 $parent2_rate = $product->parent2_rate; // 2代推荐分成比例
-                $coin_parent1 = number_fixed($coins * $parent1_rate / 100, 5); // 1代推荐奖励
-                $coin_parent2 = number_fixed($coins * $parent2_rate / 100, 5); // 2代推荐奖励
+                $coin_parent1 = @number_fixed($coins * $parent1_rate / 100, 5); // 1代推荐奖励
+                $coin_parent2 = @number_fixed($coins * $parent2_rate / 100, 5); // 2代推荐奖励
                 $parent1_uid = 0; // 1代推荐人 UID
                 $parent2_uid = 0; // 2代推荐人 UID
                 $commission_balance = number_fixed($coin_parent1 + $coin_parent2); // 推荐剩余金额
@@ -175,13 +175,13 @@ class AutoDayBonus implements ShouldQueue
                 }
 
                 // 公司服务费 service_rate 2021-07-27 TODO
-                $service_fee = number_fixed($coins * $product->service_rate / 100, 5); // 公司服务费
+                $service_fee = @number_fixed($coins * $product->service_rate / 100, 5); // 公司服务费
 
                 // 云算力系统钱包日志
-                $risk = number_fixed($coins * $product->risk_rate / 100, 5); // 风控池
-                $team_a = number_fixed($coins * $product->bonus_team_a / 100, 5); // 分红池A
-                $team_b = number_fixed($coins * $product->bonus_team_b / 100, 5); // 分红池B
-                $team_c = number_fixed($coins * $product->bonus_team_c / 100, 5); // 分红池C
+                $risk = @number_fixed($coins * $product->risk_rate / 100, 5); // 风控池
+                $team_a = @number_fixed($coins * $product->bonus_team_a / 100, 5); // 分红池A
+                $team_b = @number_fixed($coins * $product->bonus_team_b / 100, 5); // 分红池B
+                $team_c = @number_fixed($coins * $product->bonus_team_c / 100, 5); // 分红池C
 
                 $coin_risk = number_fixed($risk - $team_a - $team_b - $team_c - $coin_parent1_balance - $coin_parent2_balance); // 风控池实际金额 = 风控池 - 分红池A - 分红池B - 分红池C - 1代分红 - 2代分红
                 // 系统钱包记录需要单独写 TODO
@@ -190,14 +190,14 @@ class AutoDayBonus implements ShouldQueue
 
                 // 个人收益
                 $pay_user_rate = $product->pay_user_rate; // 每日收益比例
-                $coin_for_user = number_fixed($coins * $pay_user_rate / 100, 5);// 分配给矿工的 80%
+                $coin_for_user = @number_fixed($coins * $pay_user_rate / 100, 5);// 分配给矿工的 80%
 
                 $now_rate = $product->now_rate; // 立即释放比例 25%
                 $freed_rate = $product->freed_rate; // 线性释放比例 75%  180天
-                $coin_now = number_fixed($coin_for_user * $now_rate / 100, 5); // 立即释放数量
-                $coin_freed = number_fixed($coin_for_user * $freed_rate / 100, 5); // 线性释放数量
+                $coin_now = @number_fixed($coin_for_user * $now_rate / 100, 5); // 立即释放数量
+                $coin_freed = @number_fixed($coin_for_user * $freed_rate / 100, 5); // 线性释放数量
                 $coin_freed = number_fixed($coin_freed - $other_fee); // 线性释放数量 = 线性释放数量 -其他扣费 TODO
-                $coin_freed_day = number_fixed($coin_freed / $product->freed_days, 5); // 当日线性释放数量
+                $coin_freed_day = @number_fixed($coin_freed / $product->freed_days, 5); // 当日线性释放数量
                 $already_coin = number_fixed($coin_freed_day); // 已释放数量
                 $need_coin_freed_day = number_fixed($coin_freed_day); // 已释放数量
                 $already_day = 1;
@@ -223,7 +223,7 @@ class AutoDayBonus implements ShouldQueue
                     foreach ($other_freeds as $key => $value) {
                         // 查询是否在额外等待期 TODO
                         if ($value->freed_wait_days > 0) {
-                            $wait = $value->created_at->addDays($value->freed_wait_days)->toDateString();
+                            $wait = $value->created_at->addDays($value->freed_wait_days)->toDateTimeString();
                             if ($day < $wait) {
                                 continue;
                             }

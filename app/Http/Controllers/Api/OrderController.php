@@ -128,7 +128,7 @@ class OrderController extends Controller
             $valid_power = 0;
             $package_status = 1; // 封装状态 0-封装完成 1-等待封装 2-封装中
         } else {
-            $valid_power = number_fixed(($request->number * $product->valid_rate) / 100, 2); // 有效T数 = 购买数量 * 有效T数比例
+            $valid_power = @number_fixed(($request->number * $product->valid_rate) / 100, 2); // 有效T数 = 购买数量 * 有效T数比例
             $package_status = 0;
         }
         // 提交订单
@@ -144,7 +144,7 @@ class OrderController extends Controller
             'valid_days' => $product->valid_days, // 有效天数
             'valid_rate' => $product->valid_rate, // 有效T数比例
             'valid_power' => $valid_power, // 当前有效T数
-            'max_valid_power' => number_fixed(($request->number * $product->valid_rate) / 100, 2), // 最大有效T数
+            'max_valid_power' => @number_fixed(($request->number * $product->valid_rate) / 100, 2), // 最大有效T数
             'package_rate' => $product->package_rate, // 封装比例
             'package_already' => 0, // 已封装数量
             'package_wait' => $valid_power, // 等待封装数量

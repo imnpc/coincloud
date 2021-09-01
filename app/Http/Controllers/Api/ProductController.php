@@ -34,7 +34,7 @@ class ProductController extends Controller
                 $buy = Order::where('product_id', '=', $v->id)
                     ->where('pay_status', '=', Order::PAID_COMPLETE)
                     ->sum('number'); // 购买 T 数
-                $list[$k]['sale_rate'] = number_fixed(($buy / $v->stock) * 100,2);
+                $list[$k]['sale_rate'] = @number_fixed(($buy / $v->stock) * 100,2);
             }
         }
         return ProductResource::collection($list);
@@ -54,7 +54,7 @@ class ProductController extends Controller
             $buy = Order::where('product_id', '=', $product->id)
                 ->where('pay_status', '=', Order::PAID_COMPLETE)
                 ->sum('number'); // 购买 T 数
-            $product['sale_rate'] = number_fixed(($buy / $product->stock) * 100,2);
+            $product['sale_rate'] = @number_fixed(($buy / $product->stock) * 100,2);
         }
         $product['buy_faq'] = Article::where('article_category_id', 5)
             ->where('status', 1)

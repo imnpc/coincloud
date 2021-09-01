@@ -70,7 +70,7 @@ class OrderPackage implements ShouldQueue
 //            $table->decimal('package_wait', 32, 5)->comment('等待封装数量');
 //            $table->tinyInteger('package_status')->default(0)->comment('封装状态 0-封装完成 1-等待封装 2-封装中');
 
-                $each = number_fixed($v->max_valid_power * $v->package_rate / 100); // 每天封装数量
+                $each = @number_fixed($v->max_valid_power * $v->package_rate / 100); // 每天封装数量
                 $package_already = $v->package_already + $each; // 已封装数量
                 $valid_power = $v->valid_power + $each; // 当前有效T数
                 if ($package_already >= $v->max_valid_power) {
