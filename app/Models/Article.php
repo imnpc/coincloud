@@ -6,6 +6,7 @@ use App\Traits\dateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use SolutionForest\Translatable\HasTranslations;
 use Storage;
 
 class Article extends Model
@@ -13,6 +14,9 @@ class Article extends Model
     use HasFactory;
     use SoftDeletes;
     use dateTrait;
+    use HasTranslations;
+
+    public $translatable = ['title', 'content', 'desc'];
 
     /**
      * The attributes that are mass assignable.
@@ -35,7 +39,7 @@ class Article extends Model
     public function getThumbUrlAttribute()
     {
         if ($this->thumb) {
-            return Storage::disk('oss')->url($this->thumb);
+            return Storage::disk(config('filesystems.default'))->url($this->thumb);
         } else {
             return '';
         }

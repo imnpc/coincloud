@@ -7,6 +7,9 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use solutionforest\LaravelAdmin\Translatable\Extensions\Form\TForm;
+use solutionforest\LaravelAdmin\Translatable\Extensions\FormLangSwitcher;
+use solutionforest\LaravelAdmin\Translatable\Extensions\TranslatableForm;
 
 class AnnouncementController extends AdminController
 {
@@ -92,10 +95,22 @@ class AnnouncementController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new Announcement());
+//        $form = new Form(new Announcement());
+        $form = new TForm(new Announcement());
+        // 加入 轉換語言
+        $form->header(function (Form\Tools $tools) {
+            $tools->append((new FormLangSwitcher())->render());
+        });
 
-        $form->text('title', __('Title'))->required();
-        $form->editor('content', __('Content'))->required();
+        //        $form->text('title', __('Title'))->required();
+        //        $form->editor('content', __('Content'))->required();
+
+        $form->translatable(function (TranslatableForm $form) {
+            $form->text('title', __('Title'))->required();
+        });
+        $form->translatable(function (TranslatableForm $form) {
+            $form->editor('content', __('Content'));
+        });
         //$form->switch('is_recommand', __('Is recommand'));
 
         // 设置text、color、和存储值

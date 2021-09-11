@@ -285,6 +285,10 @@ class UserController extends Controller
             ->where('product_id', $product->id)
             ->sum('wait_coin');
 
+        $coin_freed_alreaday = Freed::where('user_id', '=', auth('api')->id())
+            ->where('product_id', $product->id)
+            ->sum('already_coin');
+
         // 质押币
         $pledge_from_id = UserWalletLog::FROM_PLEDGE;
         $pledge = Pledge::where('user_id', '=', auth('api')->id())
@@ -292,7 +296,10 @@ class UserController extends Controller
             ->first();
         $now = Carbon::now();
         if ($pledge) {
-            $my_pledge = $pledge->pledge_coins;// 自己的质押币数量
+//            $my_pledge = $pledge->pledge_coins;// 自己的质押币数量
+            $my_pledge = Pledge::where('user_id', '=', auth('api')->id())
+                ->where('product_id', $product->id)
+                ->sum('pledge_coins');// 自己的质押币数量
             // 倒计时天数
             $created_at = $pledge->created_at;
             $check_day = $created_at->diffInDays($now); // 已经过去天数
@@ -313,7 +320,7 @@ class UserController extends Controller
         }
         $coins_total = UserBonus::where('user_id', '=', auth('api')->id())
             ->where('product_id', $product->id)
-            ->sum('coins'); // 累计产出
+            ->sum('coin_for_user'); // 累计产出
 
         $data = [
             'coin_balance' => $balance, //  可提币账户
@@ -681,15 +688,15 @@ class UserController extends Controller
             $path = 'qrcode/' . $code . '.png'; // 二维码图片名称路径
         }
 
-        $exists = Storage::disk('oss')->exists($path); // 查询文件是否存在
+        $exists = Storage::disk(config('filesystems.default'))->exists($path); // 查询文件是否存在
         if (!$exists) {
             // 不存在就生成并上传二维码图片
             //$qr = QrCode::format('png')->merge('https://cloudimg.xhkylm.com/logo120.png', .3, true)->size(300)->errorCorrection('H')->generate($url);
             $qr = QrCode::format('png')->size(300)->errorCorrection('H')->generate($url);
-            Storage::disk('oss')->put($path, $qr); //上传到 OSS
+            Storage::disk(config('filesystems.default'))->put($path, $qr); //上传到 OSS
         }
 
-        $data['qrcode'] = Storage::disk('oss')->url($path); // 返回图片 URL
+        $data['qrcode'] = Storage::disk(config('filesystems.default'))->url($path); // 返回图片 URL
 
         return $data;
     }

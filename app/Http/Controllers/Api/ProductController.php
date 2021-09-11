@@ -30,6 +30,7 @@ class ProductController extends Controller
         foreach ($list as $k => $v) {
             $buy = 0;
             $list[$k]['sale_rate'] = 0;
+            $list[$k]['locale'] = session('locale') ?: config('app.locale');
             if ($v->stock > 0) {
                 $buy = Order::where('product_id', '=', $v->id)
                     ->where('pay_status', '=', Order::PAID_COMPLETE)

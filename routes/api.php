@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ElectricChargeLogController;
 use App\Http\Controllers\Api\IndexController;
+use App\Http\Controllers\Api\PledgeController;
 use App\Http\Controllers\Api\RechargeController;
 use App\Http\Controllers\Api\WithdrawController;
 use Illuminate\Http\Request;
@@ -60,6 +61,7 @@ Route::prefix('v1')
                 Route::post('captcha', [UserController::class, 'captcha']); // 使用手机号获取图片验证码
                 Route::post('captchasms', [UserController::class, 'captchasms']); // 使用图片验证码获取短信验证码
                 Route::post('forget', [UserController::class, 'forgetPassword']); // 找回重置密码
+                Route::post('reg', [UserController::class, 'store']); // 注册
 
                 // 登录后可以访问的接口
                 Route::middleware('auth:api')->group(function () {
@@ -103,6 +105,8 @@ Route::prefix('v1')
                     Route::patch('electricCharge/{electricChargeLog}', [ElectricChargeLogController::class, 'update']); // 更新电费支付凭证
 //            Route::resource('lend', 'LendController'); // 出借
 //            Route::get('mylend', 'LendController@my'); // 我的出借页面
+
+                    Route::resource('pledge', PledgeController::class); // 质押币
                 });
             });
     });

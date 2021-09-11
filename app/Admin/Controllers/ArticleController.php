@@ -8,6 +8,9 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use solutionforest\LaravelAdmin\Translatable\Extensions\Form\TForm;
+use solutionforest\LaravelAdmin\Translatable\Extensions\FormLangSwitcher;
+use solutionforest\LaravelAdmin\Translatable\Extensions\TranslatableForm;
 
 class ArticleController extends AdminController
 {
@@ -110,13 +113,26 @@ class ArticleController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new Article());
+//        $form = new Form(new Article());
+        $form = new TForm(new Article());
+        // 加入 轉換語言
+        $form->header(function (Form\Tools $tools) {
+            $tools->append((new FormLangSwitcher())->render());
+        });
 
         $form->select('article_category_id', __('Article category id'))->options(ArticleCategory::selectOptions())->required();
-        $form->text('title', __('Title'))->required();
+//        $form->text('title', __('Title'))->required();
+        $form->translatable(function (TranslatableForm $form) {
+            $form->text('title', __('Title'))->required();
+        });
         $form->image('thumb', __('Thumb'))->move('article/thumb')->uniqueName();
-        $form->textarea('desc', __('Desc'));
-        $form->editor('content', __('Content'))->required();
+
+//        $form->textarea('desc', __('Desc'));
+//        $form->editor('content', __('Content'))->required();
+        $form->translatable(function (TranslatableForm $form) {
+            $form->textarea('desc', __('Desc'));
+            $form->editor('content', __('Content'));
+        });
         // 设置text、color、和存储值
         $states1 = [
             'on'  => ['value' => 0, 'text' => '不推荐', 'color' => 'default'],

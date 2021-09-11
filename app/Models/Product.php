@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use SolutionForest\Translatable\HasTranslations;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Storage;
@@ -18,6 +19,9 @@ class Product extends Model implements Sortable
     use SoftDeletes;
     use dateTrait;
     use SortableTrait;
+    use HasTranslations;
+
+    public $translatable = ['name','desc','content'];
 
     public $sortable = [
         'order_column_name' => 'sort',
@@ -66,7 +70,7 @@ class Product extends Model implements Sortable
     public function getThumbUrlAttribute()
     {
         if ($this->thumb) {
-            return Storage::disk('oss')->url($this->thumb);
+            return Storage::disk(config('filesystems.default'))->url($this->thumb);
         } else {
             return '';
         }

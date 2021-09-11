@@ -62,7 +62,7 @@ return [
 
         'namespace' => 'App\\Admin\\Controllers',
 
-        'middleware' => ['web', 'admin'],
+        'middleware' => ['web', 'admin', 'locale'],
     ],
 
     /*
@@ -154,7 +154,7 @@ return [
     'upload' => [
 
         // Disk in `config/filesystem.php`.
-        'disk' => 'oss',
+        'disk' => config('filesystems.default'),
 
         // Image and file upload path under the disk above.
         'directory' => [
@@ -430,12 +430,13 @@ return [
         ],
         // 多语言支持
         'multi-language' => [
-            'enable' => true,
+            'enable' => false,
             // the key should be same as var locale in config/app.php
             // the value is used to show
             'languages' => [
                 'en' => 'English',
                 'zh_CN' => '简体中文',
+                'zh_TW' => '繁体中文',
             ],
             // default locale
             'default' => 'zh_CN',
@@ -446,5 +447,13 @@ return [
             // the cookie name for the multi-language var, optional, default is 'locale'
             'cookie-name' => 'locale'
         ],
+        'laravel-admin-translatable' => [
+            'enable' => true,
+            'options' => [
+                'isNavEnable' => false,
+                'isFieldEnable' => true,
+                'isDisplayOneLanguageField' => true
+            ]
+        ]
     ],
 ];

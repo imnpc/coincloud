@@ -6,12 +6,16 @@ use App\Traits\dateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use SolutionForest\Translatable\HasTranslations;
 
 class Announcement extends Model
 {
     use HasFactory;
     use SoftDeletes;
     use dateTrait;
+    use HasTranslations;
+
+    public $translatable = ['title', 'content'];
 
     /**
      * The attributes that are mass assignable.

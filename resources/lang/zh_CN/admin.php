@@ -141,5 +141,7 @@ return [
         ],
     ],
     'yes' => '是',
-    'no' => '否'
+    'no' => '否',
+    'translation'           => '翻译',
+    'lang_shortname'        => '简体',
 ];

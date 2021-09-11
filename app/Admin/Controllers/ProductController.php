@@ -8,6 +8,9 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use solutionforest\LaravelAdmin\Translatable\Extensions\Form\TForm;
+use solutionforest\LaravelAdmin\Translatable\Extensions\FormLangSwitcher;
+use solutionforest\LaravelAdmin\Translatable\Extensions\TranslatableForm;
 use Storage;
 
 class ProductController extends AdminController
@@ -33,7 +36,7 @@ class ProductController extends AdminController
         $grid->column('thumb', __('Thumb'))->display(function ($value) {
             $icon = "";
             if ($value) {
-                $src = Storage::disk('oss')->url($value);
+                $src = Storage::disk(config('filesystems.default'))->url($value);
                 $icon = "<img src='$src' style='max-width:30px;max-height:30px;text-align: left' class='img'/>";
             }
             return $icon; // 标题添加strong标签
@@ -164,9 +167,19 @@ class ProductController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new Product());
+//        $form = new Form(new Product());
+        $form = new TForm(new Product());
 
-        $form->text('name', __('Name'))->required();
+        // 加入 轉換語言
+        $form->header(function (Form\Tools $tools) {
+            $tools->append((new FormLangSwitcher())->render());
+        });
+
+//        $form->text('name', __('Name'))->required();
+        $form->translatable(function (TranslatableForm $form) {
+            $form->text('name', __('Name'))->required();
+        });
+
         $form->text('tag', __('Tag'));
         $form->decimal('price', __('Price'))->default(0)->required()->help('人民币价格，可填写为0');
         $form->decimal('price_usdt', __('Price usdt'))->default(0)->required()->help('USDT 价格，可填写为0');
@@ -228,7 +241,10 @@ class ProductController extends AdminController
         $form->text('network_basic_rate', __('Network basic rate'))->default(0);
         $form->image('thumb', __('Thumb'))->required()->move('products')->uniqueName();
 //        $form->textarea('desc', __('Desc'));
-        $form->editor('content', __('Content'))->required();
+        $form->translatable(function (TranslatableForm $form) {
+            $form->editor('content', __('Content'));
+        });
+
         $states = [
             'on' => ['value' => 0, 'text' => '显示', 'color' => 'primary'],
             'off' => ['value' => 1, 'text' => '隐藏', 'color' => 'danger'],

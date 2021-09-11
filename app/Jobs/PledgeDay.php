@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Order;
 use App\Models\Pledge;
+use App\Models\Product;
 use App\Models\User;
 use App\Models\UserWalletLog;
 use App\Services\LogService;
@@ -73,7 +74,10 @@ class PledgeDay implements ShouldQueue
                 if (!$check_pledge) {
                     if ($v->product->pledge_fee > 0 || $v->product->gas_fee > 0) {
                         // 产品质押币封装模式为 0 的 才执行
-                        if ($v->product->package_type == 0) {
+                        if ($v->product->package_type == 0 && $v->product->pledge_type == 0) {
+                            $pledge_base = $v->number * $v->product->pledge_base;
+                            $pledge_flow = $v->number * $v->product->pledge_flow;
+
                             $pledge = Pledge::create([
                                 'user_id' => $v->user_id,
                                 'order_id' => $v->id,
@@ -83,14 +87,22 @@ class PledgeDay implements ShouldQueue
                                 'pledge_fee' => $v->product->pledge_fee,
                                 'pledge_coins' => $v->number * $v->product->pledge_fee,
                                 'pledge_days' => $v->product->pledge_days,
+                                'wait_days' => $v->product->pledge_days,
                                 'gas_fee' => $v->product->gas_fee,
                                 'gas_coins' => $v->number * $v->product->gas_fee,
+                                'pledge_type' => $v->product->pledge_type,
+                                'pledge_base' => $pledge_base,
+                                'pledge_flow' => $pledge_flow,
                             ]);
+                            // 质押币增加
+//                            $remark = "质押币 + " . $check_pledge->pledge_coins;
+//                            $logService->userLog($v->user_id, $v->wallet_type_id, $check_pledge->pledge_coins, 0, $day, UserWalletLog::FROM_PLEDGE, $remark);
                             // 更新订单字段 是否产生质押记录 is_pledge TODO
                             if ($pledge) {
                                 $orders[$k]->update(['is_pledge' => 1]);
                             }
                         }
+                        // pledge_type == 1 处理额外的 TODO
                     }
                     continue;
                 }

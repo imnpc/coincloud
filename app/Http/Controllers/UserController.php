@@ -99,7 +99,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         // 图片需要使用 OSS 来获取
-        $config['reg_qrcode'] = Storage::disk('oss')->url(config('user.reg_qrcode'));
+        $config['reg_qrcode'] = Storage::disk(config('filesystems.default'))->url(config('user.reg_qrcode'));
         $config['download_url'] = config('user.download_url');
 
         return view('user.show', compact('user', 'config'));
@@ -112,7 +112,7 @@ class UserController extends Controller
     public function download()
     {
         // 图片需要使用 OSS 来获取
-        $config['reg_qrcode'] = Storage::disk('oss')->url(config('user.reg_qrcode'));
+        $config['reg_qrcode'] = Storage::disk(config('filesystems.default'))->url(config('user.reg_qrcode'));
         $config['download_url'] = config('user.download_url');
 
         return view('user.download', compact('config'));

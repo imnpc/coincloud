@@ -44,7 +44,7 @@ class Version extends Model
     public function getDownloadUrlAttribute()
     {
         if ($this->app) {
-            return Storage::disk('oss')->url($this->app);
+            return Storage::disk(config('filesystems.default'))->url($this->app);
         } else {
             return $this->url;
         }

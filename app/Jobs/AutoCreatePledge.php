@@ -6,6 +6,8 @@ use App\Models\Order;
 use App\Models\Pledge;
 use App\Models\Product;
 use App\Models\Recharge;
+use App\Models\UserWalletLog;
+use App\Services\LogService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -60,6 +62,7 @@ class AutoCreatePledge implements ShouldQueue
     {
         $day = Carbon::yesterday()->toDateString();// 获得日期
         $today = Carbon::now()->toDateString();// 获得日期
+        $logService = app()->make(LogService::class); // 钱包服务初始化 TODO
 
         try {
             $recharge = Recharge::find($this->recharge_id);
@@ -79,6 +82,10 @@ class AutoCreatePledge implements ShouldQueue
                         continue;
                     }
 
+                    $product = Product::find($v->product_id); // 获取产品信息
+                    $pledge_base = $v->number * $product->pledge_base;
+                    $pledge_flow = $v->number * $product->pledge_flow;
+
                     $pledge = Pledge::create([
                         'user_id' => $v->user_id,
                         'order_id' => $v->id,
@@ -88,9 +95,17 @@ class AutoCreatePledge implements ShouldQueue
                         'pledge_fee' => $recharge->pledge_fee,
                         'pledge_coins' => $pledge_coins,
                         'pledge_days' => $v->product->pledge_days,
+                        'wait_days' => $v->product->pledge_days,
                         'gas_fee' => $recharge->gas_fee,
                         'gas_coins' => $gas_coins,
+                        'pledge_type' => $product->pledge_type,
+                        'pledge_base' => $pledge_base,
+                        'pledge_flow' => $pledge_flow,
                     ]);
+                    // 质押币增加
+//                    $remark = "质押币 + " . $pledge_coins;
+//                    $logService->userLog($v->user_id, $v->wallet_type_id, $pledge_coins, 0, $day, UserWalletLog::FROM_PLEDGE, $remark);
+
                     // 更新订单字段 是否产生质押记录 is_pledge TODO
                     if ($pledge) {
                         $orders[$k]->update(['is_pledge' => 1]);

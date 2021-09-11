@@ -22,7 +22,7 @@ class OrderController extends Controller
     public function index()
     {
         AnonymousResourceCollection::wrap('list');// 资源列表默认返回 data 更换为 list
-
+        $now = Carbon::now()->toDateTimeString();
         $lists = QueryBuilder::for(Order::class)
             ->defaultSort('-created_at')
             ->with('product')
@@ -80,6 +80,16 @@ class OrderController extends Controller
             'payment' => 'required|numeric|in:1,2,3', // 支付方式 1-银行转账 2-USDT 3-其他虚拟币
         ]);
 
+        $user = $request->user();
+
+        // 实名
+//        if ($user->is_verify == 0 && $user->real_name) {
+//            $data['message'] = "认证审核中";
+//            return response()->json($data, 403);
+//        } else if ($user->is_verify == 0 && empty($user->real_name)) {
+//            $data['message'] = "请先到会员中心进行实名认证！";
+//            return response()->json($data, 403);
+//        }
 
         // 获取产品单价
         if ($request->payment == Order::PAY_BANK) {
@@ -97,7 +107,7 @@ class OrderController extends Controller
             $type = 'USDT'; // 单位
             $payment = [
                 'wallet_address' => config('order.wallet_usdt_address'), // USDT 钱包地址
-                'wallet_qrcode' => Storage::disk('oss')->url(config('order.wallet_usdt_qrcode')), // USDT 钱包二维码
+                'wallet_qrcode' => Storage::disk(config('filesystems.default'))->url(config('order.wallet_usdt_qrcode')), // USDT 钱包二维码
             ];
         } else if ($request->payment == Order::PAY_COIN) {
             // 其他虚拟币支付
@@ -105,7 +115,7 @@ class OrderController extends Controller
             $type = $product->wallet_slug; // 虚拟币单位
             $payment = [
                 'wallet_address' => $product->coin_wallet_address, // 虚拟币 钱包地址
-                'wallet_qrcode' => Storage::disk('oss')->url($product->coin_wallet_qrcode), // 虚拟币 钱包二维码
+                'wallet_qrcode' => Storage::disk(config('filesystems.default'))->url($product->coin_wallet_qrcode), // 虚拟币 钱包二维码
             ];
         }
 
@@ -265,7 +275,7 @@ class OrderController extends Controller
             $type = 'USDT'; // 单位
             $payment = [
                 'wallet_address' => config('order.wallet_usdt_address'), // USDT 钱包地址
-                'wallet_qrcode' => Storage::disk('oss')->url(config('order.wallet_usdt_qrcode')), // USDT 钱包二维码
+                'wallet_qrcode' => Storage::disk(config('filesystems.default'))->url(config('order.wallet_usdt_qrcode')), // USDT 钱包二维码
             ];
         } else if ($request->payment == Order::PAY_COIN) {
             // 其他虚拟币支付
@@ -273,11 +283,12 @@ class OrderController extends Controller
             $type = $product->wallet_slug; // 虚拟币单位
             $payment = [
                 'wallet_address' => $product->coin_wallet_address, // 虚拟币 钱包地址
-                'wallet_qrcode' => Storage::disk('oss')->url($product->coin_wallet_qrcode), // 虚拟币 钱包二维码
+                'wallet_qrcode' => Storage::disk(config('filesystems.default'))->url($product->coin_wallet_qrcode), // 虚拟币 钱包二维码
             ];
         }
 
         $price = $unit_price * $request->number; // 订单价格
+        $pledge_fee = $product->pledge_fee * $request->number; // 质押币
 
         if ($price < 1) {
             $data['message'] = "订单金额数据错误";
@@ -286,6 +297,7 @@ class OrderController extends Controller
 
         $data = [];
         $data['total_price'] = $price;
+        $data['pledge_fee'] = $pledge_fee;
         $data['type'] = $type;
         $data['number'] = $request->number;
         $data['payment'] = $payment;
@@ -311,6 +323,7 @@ class OrderController extends Controller
         $data['price'] = $product->price * $request->number;
         $data['price_usdt'] = $product->price_usdt * $request->number;
         $data['price_coin'] = $product->price_coin * $request->number;
+        $data['pledge_fee'] = $product->pledge_fee * $request->number;
         $data['number'] = $request->number;
         $data['product_id'] = $request->product_id;
         $data['price_coin_type'] = $product->wallet_slug;

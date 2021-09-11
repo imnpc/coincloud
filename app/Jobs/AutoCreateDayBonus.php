@@ -67,22 +67,24 @@ class AutoCreateDayBonus implements ShouldQueue
                     ->first(); // 查询前 1 天该产品系统分红记录
                 if (!$bonus) {
                     $data = DefaultDayBonus::where('product_id', '=', $v->id)->first(); // 查询该商品默认数据
-                    // 自动创建分红记录
-                    DayBonus::create([
-                        'product_id' => $v->id, // 产品
-                        'day' => $day, // 日期
-                        'total_power' => Order::where('wait_status', '=', 0)->where('status', '=', 0)->where('pay_status', '=', 0)
-                            ->where('product_id', '=', $v->id)->sum('number'), // 有效算力总数
-                        'power_add' => $data['power_add'], // 新增算力
-                        'coin_add' => $data['coin_add'], // 产币数量
-                        'efficiency' => $data['efficiency'], // 挖矿效率
-                        'cost' => $data['cost'], // 挖矿成本
-                        'fee' => $data['fee'], // 额外扣除
-                        'day_price' => $data['day_price'], // 当天币价
-                        'day_pledge' => $data['day_pledge'], // 当天质押币系数
-                        'day_cost' => $data['day_cost'], // 当天单T封装成本
-                        'remark' => '系统自动生成', // 备注
-                    ]);
+                    if ($data) {
+                        // 自动创建分红记录
+                        DayBonus::create([
+                            'product_id' => $v->id, // 产品
+                            'day' => $day, // 日期
+                            'total_power' => Order::where('wait_status', '=', 0)->where('status', '=', 0)->where('pay_status', '=', 0)
+                                ->where('product_id', '=', $v->id)->sum('number'), // 有效算力总数
+                            'power_add' => $data['power_add'], // 新增算力
+                            'coin_add' => $data['coin_add'], // 产币数量
+                            'efficiency' => $data['efficiency'], // 挖矿效率
+                            'cost' => $data['cost'], // 挖矿成本
+                            'fee' => $data['fee'], // 额外扣除
+                            'day_price' => $data['day_price'], // 当天币价
+                            'day_pledge' => $data['day_pledge'], // 当天质押币系数
+                            'day_cost' => $data['day_cost'], // 当天单T封装成本
+                            'remark' => '系统自动生成', // 备注
+                        ]);
+                    }
                 }
 
                 // 系统借币 TODO

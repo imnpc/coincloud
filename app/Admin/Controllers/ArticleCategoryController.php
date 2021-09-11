@@ -9,6 +9,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Tree;
 use Encore\Admin\Layout\Content;
+use solutionforest\LaravelAdmin\Translatable\Extensions\Form\TForm;
+use solutionforest\LaravelAdmin\Translatable\Extensions\FormLangSwitcher;
+use solutionforest\LaravelAdmin\Translatable\Extensions\TranslatableForm;
 
 class ArticleCategoryController extends AdminController
 {
@@ -119,11 +122,19 @@ class ArticleCategoryController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new ArticleCategory());
+//        $form = new Form(new ArticleCategory());
+        $form = new TForm(new ArticleCategory());
+        // 加入 轉換語言
+        $form->header(function (Form\Tools $tools) {
+            $tools->append((new FormLangSwitcher())->render());
+        });
 
 //        $form->switch('parent_id', __('Parent id'));
 //        $form->switch('order', __('Order'));
-        $form->text('title', __('Title'));
+//        $form->text('title', __('Title'));
+        $form->translatable(function (TranslatableForm $form) {
+            $form->text('title', __('Title'))->required();
+        });
         $form->image('icon', __('Icon'))->move('article/icon')->uniqueName();
         $form->radioCard('status', __('是否显示'))->options(['0' => '不显示', '1' => '显示'])->default('0')->required();
         //$form->switch('status', __('Status'));

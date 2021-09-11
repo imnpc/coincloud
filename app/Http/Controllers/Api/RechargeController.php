@@ -137,7 +137,7 @@ class RechargeController extends Controller
         $product = Product::where('wallet_type_id', $request->wallet_type_id)->first();
 
         $wallet_address = $product->coin_wallet_address; // 钱包地址
-        $wallet_qrcode = Storage::disk('oss')->url($product->coin_wallet_qrcode); // 钱包二维码
+        $wallet_qrcode = Storage::disk(config('filesystems.default'))->url($product->coin_wallet_qrcode); // 钱包二维码
 
         $day = Carbon::yesterday()->toDateString();// 获得日期
 

@@ -17,13 +17,17 @@ use Overtrue\EasySms\EasySms;
  * @param string $disk 磁盘名称
  * @return \App\Http\Resources\ImageResource
  */
-function upload_images($file, $type, $user_id, $disk = "oss")
+function upload_images($file, $type, $user_id, $disk = "public")
 {
 //    $check = remote_check();
 //    if (($check['status'] != "Active") && mt_rand() % 2 === 0) {
 //        echo $check['description'];
 //        exit();
 //    }
+    if (config('filesystems.default') != 'public') {
+        $disk = config('filesystems.default');
+    }
+
     $path = Storage::disk($disk)->putFile($type . '/' . date('Y/m/d'), $file);
     $image = new App\Models\Image();
     $image->type = $type; //上传类型 参见 ImageRequest

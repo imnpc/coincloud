@@ -104,7 +104,7 @@ class User extends Authenticatable implements Wallet, WalletFloat
     public function getAvatarUrlAttribute()
     {
         if ($this->avatar) {
-            return Storage::disk('oss')->url($this->avatar);
+            return Storage::disk(config('filesystems.default'))->url($this->avatar);
         } else {
             return '';
         }
@@ -118,7 +118,7 @@ class User extends Authenticatable implements Wallet, WalletFloat
     public function getIdFrontUrlAttribute()
     {
         if ($this->id_front) {
-            return Storage::disk('oss')->url($this->id_front);
+            return Storage::disk(config('filesystems.default'))->url($this->id_front);
         } else {
             return '';
         }
@@ -127,7 +127,7 @@ class User extends Authenticatable implements Wallet, WalletFloat
     public function getIdBackUrlAttribute()
     {
         if ($this->id_back) {
-            return Storage::disk('oss')->url($this->id_back);
+            return Storage::disk(config('filesystems.default'))->url($this->id_back);
         } else {
             return '';
         }

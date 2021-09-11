@@ -39,7 +39,7 @@ class IndexController extends Controller
         $banner_list = [];
         foreach ($banner as $ban) {
             if ($ban) {
-                $banner_list[] = Storage::disk('oss')->url($ban);
+                $banner_list[] = Storage::disk(config('filesystems.default'))->url($ban);
             } else {
                 return '';
             }
@@ -107,6 +107,10 @@ class IndexController extends Controller
 
     public function test()
     {
+
+        $bb = config('filesystems.default');
+        echo $bb;
+        exit();
         $list = WalletType::all();
 
         $options = [];

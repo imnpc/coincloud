@@ -24,7 +24,14 @@ class LogService
     {
         $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
         $old = $UserWalletService->checkbalance($uid, $wallet_type_id);
-        $new = number_fixed($old + $add);
+
+        // 注意此处可能会有精度损失 TODO
+//        $new = number_fixed($old + $add);
+        if ($add >= 0) {
+            $new = bcadd($old, $add, 5);
+        } elseif ($add < 0) {
+            $new = bcsub($old, $add, 5);
+        }
 
         $meta['old'] = $old;
         $meta['add'] = $add;
@@ -69,12 +76,19 @@ class LogService
             ]);
         }
 
-        $new_team_a = number_fixed($wallet->team_a + $team_a);
-        $new_team_b = number_fixed($wallet->team_b + $team_b);
-        $new_team_c = number_fixed($wallet->team_c + $team_c);
-        $new_risk = number_fixed($wallet->risk + $risk);
-        $new_commission_balance = number_fixed($wallet->commission_balance + $commission_balance);
-        $new_service_fee = number_fixed($wallet->service_fee + $service_fee);
+//        $new_team_a = number_fixed($wallet->team_a + $team_a);
+//        $new_team_b = number_fixed($wallet->team_b + $team_b);
+//        $new_team_c = number_fixed($wallet->team_c + $team_c);
+//        $new_risk = number_fixed($wallet->risk + $risk);
+//        $new_commission_balance = number_fixed($wallet->commission_balance + $commission_balance);
+//        $new_service_fee = number_fixed($wallet->service_fee + $service_fee);
+
+        $new_team_a = bcadd($wallet->team_a, $team_a, 5);
+        $new_team_b = bcadd($wallet->team_b, $team_b, 5);
+        $new_team_c = bcadd($wallet->team_c, $team_c, 5);
+        $new_risk = bcadd($wallet->risk, $risk, 5);
+        $new_commission_balance = bcadd($wallet->commission_balance, $commission_balance, 5);
+        $new_service_fee = bcadd($wallet->service_fee, $service_fee, 5);
 
         $log = SystemWalletLog::create([
             'system_wallet_id' => $wallet->id,

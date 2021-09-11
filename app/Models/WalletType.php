@@ -59,7 +59,7 @@ class WalletType extends Model implements Sortable
     public function getIconUrlAttribute()
     {
         if ($this->icon) {
-            return Storage::disk('oss')->url($this->icon);
+            return Storage::disk(config('filesystems.default'))->url($this->icon);
         } else {
             return '';
         }

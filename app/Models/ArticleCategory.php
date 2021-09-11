@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use SolutionForest\Translatable\HasTranslations;
 
 class ArticleCategory extends Model
 {
@@ -17,6 +18,9 @@ class ArticleCategory extends Model
     use ModelTree;
     use AdminBuilder;
     use dateTrait;
+    use HasTranslations;
+
+    public $translatable = ['title'];
 
     /**
      * The attributes that are mass assignable.
@@ -39,7 +43,7 @@ class ArticleCategory extends Model
     public function getIconUrlAttribute()
     {
         if ($this->icon) {
-            return Storage::disk('oss')->url($this->icon);
+            return Storage::disk(config('filesystems.default'))->url($this->icon);
         } else {
             return '';
         }

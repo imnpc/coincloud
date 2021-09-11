@@ -45,7 +45,7 @@ class Withdraw extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image) {
-            return Storage::disk('oss')->url($this->image);
+            return Storage::disk(config('filesystems.default'))->url($this->image);
         } else {
             return '';
         }

@@ -84,7 +84,7 @@ class Recharge extends Model
     public function getPayImageUrlAttribute()
     {
         if ($this->pay_image) {
-            return Storage::disk('oss')->url($this->pay_image);
+            return Storage::disk(config('filesystems.default'))->url($this->pay_image);
         } else {
             return '';
         }

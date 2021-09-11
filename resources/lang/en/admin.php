@@ -145,5 +145,7 @@ return [
         ],
     ],
     'yes' => 'Yes',
-    'no' => 'No'
+    'no' => 'No',
+    'translation'           => 'Translation',
+    'lang_shortname'        => 'EN',
 ];

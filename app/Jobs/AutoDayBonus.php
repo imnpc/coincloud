@@ -67,7 +67,7 @@ class AutoDayBonus implements ShouldQueue
     {
         $day = Carbon::yesterday()->toDateString();// 获得日期
         $today = Carbon::now()->toDateString();// 获得日期
-        $now = Carbon::now()->toDateTimeString();
+        $now = Carbon::now()->toDateString();
 
         try {
             $logService = app()->make(LogService::class); // 钱包服务初始化 TODO
@@ -125,11 +125,14 @@ class AutoDayBonus implements ShouldQueue
                 $other_fee = 0;
                 $system_coin = 0;
 
-                $each_add = number_fixed($bonus->efficiency - $bonus->cost); // 当日每T产币量 = 挖矿效率 - 挖矿成本
-                $coins = number_fixed($each_add * $v->valid_power, 5); // 当日产币量 = 挖矿效率 * 订单实际有效算力
+//                $each_add = number_fixed($bonus->efficiency - $bonus->cost); // 当日每T产币量 = 挖矿效率 - 挖矿成本
+//                $coins = number_fixed($each_add * $v->valid_power, 5); // 当日产币量 = 挖矿效率 * 订单实际有效算力
+                $each_add = bcsub($bonus->efficiency, $bonus->cost, 5); // 当日每T产币量 = 挖矿效率 - 挖矿成本
+                $coins = bcmul($each_add, $v->valid_power, 5); // 当日产币量 = 挖矿效率 * 订单实际有效算力
 
                 if ($bonus->fee > 0) {
-                    $other_fee = number_fixed($bonus->fee * $v->valid_power, 5); // 额外扣除总数 = 每T额外扣除fee * 订单实际有效算力
+//                    $other_fee = number_fixed($bonus->fee * $v->valid_power, 5); // 额外扣除总数 = 每T额外扣除fee * 订单实际有效算力
+                    $other_fee = bcmul($bonus->fee, $v->valid_power, 5); // 额外扣除总数 = 每T额外扣除fee * 订单实际有效算力
                 }
 
                 if ($coins <= 0) {
@@ -138,11 +141,14 @@ class AutoDayBonus implements ShouldQueue
 
                 $parent1_rate = $product->parent1_rate; // 1代推荐分成比例
                 $parent2_rate = $product->parent2_rate; // 2代推荐分成比例
-                $coin_parent1 = @number_fixed($coins * $parent1_rate / 100, 5); // 1代推荐奖励
-                $coin_parent2 = @number_fixed($coins * $parent2_rate / 100, 5); // 2代推荐奖励
+//                $coin_parent1 = @number_fixed($coins * $parent1_rate / 100, 5); // 1代推荐奖励
+//                $coin_parent2 = @number_fixed($coins * $parent2_rate / 100, 5); // 2代推荐奖励
+                $coin_parent1 = @bcmul($coins, $parent1_rate / 100, 5); // 1代推荐奖励
+                $coin_parent2 = @bcmul($coins, $parent2_rate / 100, 5); // 2代推荐奖励
                 $parent1_uid = 0; // 1代推荐人 UID
                 $parent2_uid = 0; // 2代推荐人 UID
-                $commission_balance = number_fixed($coin_parent1 + $coin_parent2); // 推荐剩余金额
+//                $commission_balance = number_fixed($coin_parent1 + $coin_parent2); // 推荐剩余金额
+                $commission_balance = bcadd($coin_parent1, $coin_parent2, 5); // 推荐剩余金额
 
                 $coin_parent1_balance = 0; // 1代推荐奖励
                 $coin_parent2_balance = 0; // 2代推荐奖励
@@ -158,7 +164,8 @@ class AutoDayBonus implements ShouldQueue
                     $parent1_uid = $user->parent_id; // 1代推荐人用户 ID
                     $parent1_user = User::find($parent1_uid); // 1代推荐人用户信息
                     $coin_parent1_balance = $coin_parent1;
-                    $commission_balance = number_fixed($commission_balance - $coin_parent1); // 推荐剩余金额
+//                    $commission_balance = number_fixed($commission_balance - $coin_parent1); // 推荐剩余金额
+                    $commission_balance = bcsub($commission_balance, $coin_parent1, 5); // 推荐剩余金额
                     //添加到用户余额 + 记录日志 filecoin_balance
                     $remark1 = "推荐分红1代";
                     $logService->userLog($parent1_uid, $product->wallet_type_id, $coin_parent1, $user->id, $day, UserWalletLog::FROM_COMMISSION, $remark1);
@@ -167,7 +174,8 @@ class AutoDayBonus implements ShouldQueue
                         $parent2_uid = $parent1_user->parent_id; // 2代推荐人用户 ID
                         $parent2_user = User::find($parent2_uid); // 2代推荐人用户信息
                         $coin_parent2_balance = $coin_parent2;
-                        $commission_balance = number_fixed($commission_balance - $coin_parent2); // 推荐剩余金额
+//                        $commission_balance = number_fixed($commission_balance - $coin_parent2); // 推荐剩余金额
+                        $commission_balance = bcsub($commission_balance, $coin_parent2, 5); // 推荐剩余金额
                         //添加到用户余额 + 记录日志 filecoin_balance
                         $remark2 = "推荐分红2代";
                         $logService->userLog($parent2_uid, $product->wallet_type_id, $coin_parent2, $parent1_uid, $day, UserWalletLog::FROM_COMMISSION, $remark2);
@@ -175,13 +183,19 @@ class AutoDayBonus implements ShouldQueue
                 }
 
                 // 公司服务费 service_rate 2021-07-27 TODO
-                $service_fee = @number_fixed($coins * $product->service_rate / 100, 5); // 公司服务费
+//                $service_fee = @number_fixed($coins * $product->service_rate / 100, 5); // 公司服务费
+                $service_fee = @bcmul($coins, $product->service_rate / 100, 5); // 公司服务费
 
                 // 云算力系统钱包日志
-                $risk = @number_fixed($coins * $product->risk_rate / 100, 5); // 风控池
-                $team_a = @number_fixed($coins * $product->bonus_team_a / 100, 5); // 分红池A
-                $team_b = @number_fixed($coins * $product->bonus_team_b / 100, 5); // 分红池B
-                $team_c = @number_fixed($coins * $product->bonus_team_c / 100, 5); // 分红池C
+//                $risk = @number_fixed($coins * $product->risk_rate / 100, 5); // 风控池
+//                $team_a = @number_fixed($coins * $product->bonus_team_a / 100, 5); // 分红池A
+//                $team_b = @number_fixed($coins * $product->bonus_team_b / 100, 5); // 分红池B
+//                $team_c = @number_fixed($coins * $product->bonus_team_c / 100, 5); // 分红池C
+
+                $risk = @bcmul($coins, $product->risk_rate / 100, 5); // 风控池
+                $team_a = @bcmul($coins, $product->bonus_team_a / 100, 5); // 分红池A
+                $team_b = @bcmul($coins, $product->bonus_team_b / 100, 5); // 分红池B
+                $team_c = @bcmul($coins, $product->bonus_team_c / 100, 5); // 分红池C
 
                 $coin_risk = number_fixed($risk - $team_a - $team_b - $team_c - $coin_parent1_balance - $coin_parent2_balance); // 风控池实际金额 = 风控池 - 分红池A - 分红池B - 分红池C - 1代分红 - 2代分红
                 // 系统钱包记录需要单独写 TODO
@@ -190,16 +204,21 @@ class AutoDayBonus implements ShouldQueue
 
                 // 个人收益
                 $pay_user_rate = $product->pay_user_rate; // 每日收益比例
-                $coin_for_user = @number_fixed($coins * $pay_user_rate / 100, 5);// 分配给矿工的 80%
+//                $coin_for_user = @number_fixed($coins * $pay_user_rate / 100, 5);// 分配给矿工的 80%
+                $coin_for_user = @bcmul($coins, $pay_user_rate / 100, 5);// 分配给矿工的 80%
 
                 $now_rate = $product->now_rate; // 立即释放比例 25%
                 $freed_rate = $product->freed_rate; // 线性释放比例 75%  180天
-                $coin_now = @number_fixed($coin_for_user * $now_rate / 100, 5); // 立即释放数量
-                $coin_freed = @number_fixed($coin_for_user * $freed_rate / 100, 5); // 线性释放数量
-                $coin_freed = number_fixed($coin_freed - $other_fee); // 线性释放数量 = 线性释放数量 -其他扣费 TODO
-                $coin_freed_day = @number_fixed($coin_freed / $product->freed_days, 5); // 当日线性释放数量
-                $already_coin = number_fixed($coin_freed_day); // 已释放数量
-                $need_coin_freed_day = number_fixed($coin_freed_day); // 已释放数量
+//                $coin_now = @number_fixed($coin_for_user * $now_rate / 100, 5); // 立即释放数量
+//                $coin_freed = @number_fixed($coin_for_user * $freed_rate / 100, 5); // 线性释放数量
+//                $coin_freed = number_fixed($coin_freed - $other_fee); // 线性释放数量 = 线性释放数量 -其他扣费 TODO
+//                $coin_freed_day = @number_fixed($coin_freed / $product->freed_days, 5); // 当日线性释放数量
+                $coin_now = @bcmul($coin_for_user, $now_rate / 100, 5); // 立即释放数量
+                $coin_freed = @bcmul($coin_for_user, $freed_rate / 100, 5); // 线性释放数量
+                $coin_freed = @bcsub($coin_freed, $other_fee, 5); // 线性释放数量 = 线性释放数量 -其他扣费 TODO
+                $coin_freed_day = @bcdiv($coin_freed, $product->freed_days, 5); // 当日线性释放数量
+                $already_coin = @number_fixed($coin_freed_day); // 已释放数量
+                $need_coin_freed_day = @number_fixed($coin_freed_day); // 已释放数量
                 $already_day = 1;
                 // 如果产品 释放等待天数大于 0
                 if ($product->freed_wait_days > 0) {
@@ -208,7 +227,9 @@ class AutoDayBonus implements ShouldQueue
                     $coin_freed_day = 0;
                 }
 
-                $wait_coin = number_fixed($coin_freed - $coin_freed_day); // 等待释放数量
+//                $wait_coin = number_fixed($coin_freed - $coin_freed_day); // 等待释放数量
+                $wait_coin = bcsub($coin_freed, $coin_freed_day, 5); // 等待释放数量
+
                 if ($wait_coin < 0) {
                     $wait_coin = 0; // 如果等待释放的数量小于0 标记为0 原因是:计算精度会有稍微差别 小数点最后2位可能会有问题
                 }
@@ -223,8 +244,8 @@ class AutoDayBonus implements ShouldQueue
                     foreach ($other_freeds as $key => $value) {
                         // 查询是否在额外等待期 TODO
                         if ($value->freed_wait_days > 0) {
-                            $wait = $value->created_at->addDays($value->freed_wait_days)->toDateTimeString();
-                            if ($day < $wait) {
+                            $wait = $value->created_at->addDays($value->freed_wait_days)->toDateString();
+                            if ($now < $wait) {
                                 continue;
                             }
                         }
@@ -239,7 +260,7 @@ class AutoDayBonus implements ShouldQueue
                             continue;
                         }
 
-                        if ($value->already_day <= $value->days) {
+                        if ($value->already_day < $value->days) {
                             // 每日线性释放记录
                             $coin_freed_other += $value->coin_freed_day;
                             $already_day = $value->already_day + 1; // 最新释放天数
@@ -252,10 +273,15 @@ class AutoDayBonus implements ShouldQueue
                                 'today' => $already_day,
                             ]);
 
+                            $o_already_coin = bcadd($value->already_coin, $value->coin_freed_day, 5);
+                            $o_wait_coin = bcsub($value->coin_freed, $value->already_coin, 5);
+                            $o_wait_coin = bcsub($o_wait_coin, $value->coin_freed_day, 5);
                             $data = [
                                 'already_day' => $already_day, // 已释放天数
-                                'already_coin' => number_fixed($value->already_coin + $value->coin_freed_day), // 已释放数量
-                                'wait_coin' => number_fixed($value->coin_freed - $value->already_coin - $value->coin_freed_day), // 等待释放数量
+//                                'already_coin' => number_fixed($value->already_coin + $value->coin_freed_day), // 已释放数量
+//                                'wait_coin' => number_fixed($value->coin_freed - $value->already_coin - $value->coin_freed_day), // 等待释放数量
+                                'already_coin' => $o_already_coin, // 已释放数量
+                                'wait_coin' => $o_wait_coin, // 等待释放数量
                             ];
 
                             $other_freeds[$key]->update($data);
@@ -270,7 +296,9 @@ class AutoDayBonus implements ShouldQueue
                 }
 
                 // 当日可分配产币量 = 立即释放数量 + 当日线性释放数量 + 线性释放其他数量总计
-                $coin_day = number_fixed($coin_now + $coin_freed_day + $coin_freed_other);
+//                $coin_day = number_fixed($coin_now + $coin_freed_day + $coin_freed_other);
+                $coin_day = bcadd($coin_now, $coin_freed_day, 5);
+                $coin_day = bcadd($coin_day, $coin_freed_other, 5);
                 $balance = $coin_day; // 余额
 
                 // 用户每日分成
@@ -311,9 +339,8 @@ class AutoDayBonus implements ShouldQueue
                     $remark_day = "用户每日新增可用资产" . $coin_now;
                     $logService->userLog($v->user_id, $product->wallet_type_id, $coin_now, 0, $day, UserWalletLog::FROM_FREED, $remark_day);
                 }
-
-                // 如果 线性释放比例大于 0 TODO
-                if ($freed_rate > 0) {
+                // 如果 线性释放比例大于 0 && 释放金额大于 0
+                if ($freed_rate > 0 && $coin_freed > 0) {
                     // 线性释放列表
                     $freeds = Freed::create([
                         'user_id' => $v->user_id,
