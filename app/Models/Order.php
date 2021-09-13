@@ -62,6 +62,7 @@ class Order extends Model
         'order_sn', 'user_id', 'product_id', 'number', 'wallet_type_id', 'pay_money', 'wait_days', 'wait_status', 'valid_days',
         'valid_rate', 'valid_power', 'max_valid_power', 'package_rate', 'package_already', 'package_wait', 'package_status',
         'payment', 'payment_type', 'pay_status', 'pay_image', 'pay_time', 'confirm_time', 'is_output_coin', 'status', 'remark',
+        'revenue_type', 'revenue_status', 'is_pledge',
     ];
 
     /**

@@ -70,6 +70,8 @@ class AutoCreatePledge implements ShouldQueue
             $orders = Order::where('wallet_type_id', $recharge->wallet_type_id)
                 ->where('user_id', $recharge->user_id)
                 ->where('is_pledge', 0)
+                ->where('pay_status', '=', 0) // 支付状态 0-已完成 1-未提交 2-审核中
+                ->where('status', '=', 0) // 订单状态 0-有效 1-无效
                 ->get();
             if ($orders) {
                 $used = 0;

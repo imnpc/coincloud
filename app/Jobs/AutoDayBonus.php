@@ -113,8 +113,8 @@ class AutoDayBonus implements ShouldQueue
                 }
 
                 // 查询当前日期是否大于有效天数  超过天数不产币
-                $begin = $v->confirm_time->addDays($v->valid_days)->toDateTimeString();
-                if ($day > $begin) {
+                $begin = $v->confirm_time->addDays($v->valid_days)->toDateString();
+                if ($now > $begin) {
                     continue;
                 }
 

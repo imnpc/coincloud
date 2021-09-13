@@ -63,13 +63,13 @@ class ChangeOrderWaitStatus implements ShouldQueue
                 ->where('pay_status', '=', 0) // 支付状态 0-已完成 1-未提交 2-审核中
                 ->where('status', '=', 0) // 订单状态 0-有效 1-无效
                 ->get();
-            $now = Carbon::now()->toDateTimeString();
+            $now = Carbon::now()->toDateString();
             foreach ($lists as $k => $v) {
                 // 按照 确认时间开始算
                 if (is_null($v->confirm_time)) {
                     continue;
                 }
-                $beigin = $v->confirm_time->addDays($v->wait_days)->toDateTimeString();
+                $beigin = $v->confirm_time->addDays($v->wait_days)->toDateString();
 
                 if ($now >= $beigin) {
                     $lists[$k]->update(['wait_status' => 0]); // 标记等待状态 已生效
