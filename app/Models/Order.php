@@ -43,6 +43,7 @@ class Order extends Model
         self::WAIT_SUCCESS => '已生效',
         self::WAIT_PENDING => '等待中',
     ];
+
     // 封装状态 0-封装完成 1-等待封装 2-封装中
     public const PACKAGE_COMPLETE = 0;
     public const PACKAGE_WAIT = 1;
@@ -51,6 +52,20 @@ class Order extends Model
         self::PACKAGE_COMPLETE => '封装完成',
         self::PACKAGE_WAIT => '等待封装',
         self::PACKAGE_PENDING => '封装中',
+    ];
+
+    public const REVENUE_TYPE_DEFAULT = 0;
+    public const REVENUE_TYPE_PLEDGE = 1;
+    public static $RevenueTypeMap = [
+        self::REVENUE_TYPE_DEFAULT => '默认',
+        self::REVENUE_TYPE_PLEDGE => '质押满额',
+    ];
+
+    public const REVENUE_STATUS_COMPLETE = 0;
+    public const REVENUE_STATUS_PENDING = 1;
+    public static $RevenueStatusMap = [
+        self::REVENUE_STATUS_COMPLETE => '默认',
+        self::REVENUE_STATUS_PENDING => '执行中',
     ];
 
     /**

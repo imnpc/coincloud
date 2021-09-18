@@ -100,9 +100,10 @@ function get_array_ids(array $data, string $key = 'id'): array
 /**
  * 火币数据接口
  * @param $from
+ * @param bool $format
  * @return string|\Torann\Currency\Currency|void
  */
-function huobiusdt($from)
+function huobiusdt($from, $format = true)
 {
     // 配置
     $huobi = [
@@ -118,7 +119,11 @@ function huobiusdt($from)
 
     if ($hr24['status'] == 'ok') {
         $usdt = $hr24['tick']['close'];
-        return currency($usdt, 'USD', 'CNY');
+        if ($format) {
+            return currency($usdt, 'USD', 'CNY');
+        } else {
+            return currency($usdt, 'USD', 'CNY', false);
+        }
     } elseif ($hr24['status'] == 'error') {
         return '暂无数据';
     }

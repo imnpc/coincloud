@@ -206,6 +206,9 @@ class UserController extends Controller
             $data[$k]['unfreed_from_id'] = UserWalletLog::FROM_FREED75;
             $data[$k]['is_show_text'] = $v->is_show_text;
             $data[$k]['unit'] = $v->unit;
+            $data[$k]['now_rate'] = $v->now_rate;
+            $data[$k]['freed_rate'] = $v->freed_rate;
+            $data[$k]['freed_days'] = $v->freed_days;
 
         }
 
@@ -213,25 +216,17 @@ class UserController extends Controller
     }
 
     /**
-     * 资产管理
+     * 资产管理 TODO
      * @param Request $request
      * @return array
      */
     public function account(Request $request)
     {
-        // wallet_type_id
         $user = $request->user();
         $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
         $day = Carbon::now()->subDay()->toDateString();// 获得前一天日期
 
-        // wallet_type_id 钱包类型/slug/获取对应钱包 TODO
-        $wallet_type = WalletType::find($request->wallet_type_id);
-
-        if (empty($wallet_type) || $wallet_type->is_enblened = 0) {
-            $data['message'] = "不支持该类型！";
-            return response()->json($data, 403);
-        }
-        $product = Product::where('wallet_type_id', $request->wallet_type_id)
+        $product = Product::where('id', $request->product_id)
             ->where('status', 0)
             ->first();
 
@@ -240,24 +235,57 @@ class UserController extends Controller
             return response()->json($data, 403);
         }
 
+        // wallet_type_id 钱包类型/slug/获取对应钱包 TODO
+        $wallet_type = WalletType::find($product->wallet_type_id);
+
+        if (empty($wallet_type) || $wallet_type->is_enblened = 0) {
+            $data['message'] = "不支持该类型！";
+            return response()->json($data, 403);
+        }
+
         $bonus = UserBonus::where('day', '=', $day)
             ->where('user_id', '=', auth('api')->id())
             ->where('product_id', $product->id)
             ->first();
-        // 临时禁用 TODO
-        if (!$bonus) {
-            $data['message'] = "当前产品暂无当日数据,请稍后再试";
-            return response()->json($data, 404);
-        }
-
-        $system = DayBonus::find($bonus->day_bonus_id);
 
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
         $balance = $wallet->balanceFloat; // 钱包余额
+
+        // 临时禁用 TODO
+        if (!$bonus) {
+//            $data['message'] = "当前产品暂无当日数据,请稍后再试";
+//            return response()->json($data, 404);
+            $data = [
+                'coin_balance' => $balance, //  可提币账户
+                'yesterday_coin' => 0, // 昨日增加
+                'day_reward' => 0, // 奖励币当日释放
+                'wait_reward' => 0, // 奖励币未释放
+                'coin_freed_day' => 0, // 当日 75 % 已释放总量
+                'coin_unfreed_day' => 0, //  75 % 未释放累计
+                'coin_rate_day' => 0, // 当日 25 % 释放数量
+                'pledge_coin' => 0, // 质押币
+                'pledge_day' => 0, // 质押剩余天数
+                'cost' => 0, // GAS消耗  = 挖矿效率 - 挖矿成本
+                'coins_total' => 0, // 累计产出
+                'coin_type_id' => $product->wallet_type_id,
+                'reward_from_id' => UserWalletLog::FROM_REWARD, // 奖励币明细 from
+                'freed75_from_id' => UserWalletLog::FROM_FREED75, // 75%明细 from
+                'freed25_from_id' => UserWalletLog::FROM_FREED, // 25%明细 from
+                'pledge_from_id' => 0, // 质押币 明细
+//            'gas_from_id' => UserWalletLog::FROM_BORROW,
+                'now_rate' => $product->now_rate, // 立即释放比例
+                'freed_rate' => $product->freed_rate, // 线性释放比例
+                'is_show_freed' => 0, // 是否显示线性释放 0-不显示 1-显示
+            ];
+            return $data;
+        }
+
+        $system = DayBonus::find($bonus->day_bonus_id);
+
         //echo $balance;
         // 昨日增加
-        $yesterday_add = $UserWalletService->yesterday($user->id, $request->wallet_type_id);
+        $yesterday_add = $UserWalletService->yesterday($user->id, $product->wallet_type_id);
 
         $wait_reward = 0;
         $total_reward = 0;
@@ -334,7 +362,7 @@ class UserController extends Controller
             'pledge_day' => $pledge_day, // 质押剩余天数
             'cost' => $system->efficiency - $system->cost, // GAS消耗  = 挖矿效率 - 挖矿成本
             'coins_total' => $coins_total, // 累计产出
-            'coin_type_id' => $request->wallet_type_id,
+            'coin_type_id' => $product->wallet_type_id,
             'reward_from_id' => UserWalletLog::FROM_REWARD, // 奖励币明细 from
             'freed75_from_id' => UserWalletLog::FROM_FREED75, // 75%明细 from
             'freed25_from_id' => UserWalletLog::FROM_FREED, // 25%明细 from
@@ -384,11 +412,12 @@ class UserController extends Controller
         $logs = QueryBuilder::for(UserWalletLog::class)
             ->allowedFilters([
                 AllowedFilter::exact('wallet_type_id'), // 钱包类型 ID
+                AllowedFilter::exact('product_id'), // 产品 ID
                 AllowedFilter::exact('from'),// 来源
             ])
             ->defaultSort('-id')
             ->where('user_id', '=', auth('api')->id())
-            ->select('id', 'wallet_type_id', 'from', 'day', 'add', 'remark', 'created_at')
+            ->select('id', 'wallet_type_id', 'product_id', 'from', 'day', 'add', 'remark', 'created_at')
             ->paginate();
 
         return UserWalletLogResource::collection($logs);
@@ -527,12 +556,14 @@ class UserController extends Controller
             // 分红账户
             $bonus = UserWalletLog::where('user_id', '=', $user->id)
                 ->where('wallet_type_id', '=', $v->wallet_type_id)
+                ->where('product_id', '=', $v->id)
                 ->where('from', '=', UserWalletLog::FROM_TEAM_DIVIDENDS)
                 ->sum('add');
             $list[$k]['bonus'] = $bonus;
             // 奖励产币
             $reward = UserWalletLog::where('user_id', '=', $user->id)
                 ->where('wallet_type_id', '=', $v->wallet_type_id)
+                ->where('product_id', '=', $v->id)
                 ->where('from', '=', UserWalletLog::FROM_COMMISSION)
                 ->sum('add');
             $list[$k]['reward'] = $reward;
@@ -904,6 +935,7 @@ class UserController extends Controller
             ->get();
         foreach ($list as $k => $v) {
             $data[$k]['name'] = $v->wallet_slug;
+            $data[$k]['product_id'] = $v->id;
             $data[$k]['wallet_type_id'] = $v->wallet_type_id;
         }
 

@@ -39,6 +39,7 @@ class RechargeController extends AdminController
 //        $grid->column('wallet_type_id', __('Wallet type id'));
         $grid->column('user.mobile', __('Mobile'));
         $grid->column('wallet_slug', __('Wallet slug'));
+        $grid->column('product.name', __('Products'));
         $grid->column('coin', __('Coin'));
         $grid->column('used_coin', __('Used coin'));
         $grid->column('pledge_fee', __('Pledge'));
@@ -154,6 +155,7 @@ class RechargeController extends AdminController
         $form->display('user.mobile', __('Mobile'));
 //        $form->number('wallet_type_id', __('Wallet type id'));
         $form->display('wallet_slug', __('Wallet slug'));
+        $form->display('product.name', __('Products'));
         $form->display('coin', __('Coin'));
         $form->display('pay_type', __('Pay type'))->with(function ($value) {
             return Recharge::$paymentMap[$value];

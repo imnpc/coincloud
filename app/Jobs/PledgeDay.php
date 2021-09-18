@@ -118,7 +118,7 @@ class PledgeDay implements ShouldQueue
                         $pledge_day = 0;
                         // 需要修改 TODO
                         $remark_day = "质押币退回 " . $check_pledge->pledge_coins;
-                        $logService->userLog($v->user_id, $v->wallet_type_id, $check_pledge->pledge_coins, 0, $day, UserWalletLog::FROM_PLEDGE, $remark_day);
+                        $logService->userLog($v->user_id, $v->wallet_type_id, $check_pledge->pledge_coins, 0, $day, UserWalletLog::FROM_PLEDGE, $remark_day, $v->product_id, $v->id);
 
                         $check_pledge->update(['wait_days' => $pledge_day, 'status' => 1]);
                     } else {

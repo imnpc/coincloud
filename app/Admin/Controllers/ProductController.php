@@ -187,6 +187,7 @@ class ProductController extends AdminController
         $form->text('unit', __('Unit'))->required()->help('单位，默认为 T，可以填写中文: 台,节点');
         $form->number('min_buy', __('Min buy'))->default(1)->help('最低购买数量,默认1');
         $form->number('stock', __('Stock'))->default(0)->help('库存数量,0为不限制');
+        $form->radioCard('is_sold_out', __('Is sold out'))->options(['0' => '否', '1' => '是'])->default('0')->required()->help('是否已售罄');
         $form->text('coin_wallet_address', __('Coin wallet address'));
         $form->image('coin_wallet_qrcode', __('Coin wallet qrcode'))->required()->move('products')->uniqueName();
         $form->select('wallet_type_id', __('Wallet type id'))->options(WalletType::where('is_enblened',1)->get()->pluck('slug', 'id'))->required();
@@ -223,6 +224,8 @@ class ProductController extends AdminController
         $form->radioCard('pledge_type', __('Pledge type'))->options(['0' => '默认', '1' => '混合'])->default('0')->required()->help('质押处理模式,0-默认:1种到期自动处理,1-混合:包含基础质押和流量质押');
         $form->decimal('pledge_base', __('Pledge base'))->default(0)->required();
         $form->decimal('pledge_flow', __('Pledge flow'))->default(0)->required();
+        // 收益类型 0-默认 1-pledge收满质押币
+        $form->radioCard('revenue_type', __('Revenue type'))->options(['0' => '默认', '1' => '质押币满额'])->default('0')->required()->help('收益类型,0-默认:按照系统比例执行,1-质押币满额:优先满额产出质押币以后在按照系统比例执行');
 
         $form->decimal('valid_rate', __('Valid rate'))->default(0.00)->required();
         $form->decimal('package_rate', __('Package rate'))->default(0.00)->required();

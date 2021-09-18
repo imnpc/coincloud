@@ -39,6 +39,7 @@ class Product extends Model implements Sortable
         'day_rate', 'freed_rate', 'freed_days', 'parent1', 'parent2', 'invite_rate', 'bonus_team_a', 'bonus_team_b', 'bonus_team_c',
         'upgrade_team_a', 'upgrade_team_b', 'upgrade_team_c', 'gas_fee', 'pledge_fee', 'pledge_days', 'valid_rate', 'package_rate',
         'thumb', 'desc', 'content', 'status', 'is_show_text', 'min_buy', 'stock', 'sort', 'show_service_rate','freed_wait_days',
+        'is_sold_out','revenue_type',
     ];
 
     /**
@@ -179,5 +180,11 @@ class Product extends Model implements Sortable
     public function systemwalletlog()
     {
         return $this->hasMany(SystemWalletLog::class);
+    }
+
+    // 关联 充值
+    public function recharge()
+    {
+        return $this->hasMany(Recharge::class);
     }
 }

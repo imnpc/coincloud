@@ -82,6 +82,11 @@ class OrderController extends Controller
 
         $user = $request->user();
 
+        if ($product->is_sold_out == 1) {
+            $data['message'] = "产品已售罄";
+            return response()->json($data, 403);
+        }
+	
         // 实名
 //        if ($user->is_verify == 0 && $user->real_name) {
 //            $data['message'] = "认证审核中";
@@ -141,6 +146,11 @@ class OrderController extends Controller
             $valid_power = @number_fixed(($request->number * $product->valid_rate) / 100, 2); // 有效T数 = 购买数量 * 有效T数比例
             $package_status = 0;
         }
+        if ($product->revenue_type == 1) {
+            $revenue_status = 1;
+        } else {
+            $revenue_status = 0;
+        }
         // 提交订单
         $order = Order::create([
             'order_sn' => $order_sn, // 订单编号
@@ -164,6 +174,8 @@ class OrderController extends Controller
             'pay_status' => 1, // 支付状态 0-已完成 1-未提交 2-审核中
 //            'is_output_coin' => $product->is_output_coin, // 是否产币 0-是 1-否 TODO
             'status' => 0, // 订单状态 0-有效 1-无效
+            'revenue_type' => $product->revenue_type, // 收益类型 0-默认  1-pledge 收满质押币
+            'revenue_status' => $revenue_status, // 收益状态 0-默认无需执行  1-执行中
         ]);
 
         // 提交订单以后获取支付方式详细信息 银行账号 或者 钱包地址 二维码
@@ -259,6 +271,11 @@ class OrderController extends Controller
             'payment' => 'required|numeric|in:1,2,3', // 支付方式 1-银行转账 2-USDT 3-其他虚拟币
         ]);
 
+        if ($product->is_sold_out == 1) {
+            $data['message'] = "产品已售罄";
+            return response()->json($data, 403);
+        }
+
         // 获取产品单价
         if ($request->payment == Order::PAY_BANK) {
             // 人民币支付
@@ -319,6 +336,11 @@ class OrderController extends Controller
             'product_id' => 'required|exists:products,id', // 产品 ID
             'number' => 'required|numeric|min:'.$product->min_buy, // 购买数量
         ]);
+
+        if ($product->is_sold_out == 1) {
+            $data['message'] = "产品已售罄";
+            return response()->json($data, 403);
+        }
 
         $data['price'] = $product->price * $request->number;
         $data['price_usdt'] = $product->price_usdt * $request->number;

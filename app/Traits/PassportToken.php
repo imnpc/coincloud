@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use DateTime;
 use App\Models\User;
+use DateTimeImmutable;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Passport\Passport;
 use Illuminate\Events\Dispatcher;
@@ -19,6 +20,11 @@ use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
 
 # https://github.com/laravel/passport/issues/71
+//$user = User::find(1);
+//// return  response
+//return $this->getBearerTokenByUser($user, 1, true);
+//// return array
+//return $this->getBearerTokenByUser($user, 1, false);
 
 trait PassportToken
 {
@@ -42,9 +48,8 @@ trait PassportToken
     {
         $maxGenerationAttempts = 10;
         $refreshTokenRepository = app(RefreshTokenRepository::class);
-
         $refreshToken = $refreshTokenRepository->getNewRefreshToken();
-        $refreshToken->setExpiryDateTime((new \DateTime())->add(Passport::refreshTokensExpireIn()));
+        $refreshToken->setExpiryDateTime((new DateTimeImmutable())->add(Passport::refreshTokensExpireIn()));
         $refreshToken->setAccessToken($accessToken);
 
         while ($maxGenerationAttempts-- > 0) {
@@ -63,10 +68,9 @@ trait PassportToken
 
     protected function createPassportTokenByUser(User $user, $clientId)
     {
-        $accessToken = new AccessToken($user->id);
+        $accessToken = new AccessToken($user->id,[],new Client($clientId, null, null));
         $accessToken->setIdentifier($this->generateUniqueIdentifier());
-        $accessToken->setClient(new Client($clientId, null, null));
-        $accessToken->setExpiryDateTime((new DateTime())->add(Passport::tokensExpireIn()));
+        $accessToken->setExpiryDateTime((new DateTimeImmutable())->add(Passport::tokensExpireIn()) );
 
         $accessTokenRepository = new AccessTokenRepository(new TokenRepository(), new Dispatcher());
         $accessTokenRepository->persistNewAccessToken($accessToken);
@@ -78,14 +82,19 @@ trait PassportToken
         ];
     }
 
-    protected function sendBearerTokenResponse($accessToken, $refreshToken)
+    protected function sendBearerTokenResponse(AccessTokenEntityInterface $accessToken, $refreshToken)
     {
         $response = new BearerTokenResponse();
         $response->setAccessToken($accessToken);
         $response->setRefreshToken($refreshToken);
 
-        $privateKey = new CryptKey('file://'.Passport::keyPath('oauth-private.key'), null, false);
+        if (config('passport.private_key')) {
+            $privateKey = new CryptKey(config('passport.private_key'), null, false);
+        } else {
+            $privateKey = new CryptKey('file://' . Passport::keyPath('oauth-private.key'), null, false);
+        }
 
+        $accessToken->SetprivateKey($privateKey);
         $response->setPrivateKey($privateKey);
         $response->setEncryptionKey(app('encrypter')->getKey());
 

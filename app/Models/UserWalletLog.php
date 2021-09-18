@@ -80,7 +80,7 @@ class UserWalletLog extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'wallet_type_id', 'from_user_id', 'day', 'old', 'add', 'new', 'from', 'remark',
+        'user_id', 'wallet_type_id', 'from_user_id', 'day', 'old', 'add', 'new', 'from', 'remark', 'product_id', 'order_id',
     ];
 
     /**

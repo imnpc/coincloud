@@ -79,6 +79,9 @@ class WithdrawController extends Controller
             $data['message'] = "不支持该类型！";
             return response()->json($data, 403);
         }
+
+        // 增加产品 ID TODO
+
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
         $balance = $wallet->balanceFloat;
@@ -141,6 +144,7 @@ class WithdrawController extends Controller
 
         $request->validate([
             'wallet_type_id' => 'required|exists:wallet_types,id', // 钱包类型
+//            'product_id' => 'required|exists:products,id', // 产品 ID
         ]);
 
         // 需要实名认证 TODO
@@ -159,6 +163,9 @@ class WithdrawController extends Controller
             $data['message'] = "不支持该类型！";
             return response()->json($data, 403);
         }
+
+        // 增加产品 ID TODO
+
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
         $balance = $wallet->balanceFloat;

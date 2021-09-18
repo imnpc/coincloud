@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RechargeAccountLogResource;
 use App\Http\Resources\RechargeResource;
-use App\Models\DayBonus;
 use App\Models\Order;
 use App\Models\Pledge;
 use App\Models\Product;
@@ -32,10 +31,11 @@ class RechargeController extends Controller
         $logs = QueryBuilder::for(Recharge::class)
             ->allowedFilters([
                 AllowedFilter::exact('wallet_type_id'), // 钱包类型 ID
+                AllowedFilter::exact('product_id'), // 产品 ID
             ])
             ->defaultSort('-created_at')
             ->where('user_id', '=', auth('api')->id())
-            ->select('id', 'order_sn', 'wallet_type_id', 'pay_type', 'coin', 'reason', 'pay_status', 'created_at')
+            ->select('id', 'order_sn', 'wallet_type_id', 'product_id', 'pay_type', 'coin', 'reason', 'pay_status', 'created_at')
             ->paginate();
 
         foreach ($logs as $k => $v) {
@@ -66,6 +66,7 @@ class RechargeController extends Controller
             'pay_type' => 'required|numeric|in:1,2', // 支付类型 1-充值 2-账户转入
             'pay_image' => 'required_if:type,1|mimes:' . $image, // 如果 type=1 支付凭证图片必须有
             'wallet_type_id' => 'required|exists:wallet_types,id', // 钱包类型
+            'product_id' => 'required|exists:products,id', // 产品 ID
         ]);
 
         $day = Carbon::yesterday()->toDateString();// 获得日期
@@ -82,7 +83,8 @@ class RechargeController extends Controller
             $pay_status = 2;
         }
 
-        $product = Product::where('wallet_type_id', $request->wallet_type_id)->first();
+//        $product = Product::where('wallet_type_id', $request->wallet_type_id)->first();
+        $product = Product::find($request->product_id);
         $pledge_fee = $product->pledge_fee; // 当天质押币系数
         $gas_fee = $product->gas_fee; // 当天单T有效算力封装成本
 
@@ -106,7 +108,8 @@ class RechargeController extends Controller
         $order = Recharge::create([
             'order_sn' => $order_sn,
             'user_id' => $user->id,
-            'wallet_type_id' => $request->wallet_type_id,
+            'wallet_type_id' => $product->wallet_type_id,
+            'product_id' => $request->product_id,
             'coin' => $request->coin,
             'pay_type' => $request->pay_type,
             'pay_time' => Carbon::now(),
@@ -132,9 +135,11 @@ class RechargeController extends Controller
 
         $request->validate([
             'wallet_type_id' => 'required|exists:wallet_types,id', // 钱包类型
+            'product_id' => 'required|exists:products,id', // 产品 ID
         ]);
 
-        $product = Product::where('wallet_type_id', $request->wallet_type_id)->first();
+//        $product = Product::where('wallet_type_id', $request->wallet_type_id)->first();
+        $product = Product::find($request->product_id);
 
         $wallet_address = $product->coin_wallet_address; // 钱包地址
         $wallet_qrcode = Storage::disk(config('filesystems.default'))->url($product->coin_wallet_qrcode); // 钱包二维码
