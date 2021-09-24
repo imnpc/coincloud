@@ -150,24 +150,30 @@ function mxcusdt($from)
     }
 }
 
+/**
+ * 授权检测
+ * @param string $licensekey 授权码
+ * @param string $localkey 本地 key
+ * @return array|mixed|void
+ */
 function shy_check_license($licensekey, $localkey = '')
 {
-    $whmcsurl = 'https://license.shanhaiyun.com/';
-    $licensing_secret_key = '5927b0ae59e11ce8245a7af98fed70d3';
+    $serverurl = 'https://license.shanhaiyun.com/'; // 授权服务器
+    $licensing_secret_key = '5927b0ae59e11ce8245a7af98fed70d3'; // 多币系统密钥
     if (strpos($licensekey, 'Single') !== false) {
-        $licensing_secret_key = '3c79308da67d47445d8d13dc05f7a8fe';
+        $licensing_secret_key = '3c79308da67d47445d8d13dc05f7a8fe'; // 单币系统密钥
     }
-    $localkeydays = 30;
-    $allowcheckfaildays = 5;
-    $check_token = time() . md5(mt_rand(100000000, mt_getrandmax()) . $licensekey);
-    $checkdate = date("Ymd");
-    $domain = $_SERVER['SERVER_NAME'];
-    $usersip = get_ip();
+    $localkeydays = 30; // 本地 key 有效期
+    $allowcheckfaildays = 5; // 本地 key 宽限天数
+    $check_token = time() . md5(mt_rand(100000000, mt_getrandmax()) . $licensekey); // 检测 token
+    $checkdate = date("Ymd"); // 检测日期
+    $domain = $_SERVER['SERVER_NAME']; // 域名
+    $usersip = get_ip(); // 所在服务器 IP
     if (!$usersip) {
         $usersip = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : $_SERVER['LOCAL_ADDR'];
     }
-    $dirpath = dirname(dirname(__FILE__));
-    $verifyfilepath = 'api/v1/verify';
+    $dirpath = dirname(dirname(__FILE__)); // 程序安装目录
+    $verifyfilepath = 'api/v1/verify'; // 授权检测接口
     $localkeyvalid = false;
     if ($localkey) {
         $localkey = str_replace("\n", '', $localkey); # Remove the line breaks
@@ -228,7 +234,7 @@ function shy_check_license($licensekey, $localkey = '')
         }
         if (function_exists('curl_exec')) {
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $whmcsurl . $verifyfilepath);
+            curl_setopt($ch, CURLOPT_URL, $serverurl . $verifyfilepath);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $query_string);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
@@ -240,11 +246,11 @@ function shy_check_license($licensekey, $localkey = '')
             curl_close($ch);
         } else {
             $responseCodePattern = '/^HTTP\/\d+\.\d+\s+(\d+)/';
-            $fp = @fsockopen($whmcsurl, 80, $errno, $errstr, 5);
+            $fp = @fsockopen($serverurl, 80, $errno, $errstr, 5);
             if ($fp) {
                 $newlinefeed = "\r\n";
-                $header = "POST " . $whmcsurl . $verifyfilepath . " HTTP/1.0" . $newlinefeed;
-                $header .= "Host: " . $whmcsurl . $newlinefeed;
+                $header = "POST " . $serverurl . $verifyfilepath . " HTTP/1.0" . $newlinefeed;
+                $header .= "Host: " . $serverurl . $newlinefeed;
                 $header .= "Content-type: application/x-www-form-urlencoded" . $newlinefeed;
                 $header .= "Content-length: " . @strlen($query_string) . $newlinefeed;
                 $header .= "Connection: close" . $newlinefeed . $newlinefeed;
@@ -322,7 +328,7 @@ function remote_check()
         $localkey = Storage::disk('local')->get('localkey.txt');
         $results = shy_check_license($licensekey, $localkey);
     }
-    $results['message'] = "";
+
     switch ($results['status']) {
         case "Active":
             if (isset($results['localkey'])) {
@@ -343,12 +349,20 @@ function remote_check()
         $results['description'] = "请填写授权码";
     }
 
+//    if (empty($results['message'])) {
+//        $results['message'] = "";
+//    }
+
+//    if (isset($results['message'])) {
+//        $results['description'] = $results['message'];
+//    }
+//
+//    if (isset($results['description'])) {
+//        $results['message'] = $results['description'];
+//    }
+
     if (empty($results['description'])) {
         $results['description'] = "检测数据无效";
-    }
-
-    if (isset($results['description'])) {
-        $results['message'] = $results['description'];
     }
 
     return $results;
