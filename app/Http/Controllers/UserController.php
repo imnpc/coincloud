@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Version;
 use App\Notifications\VerificationCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -116,6 +117,16 @@ class UserController extends Controller
         $config['download_url'] = config('user.download_url');
 
         return view('user.download', compact('config'));
+    }
+
+    public function downapp()
+    {
+        // 获取最新版本
+        $version = Version::where('status', '=', 1)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        return view('user.downapp', compact('version'));
     }
 
     /**
