@@ -18,7 +18,8 @@ return [
             // middleware => 'auth',
         ],
     ],
-    'hash_filename' => true,
+    'hash_filename' => true, /* 随机文件名*/
+
     // 上传 配置
     'upload' => [
         /* 前后端通信相关的配置,注释只允许使用多行方式 */
