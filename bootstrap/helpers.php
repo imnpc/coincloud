@@ -320,6 +320,14 @@ function shy_check_license($licensekey, $localkey = '')
 
 function remote_check()
 {
+    $name = "mydate_check_status";
+    if (Cache::has($name)) {
+        $mydate_check_status = Cache::get($name);
+        if ($mydate_check_status['status'] == 'Active') {
+            return $mydate_check_status;
+        }
+    }
+
     $licensekey = config('app.license_key');
     $exists = Storage::disk('local')->exists('localkey.txt');
     if (!$exists) {
@@ -364,6 +372,8 @@ function remote_check()
     if (empty($results['description'])) {
         $results['description'] = "检测数据无效";
     }
+
+    Cache::put($name, $results, 60 * 60 * 24);
 
     return $results;
 }
