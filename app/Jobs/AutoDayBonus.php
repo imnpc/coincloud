@@ -96,6 +96,7 @@ class AutoDayBonus implements ShouldQueue
                     ->where('user_id', '=', $v->user_id) // 未执行的
                     ->where('day_bonus_id', '=', $bonus->id) // 未执行的
                     ->where('product_id', '=', $this->product_id)
+                    ->where('order_id', $v->id)
                     ->first();// 查询用户分红记录是否存在
                 if ($checkmybonus) {
                     continue;
@@ -380,6 +381,7 @@ class AutoDayBonus implements ShouldQueue
                     'risk_rate' => $product->risk_rate,
                     'coin_risk' => $coin_risk,
                     'status' => 1, // 0-未执行 1-已执行
+                    'order_id' => $v->id, // 订单 ID
                 ]);
 
                 // 线性释放金额记录到用户日志 TODO
