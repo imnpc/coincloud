@@ -264,6 +264,12 @@
     "Service fee add": "新增服务费",
     "Service fee": "服务费",
     "From user id": "来自用户",
-    "System wallet id": "系统钱包ID"
+    "System wallet id": "系统钱包ID",
+    "Parent total": "直推人数",
+    "Max buy": "最高购买数量",
+    "Is banned": "封禁用户",
+    "Ship data": "物流数据",
+    "Trade no": "支付单号",
+    "Day bonus": "每日静态收益"
 }
 

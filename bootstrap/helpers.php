@@ -413,3 +413,31 @@ function send_sms($mobile, $code): array
 
     return $result;
 }
+
+function read_csv($file)
+{
+    setlocale(LC_ALL,'zh_CN');//linux系统下生效
+    $data = null;//返回的文件数据行
+//    if(!is_file($file)&&!file_exists($file))
+//    {
+//        die('文件错误');
+//    }
+    $cvs_file = fopen($file,'r'); //开始读取csv文件数据
+    $i = 0;//记录cvs的行
+    while ($file_data = fgetcsv($cvs_file))
+    {
+        $i++;
+        if($i==1)
+        {
+            continue;//过滤表头
+        }
+        if($file_data[0]!='')
+        {
+            $data[$i] = $file_data;
+        }
+
+    }
+    fclose($cvs_file);
+    return $data;
+}
+

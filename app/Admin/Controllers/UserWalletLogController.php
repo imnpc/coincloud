@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Product;
 use App\Models\UserWalletLog;
+use App\Models\WalletType;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -32,7 +33,8 @@ class UserWalletLogController extends AdminController
             $filter->disableIdFilter();
             // 在这里添加字段过滤器
             $filter->equal('user_id', __('User id'));
-            $filter->equal('wallet_type_id', __('Product'))->select(Product::all()->pluck('name', 'wallet_type_id'));
+            $filter->equal('product_id', __('Product'))->select(Product::all()->pluck('name', 'id'));
+            $filter->equal('wallet_type_id', __('Wallet slug'))->select(WalletType::all()->pluck('name', 'id'));
         });
 
         $grid->column('id', __('Id'));

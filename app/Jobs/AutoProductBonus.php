@@ -26,7 +26,7 @@ class AutoProductBonus implements ShouldQueue
      *
      * @var int
      */
-    public $timeout = 300;
+    public $timeout = 3000;
 
     /**
      * 任务描述

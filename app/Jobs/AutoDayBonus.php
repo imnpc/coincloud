@@ -38,7 +38,7 @@ class AutoDayBonus implements ShouldQueue
      *
      * @var int
      */
-    public $timeout = 3000;
+    public $timeout = 7200;
 
     /**
      * 任务描述

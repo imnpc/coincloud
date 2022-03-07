@@ -43,6 +43,7 @@ class UserController extends AdminController
             $filter->equal('id', __('Id'));
             $filter->equal('parent_id', __('Parent id'));
             $filter->like('real_name', __('Real name'));
+            $filter->like('mobile', __('Mobile'));
             $filter->equal('is_verify', __('是否实名'))->radio([
                 '' => '所有',
                 0 => '未实名',
@@ -69,6 +70,7 @@ class UserController extends AdminController
         $grid->column('level.name', __('Level id'));
         $grid->column('is_verify', __('是否实名认证'))->bool(['0' => false, '1' => true]);
         $grid->column('show_pledge', __('Show pledge'))->bool(['0' => false, '1' => true]);
+        $grid->column('is_banned', __('Is banned'))->bool(['0' => false, '1' => true]);
         $grid->column('last_login_at', __('Last login at'));
         $grid->column('last_login_ip', __('Last login ip'));
         $grid->column('status', __('Status'))->using([
@@ -185,6 +187,7 @@ class UserController extends AdminController
         });
         $form->radioCard('is_verify', __('Is verify'))->options(['0' => '未认证', '1' => '已认证'])->default('0');
         $form->radioCard('show_pledge', __('Show pledge'))->options(['0' => '不显示', '1' => '显示'])->default('1');
+        $form->radioCard('is_banned', __('Is banned'))->options(['0' => '否', '1' => '是'])->default('0');
 
         $states = [
             'on' => ['value' => 0, 'text' => '启用', 'color' => 'primary'],

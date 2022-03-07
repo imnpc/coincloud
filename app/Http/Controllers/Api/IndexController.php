@@ -110,6 +110,31 @@ class IndexController extends Controller
 
     public function test()
     {
+
+        $csv_file = Storage::disk('public')->url('2022-01-10.csv');
+        $list = read_csv($csv_file);
+
+        $list = array_values($list);
+        //print_r($list);
+        foreach ($list as $key => $value) {
+            //echo $value[0];
+//           echo $value[0].'--'.$value[1].'***';
+           $pwd = md5("JwAhf0gPmHIJIZbiPlca".$value[1]);
+            $data[] = "INSERT INTO `ey_users` (`username`, `password`, `nickname`, `head_pic`, `level`, `reg_time`)
+            VALUES ('$value[0]', '$pwd', '$value[0]', '/public/static/common/images/dfboy.png', '1',
+                    '1634016801');\r\n";
+        }
+
+        Storage::disk('public')->put('users-2022-01-10.sql', $data);
+        print_r($data);
+
+        //-- 转存表中的数据 `ey_users`  JwAhf0gPmHIJIZbiPlca.密码
+        //--
+        //
+        //INSERT INTO `ey_users` (`username`, `password`, `nickname`, `head_pic`, `level`, `reg_time`)
+        //VALUES ('H00006', '5ee31bfd0985da3d0b98e54ddf9ffd74', 'H00006', '/public/static/common/images/dfboy.png', '1',
+        //        '1634016801');
+        exit();
         $coins = 100;
         $bonus_team_a = 0;
         $team_a = @bcmul($coins, $bonus_team_a / 100, 5); // 分红池A

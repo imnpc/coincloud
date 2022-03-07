@@ -14,7 +14,7 @@
         }
 
         body {
-            background-color: black;
+            background-color: #305095;
         }
 
         .DW {
@@ -23,8 +23,8 @@
         .logon {
             width: 350px;
             height: 450px;
-            border: 2px solid #444444;
-            background-color: #191919;
+            border: 2px solid #fff;
+            background-color: #305095;
             margin: 0 auto;
             margin-top: 80px;
             border-radius: 15px;
@@ -46,7 +46,7 @@
         }
 
         .bInput {
-            background-color: gray;
+            background-color: #fff;
             height: 37px;
             width: 90%;
             border: 1px solid floralwhite;
@@ -56,7 +56,7 @@
         }
 
         .sInput {
-            background-color: gray;
+            background-color: #fff;
             height: 37px;
             width: 55%;
             border: 1px solid floralwhite;
@@ -86,7 +86,7 @@
         .LBut {
             width: 160px;
             height: 40px;
-            background-color: deeppink;
+            background-color: #305095;
             color: floralwhite;
             border: 1px solid floralwhite;
             border-radius: 7px;

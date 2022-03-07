@@ -283,6 +283,43 @@ class UserController extends Controller
 
         $system = DayBonus::find($bonus->day_bonus_id);
 
+        if ($bonus) {
+            $system = DayBonus::find($bonus->day_bonus_id);
+            $cost = $system->efficiency - $system->cost; // GAS消耗  = 挖矿效率 - 挖矿成本
+//            $coin_freed_day = (string)($bonus->coin_freed_day + $bonus->coin_freed_other); // 当日 75 % 已释放总量
+//            $coin_rate_day = (string)($bonus->coin_now + $bonus->coin_freed_other); // 当日 25 % 释放数量
+//            $yesterday_coin_income = $bonus->coin_for_user;
+
+            $freed_day = UserBonus::where('day', '=', $day)
+                ->where('user_id', '=', auth('api')->id())
+                ->where('product_id', $product->id)
+                ->sum('coin_freed_day');
+            $freed_other = UserBonus::where('day', '=', $day)
+                ->where('user_id', '=', auth('api')->id())
+                ->where('product_id', $product->id)
+                ->sum('coin_freed_other');
+            $coin_now = UserBonus::where('day', '=', $day)
+                ->where('user_id', '=', auth('api')->id())
+                ->where('product_id', $product->id)
+                ->sum('coin_now');
+            $coin_freed_day = bcadd($freed_day, $freed_other, 5); // 当日 75 % 已释放总量
+            $coin_rate_day = bcadd($coin_now, $freed_other, 5); // 当日 25 % 释放数量
+            $yesterday_coin_income = UserBonus::where('day', '=', $day)
+                ->where('user_id', '=', auth('api')->id())
+                ->where('product_id', $product->id)
+                ->sum('coin_for_user'); // 累计产出
+        } else {
+            $cost = 0;
+            $coin_freed_day = 0;
+            $coin_rate_day = 0;
+            $yesterday_coin_income = 0;
+        }
+
+        $UserWalletService->checkWallet(auth('api')->id());
+
+        $name = $wallet_type->slug;
+        $wallet = $user->getWallet($name);
+        $balance = $wallet->balanceFloat; // 钱包余额
         //echo $balance;
         // 昨日增加
         $yesterday_add = $UserWalletService->yesterday($user->id, $product->wallet_type_id);

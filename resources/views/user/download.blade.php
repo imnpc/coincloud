@@ -11,14 +11,14 @@
       padding: 0;
     }
     body{
-      background-color: black;
+      background-color: #305095;
     }
 
     .extension{
       width: 350px;
       height: 450px;
-      border:2px solid #444444;
-      background-color: #191919;
+      border:2px solid #fff;
+      background-color: #305095;
       margin: 0 auto;
       margin-top: 80px;
       border-radius: 15px;
@@ -28,7 +28,7 @@
     .exImg{
       width: 90%;
       height: 70%;
-      background-color: gray;
+      background-color: #305095;
       margin: auto;
       margin-top: 15px;
       border: 1px solid #ffffff;
@@ -48,7 +48,7 @@
       padding: 0;
     }
     .sInput{
-      background-color:gray;
+      background-color:#305095;
       height: 37px;
       width: 63%;
       border:1px solid floralwhite;
@@ -68,8 +68,9 @@
       right: 5px;
       top: 1px;
       border: 1px solid floralwhite;
-      background-color: #EF334D;
+      background-color: #305095;
       border-radius: 0 7px 7px 0;
+      color: #fff;
     }
 
         .notice {

@@ -47,6 +47,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ChangeResponseStructureMiddleware::class,
             \App\Http\Middleware\ChangeLocale::class,
+            \App\Http\Middleware\CheckBanned::class,
         ],
     ];
 
