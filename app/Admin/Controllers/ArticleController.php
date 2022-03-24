@@ -40,9 +40,14 @@ class ArticleController extends AdminController
             return $icon; // 标题添加strong标签
         });
         $grid->column('article_category_id', __('Article category id'))->display(function ($category_id) {
-            if($category_id > 0){
-                return ArticleCategory::find($category_id)->title;
-            }else{
+            if ($category_id > 0) {
+                $category = ArticleCategory::find($category_id);
+                if ($category) {
+                    return ArticleCategory::find($category_id)->title;
+                } else {
+                    return "";
+                }
+            } else {
                 return "";
             }
         });

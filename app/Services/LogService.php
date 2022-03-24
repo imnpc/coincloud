@@ -92,6 +92,9 @@ class LogService
                 'product_id' => $product_id,
                 'wallet_type_id' => $wallet_type_id,
             ]);
+            $wallet = SystemWallet::where('wallet_type_id', $wallet_type_id)
+                ->where('product_id', $product_id)
+                ->first();
         }
 
 //        $new_team_a = number_fixed($wallet->team_a + $team_a);
