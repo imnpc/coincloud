@@ -6,6 +6,7 @@
 
 use App\Gateways\QxtGateway;
 use EasyExchange\Factory;
+use Illuminate\Support\Facades\Http;
 use Lin\Mxc\MxcSpot;
 use Overtrue\EasySms\EasySms;
 
@@ -144,6 +145,36 @@ function mxcusdt($from)
 
     if ($result['code'] == '200') {
         $usdt = $result['data'][0]['last'];
+        return currency($usdt, 'USD', 'CNY');
+    } else {
+        return '敬请期待';
+    }
+}
+
+/**
+ * ZTB 数据接口
+ * https://www.ztb.im（海外域名）
+ * https://www.ztbzh.net（大陆域名）
+ * @param $from
+ * @return string|\Torann\Currency\Currency
+ */
+function ztbusdt($from)
+{
+    $symbol = strtoupper($from).'_USDT';
+    $base_url = 'https://www.ztbzh.net';
+    $path = '/api/v1/tickers';
+    if (Cache::has('ztb')) {
+        $response = Cache::get('ztb'); // get from cahche 有缓存从缓存读取数据
+    } else {
+        $response = Http::get($base_url.$path);
+        Cache::put('ztb', $response->json(), 3600); // 默认缓存 1 小时
+    }
+    $data = $response['ticker'];
+
+    $key = array_search($symbol, array_column($data, 'symbol'));
+    if ($key) {
+        $coin = $data[$key];
+        $usdt = $coin['last'];
         return currency($usdt, 'USD', 'CNY');
     } else {
         return '敬请期待';

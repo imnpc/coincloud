@@ -169,7 +169,7 @@ class UserController extends AdminController
             $form->password('password', __('Password'))->default('123456')->required()->help('默认密码 123456');
         }
 
-        $form->text('parent_id', __('Parent id'))->default(0);
+        $form->number('parent_id', __('Parent id'))->default(0);
 //        $form->select('parent_id', __('Parent id'))->options(function ($id) {
 //            $user = User::find($id);
 //            if ($user) {

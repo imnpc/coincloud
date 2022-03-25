@@ -80,6 +80,14 @@ class WithdrawController extends Controller
             return response()->json($data, 403);
         }
 
+//        $day = Carbon::now();// 获得日期
+//        $inday = config('withdraw.can_date'); // 允许提现日期
+//        $days = explode(',', $inday);
+//        if (!in_array($day->day, $days)) {
+//            $data['message'] = "不在允许提现日期内！";
+//            return response()->json($data, 403);
+//        }
+
         // 增加产品 ID TODO
 
         $name = $wallet_type->slug;
@@ -163,6 +171,14 @@ class WithdrawController extends Controller
             $data['message'] = "不支持该类型！";
             return response()->json($data, 403);
         }
+
+//        $day = Carbon::now();// 获得日期
+//        $inday = config('withdraw.can_date'); // 允许提现日期
+//        $days = explode(',', $inday);
+//        if (!in_array($day->day, $days)) {
+//            $data['message'] = "不在允许提现日期内！";
+//            return response()->json($data, 403);
+//        }
 
         // 增加产品 ID TODO
 

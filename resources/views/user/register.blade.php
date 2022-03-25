@@ -96,6 +96,24 @@
 </head>
 <body>
 <div class="DW">
+    @if (count($errors) > 0)
+        <div class="alert alert-danger">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    @foreach (['danger', 'warning', 'success', 'info'] as $msg)
+        @if(session()->has($msg))
+            <div class="flash-message">
+                <p class="alert alert-{{ $msg }}">
+                    {{ session()->get($msg) }}
+                </p>
+            </div>
+        @endif
+    @endforeach
     <form method="POST" action="{{ route('userregister') }}">
         @csrf
     <div class="logon">

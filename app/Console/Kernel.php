@@ -40,7 +40,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('config:cache')->dailyAt('23:50'); // 更新缓存
         $schedule->command('queue:restart')->dailyAt('23:51');// 重启队列
         $schedule->command('horizon:terminate')->dailyAt('23:53'); // 停止队列管理(一分钟以后自动重启队列)
-        $schedule->command('currency:update -o')->everySixHours(); // 更新汇率 每隔6小时
+        $schedule->command('currency:update -o')->twiceDaily(1, 13); // 更新汇率 1点 13点
         $schedule->command('geoip:update')->weekly()->thursdays()->at('4:30'); // 更新GEO地理位置数据库 每周四 4:30
 
 //        $schedule->job(new AutoUpdateCoinPrice)->everyTenMinutes(); // 更新实时币价  服务器 10分钟一次

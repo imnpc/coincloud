@@ -90,7 +90,8 @@ class UserController extends Controller
         ]);
         //session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
 //        return redirect()->route('user.show', [$user]);
-
+        // 清除验证码缓存
+        \Cache::forget($key);
         $data['message'] = "注册成功";
         return response()->json($data, 200);
     }
@@ -237,7 +238,7 @@ class UserController extends Controller
 
         // wallet_type_id 钱包类型/slug/获取对应钱包 TODO
         $wallet_type = WalletType::find($product->wallet_type_id);
-
+        $UserWalletService->checkWallet(auth('api')->id());
         if (empty($wallet_type) || $wallet_type->is_enblened = 0) {
             $data['message'] = "不支持该类型！";
             return response()->json($data, 403);
@@ -315,7 +316,7 @@ class UserController extends Controller
             $yesterday_coin_income = 0;
         }
 
-        $UserWalletService->checkWallet(auth('api')->id());
+
 
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
@@ -793,6 +794,8 @@ class UserController extends Controller
         if (!hash_equals($verifyData['code'], $request->code)) {
             abort(401, '验证码不正确');// 验证码不正确
         }
+        // 清除验证码缓存
+        \Cache::forget($key);
 
         $user->update(['money_password' => bcrypt($request->password)]);
         $data['message'] = "资金密码设置成功";
@@ -974,6 +977,37 @@ class UserController extends Controller
             $data[$k]['name'] = $v->wallet_slug;
             $data[$k]['product_id'] = $v->id;
             $data[$k]['wallet_type_id'] = $v->wallet_type_id;
+        }
+
+        return $data;
+    }
+
+    // 我的资产
+    public function myaccount(Request $request)
+    {
+        $user = $request->user();
+        $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
+        $UserWalletService->checkWallet(auth('api')->id());
+
+        $wallet = WalletType::where('id', '>', 2)
+            ->where('id', '<', 5)
+            ->where('is_enblened', '=', 1)
+            ->orderBy('sort', 'desc')
+            ->get();
+        $data = [];
+        foreach ($wallet as $k => $v) {
+            $data[$k]['name'] = $v['slug'];
+            $data[$k]['wallet_type_id'] = $v['id'];
+            $data[$k]['balance'] = 0;
+            $data[$k]['coins_total'] = 0;
+            $data[$k]['yesterday_add'] = 0;
+            $wallet = $user->getWallet($v['slug']);
+            $data[$k]['balance'] = $wallet->balanceFloat; // 钱包余额
+            $data[$k]['yesterday_add'] = $UserWalletService->yesterday($user->id, $v->id);
+            $data[$k]['coins_total'] =UserWalletLog::where('user_id', '=', $user->id)
+                ->where('wallet_type_id', '=', $v->id)
+                ->where('add', '>', 0)
+                ->sum('add');
         }
 
         return $data;

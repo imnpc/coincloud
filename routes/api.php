@@ -50,6 +50,7 @@ Route::prefix('v1')
                 Route::get('category', [ArticleController::class, 'category']); // 文章分类
                 Route::get('index', [IndexController::class, 'index']); // APP 首页
                 Route::get('aboutus', [IndexController::class, 'aboutus']); // 关于我们
+                Route::get('agreement', [IndexController::class, 'agreement']); // 用户协议
                 Route::get('version', [VersionController::class, 'index']); // 检测最新版本
                 Route::post('checkversion', [VersionController::class, 'check']); // 比较版本号
 
@@ -83,6 +84,7 @@ Route::prefix('v1')
                     Route::get('walletlog', [UserController::class, 'walletLog']); // 我的资产流水
 //            Route::get('rewardwalletlog', 'UserController@RewardwalletLog'); // 奖励算力资产流水
                     Route::get('myproduct', [UserController::class, 'myproduct']); // 我的产品列表
+                    Route::get('myaccount', [UserController::class, 'myaccount']); // 我的资产列表
 
                     Route::resource('withdraw', WithdrawController::class); // 提币
                     Route::get('mycoin', [WithdrawController::class, 'my']); // 我的提币
