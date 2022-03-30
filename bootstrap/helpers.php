@@ -445,30 +445,17 @@ function send_sms($mobile, $code): array
     return $result;
 }
 
-function read_csv($file)
+/**
+ * @param $num         科学计数法字符串  如 2.1E-5
+ * @param  int  $double  小数点保留位数 默认5位
+ * @return string
+ */
+function sctonum($num, $double = 5)
 {
-    setlocale(LC_ALL,'zh_CN');//linux系统下生效
-    $data = null;//返回的文件数据行
-//    if(!is_file($file)&&!file_exists($file))
-//    {
-//        die('文件错误');
-//    }
-    $cvs_file = fopen($file,'r'); //开始读取csv文件数据
-    $i = 0;//记录cvs的行
-    while ($file_data = fgetcsv($cvs_file))
-    {
-        $i++;
-        if($i==1)
-        {
-            continue;//过滤表头
-        }
-        if($file_data[0]!='')
-        {
-            $data[$i] = $file_data;
-        }
-
+    if (false !== stripos($num, "e")) {
+        $a = explode("e", strtolower($num));
+        return bcmul($a[0], bcpow(10, $a[1], $double), $double);
     }
-    fclose($cvs_file);
-    return $data;
-}
 
+    return $num;
+}

@@ -312,6 +312,7 @@ class AutoDayBonus implements ShouldQueue
                         if ($value->already_day < $value->days) {
                             // 每日线性释放记录
                             $coin_freed_other += $value->coin_freed_day;
+                            $coin_freed_other = sctonum($coin_freed_other);
                             $already = $value->already_day + 1; // 最新释放天数
                             $day_freeds = DayFreed::create([
                                 'user_id' => $v->user_id,
