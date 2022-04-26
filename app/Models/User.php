@@ -253,7 +253,8 @@ class User extends Authenticatable implements Wallet, WalletFloat
             $rate = $reward_rate - $last_rate;
             if ($rate > 0) {
                 $fix_rate = $rate;
-                $team_bonus = @number_fixed($user_coin * $rate / 100);
+//                $team_bonus = @number_fixed($user_coin * $rate / 100);
+                $team_bonus = @bcmul($user_coin, $rate / 100,5);
                 // 给团队长发提成
                 $remark = "团队分红-" . $fix_rate;
                 $logService->userLog($top_user->id, $wallet_type_id, $team_bonus, 0, $day, UserWalletLog::FROM_TEAM_BONUS, $remark);

@@ -70,9 +70,13 @@ class OrderPackage implements ShouldQueue
 //            $table->decimal('package_wait', 32, 5)->comment('等待封装数量');
 //            $table->tinyInteger('package_status')->default(0)->comment('封装状态 0-封装完成 1-等待封装 2-封装中');
 
-                $each = @number_fixed($v->max_valid_power * $v->package_rate / 100); // 每天封装数量
-                $package_already = $v->package_already + $each; // 已封装数量
-                $valid_power = $v->valid_power + $each; // 当前有效T数
+//                $each = @number_fixed($v->max_valid_power * $v->package_rate / 100); // 每天封装数量
+                $each = @bcmul($v->max_valid_power, $v->package_rate / 100, 5); // 每天封装数量
+//                $package_already = $v->package_already + $each; // 已封装数量
+//                $valid_power = $v->valid_power + $each; // 当前有效T数
+                $package_already = @bcadd($v->package_already, $each, 5); // 已封装数量
+                $valid_power = @bcadd($v->valid_power, $each, 5); // 当前有效T数
+
                 if ($package_already >= $v->max_valid_power) {
                     $package_already = $v->max_valid_power;
                 }
@@ -80,7 +84,8 @@ class OrderPackage implements ShouldQueue
                     $valid_power = $v->max_valid_power;
                 }
 
-                $package_wait = number_fixed($v->max_valid_power - $package_already); // 等待封装数量
+//                $package_wait = number_fixed($v->max_valid_power - $package_already); // 等待封装数量
+                $package_wait = @bcsub($v->max_valid_power, $package_already, 5); // 等待封装数量
                 if ($package_wait <= 0) {
                     $package_wait = 0;
                     $package_status = 0;

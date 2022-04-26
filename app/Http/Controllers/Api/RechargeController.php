@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RechargeAccountLogResource;
 use App\Http\Resources\RechargeResource;
+use App\Models\DayBonus;
 use App\Models\Order;
 use App\Models\Pledge;
 use App\Models\Product;
@@ -148,7 +149,9 @@ class RechargeController extends Controller
 
         $pledge_fee = $product->pledge_fee; // 当天质押币系数
         $gas_fee = $product->gas_fee; // 当天单T有效算力封装成本
-        $each_fee = number_fixed($pledge_fee + $gas_fee); // 封装满单T所需FIL币成本
+
+//        $each_fee = number_fixed($pledge_fee + $gas_fee); // 封装满单T所需FIL币成本
+        $each_fee = @bcadd($pledge_fee, $gas_fee, 5); // 封装满单T所需FIL币成本
 
         $num = Order::where('user_id', '=', $user->id)
             ->where('product_id', $product->id)
@@ -180,7 +183,8 @@ class RechargeController extends Controller
 //            ->where('status', 0)
 //            ->sum('valid_power'); // 有效算力 TODO
 
-        $max = number_fixed($can_pledge * $each_fee);
+//        $max = number_fixed($can_pledge * $each_fee);
+        $max = @bcmul($can_pledge, $each_fee, 5);
 
         $pledge_days = $product->pledge_days; // 天数
         //$day_limit = config('recharge.day_limit'); // 每天可封装T数

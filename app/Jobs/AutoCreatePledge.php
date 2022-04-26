@@ -77,17 +77,17 @@ class AutoCreatePledge implements ShouldQueue
             if ($orders) {
                 $used = 0;
                 foreach ($orders as $k => $v) {
-                    $pledge_coins = $v->number * $recharge->pledge_fee;
-                    $gas_coins = $v->number * $recharge->gas_fee;
-                    $total = $pledge_coins + $gas_coins;
-                    $used += $total;
+                    $pledge_coins = @bcmul($v->number, $recharge->pledge_fee, 2);
+                    $gas_coins = @bcmul($v->number, $recharge->gas_fee, 2);
+                    $total = @bcadd($pledge_coins, $gas_coins, 2);
+                    $used = @bcadd($used, $total, 2);
                     if ($used > $max) {
                         continue;
                     }
 
                     $product = Product::find($v->product_id); // 获取产品信息
-                    $pledge_base = $v->number * $product->pledge_base;
-                    $pledge_flow = $v->number * $product->pledge_flow;
+                    $pledge_base = @bcmul($v->number, $product->pledge_base, 2);
+                    $pledge_flow = @bcmul($v->number, $product->pledge_flow, 2);
 
                     $pledge = Pledge::create([
                         'user_id' => $v->user_id,

@@ -122,7 +122,8 @@ class WithdrawController extends Controller
         }
 
         $fee = config('withdraw.coin_fee'); // 手续费
-        $real_coin = number_fixed($request->coin - $fee); // 实际到账金额 = 申请提币金额 - 手续费
+//        $real_coin = number_fixed($request->coin - $fee); // 实际到账金额 = 申请提币金额 - 手续费
+        $real_coin = @bcsub($request->coin, $fee, 5); // 实际到账金额 = 申请提币金额 - 手续费
         $withdraw = Withdraw::create([
             'user_id' => auth('api')->id(),
             'image' => $upload->path,

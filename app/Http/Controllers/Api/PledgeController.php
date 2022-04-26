@@ -10,6 +10,7 @@ use App\Http\Resources\PledgeResource;
 use App\Models\Pledge;
 use App\Models\UserWalletLog;
 use App\Models\WalletType;
+use App\Models\Withdraw;
 use App\Services\LogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -123,7 +124,8 @@ class PledgeController extends Controller
         }
 
         $fee = config('withdraw.coin_fee'); // 手续费
-        $real_coin = number_fixed($request->coin - $fee); // 实际到账金额 = 申请提币金额 - 手续费
+//        $real_coin = number_fixed($request->coin - $fee); // 实际到账金额 = 申请提币金额 - 手续费
+        $real_coin = @bcsub($request->coin, $fee, 5); // 实际到账金额 = 申请提币金额 - 手续费
         $withdraw = Withdraw::create([
             'user_id' => auth('api')->id(),
             'image' => $upload->path,

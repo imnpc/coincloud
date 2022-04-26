@@ -124,7 +124,8 @@ class OrderController extends Controller
             ];
         }
 
-        $price = $unit_price * $request->number; // 订单价格
+//        $price = $unit_price * $request->number; // 订单价格
+        $price = @bcmul($unit_price, $request->number, 2); // 订单价格
 
         if ($price < 1) {
             $data['message'] = "订单金额数据错误";
@@ -143,7 +144,8 @@ class OrderController extends Controller
             $valid_power = 0;
             $package_status = 1; // 封装状态 0-封装完成 1-等待封装 2-封装中
         } else {
-            $valid_power = @number_fixed(($request->number * $product->valid_rate) / 100, 2); // 有效T数 = 购买数量 * 有效T数比例
+//            $valid_power = @number_fixed(($request->number * $product->valid_rate) / 100, 2); // 有效T数 = 购买数量 * 有效T数比例
+            $valid_power = @bcmul($request->number, $product->valid_rate / 100, 2); // 有效T数 = 购买数量 * 有效T数比例
             $package_status = 0;
         }
         if ($product->revenue_type == 1) {
@@ -164,7 +166,8 @@ class OrderController extends Controller
             'valid_days' => $product->valid_days, // 有效天数
             'valid_rate' => $product->valid_rate, // 有效T数比例
             'valid_power' => $valid_power, // 当前有效T数
-            'max_valid_power' => @number_fixed(($request->number * $product->valid_rate) / 100, 2), // 最大有效T数
+//            'max_valid_power' => @number_fixed(($request->number * $product->valid_rate) / 100, 2), // 最大有效T数
+            'max_valid_power' => @bcmul($request->number, $product->valid_rate / 100, 2), // 最大有效T数
             'package_rate' => $product->package_rate, // 封装比例
             'package_already' => 0, // 已封装数量
             'package_wait' => $valid_power, // 等待封装数量
@@ -304,8 +307,11 @@ class OrderController extends Controller
             ];
         }
 
-        $price = $unit_price * $request->number; // 订单价格
-        $pledge_fee = $product->pledge_fee * $request->number; // 质押币
+//        $price = $unit_price * $request->number; // 订单价格
+//        $pledge_fee = $product->pledge_fee * $request->number; // 质押币
+
+        $price = @bcmul($unit_price, $request->number, 2); // 订单价格
+        $pledge_fee = @bcmul($product->pledge_fee, $request->number, 2); // 质押币
 
         if ($price < 1) {
             $data['message'] = "订单金额数据错误";
@@ -342,10 +348,10 @@ class OrderController extends Controller
             return response()->json($data, 403);
         }
 
-        $data['price'] = $product->price * $request->number;
-        $data['price_usdt'] = $product->price_usdt * $request->number;
-        $data['price_coin'] = $product->price_coin * $request->number;
-        $data['pledge_fee'] = $product->pledge_fee * $request->number;
+        $data['price'] = @bcmul($product->price, $request->number, 2);
+        $data['price_usdt'] = @bcmul($product->price_usdt, $request->number, 2);
+        $data['price_coin'] = @bcmul($product->price_coin, $request->number, 2);
+        $data['pledge_fee'] = @bcmul($product->pledge_fee, $request->number, 2);
         $data['number'] = $request->number;
         $data['product_id'] = $request->product_id;
         $data['price_coin_type'] = $product->wallet_slug;

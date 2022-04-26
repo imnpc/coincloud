@@ -89,7 +89,7 @@ class LevelController extends AdminController
         $form->text('name', __('Name'));
         $form->number('min', __('Min'));
         $form->number('max', __('Max'));
-        $form->number('reward_rate', __('Reward rate'));
+        $form->decimal('reward_rate', __('Reward rate'))->help('支持小数，禁止使用空格');
         $form->text('remark', __('Remark'));
 
         $form->tools(function (Form\Tools $tools) {
