@@ -459,3 +459,42 @@ function sctonum($num, $double = 5)
 
     return $num;
 }
+
+/**
+ * 生成唯一订单号
+ * @param  string  $model  模型名称,首字母大写
+ * @param  string  $field  订单号查询字段
+ * @return bool|string
+ */
+function createNO($model, $field)
+{
+    // 订单流水号前缀
+    $prefix = date('YmdHis');
+    for ($i = 0; $i < 10; $i++) {
+        // 随机生成 6 位的数字
+        $sn = $prefix.str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        // 查询该模型是否已经存在对应订单号
+        $modelName = '\\App\\Models\\'.$model;
+        $MODEL = new $modelName;
+        if (!$MODEL::query()->where($field, $sn)->exists()) {
+            return $sn;
+        }
+    }
+    \Log::warning('生成单号失败-'.$modelName);
+
+    return false;
+}
+
+/**
+ * 判断是否都是中文
+ * @param $str
+ * @return int
+ */
+function isAllChinese($str)
+{
+    $len = preg_match('/^[\x{4e00}-\x{9fa5}]+$/u', $str);
+    if ($len) {
+        return true;
+    }
+    return false;
+}
