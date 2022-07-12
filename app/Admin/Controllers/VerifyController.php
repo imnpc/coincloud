@@ -16,7 +16,7 @@ class VerifyController extends AdminController
      *
      * @var string
      */
-    protected $title = '待实名用户';
+    protected $title = '等待实名审核用户';
 
     /**
      * Make a grid builder.

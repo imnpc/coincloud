@@ -10,7 +10,6 @@ use App\Admin\Extensions\ShowOrder;
 use App\Admin\Extensions\ShowTeam;
 use App\Models\Level;
 use App\Models\User;
-use Encore\Admin\Actions\Action;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -88,7 +87,7 @@ class UserController extends AdminController
 //        $grid->disableRowSelector(); // 禁用行选择checkbox
 //        $grid->disableCreateButton(); // 禁用创建按钮
 //        $grid->disableActions(); // 禁用行操作列
-        $grid->disableExport(); // 禁用导出数据
+//        $grid->disableExport(); // 禁用导出数据
         $grid->disableColumnSelector();// 禁用行选择器
 
         $grid->actions(function ($actions) {
