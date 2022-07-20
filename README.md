@@ -1,10 +1,10 @@
 ## 环境要求
 
-### 基本要求: PHP 7.4 + MySql 5.7 + Redis
+### 基本要求: PHP 8.1 + MySql 5.7 + Redis
 
 Composer
 
-PHP >= 7.4
+PHP >= 8.1
 
 MySql > 5.7
 
@@ -32,9 +32,9 @@ Redis PHP Extension
 yum install -y wget && wget -O install.sh http://download.bt.cn/install/install_6.0.sh && sh install.sh
 ```
 
-安装完毕以后登录到面板 选择 Nginx 1.18 + PHP 7.4 + MySql 5.7 进行安装,安装完毕前往 软件商店->运行环境,安装 Redis.
+安装完毕以后登录到面板 选择 Nginx 1.18 + PHP 8.1 + MySql 5.7 进行安装,安装完毕前往 软件商店->运行环境,安装 Redis.
 
-php配置:软件商店->运行环境->PHP 7.4->设置,
+php配置:软件商店->运行环境->PHP 8.1->设置,
 
 安装扩展->安装扩展 fileinfo opcache redis exif intl.
 
@@ -79,9 +79,9 @@ OSS_ENDPOINT=OSS节点
 
 OSS_BUCKET=OSS存储名
 
-ALIYUN_OSS_CDN_BASE_URL=OSS绑定自有域名访问URL
+OSS_DOMAIN=OSS绑定自有域名访问URL
 
-FILESYSTEM_DRIVER=oss
+FILESYSTEM_DISK=oss
 
 ALIYUN_SMS_SIGN_NAME=阿里云短信签名
 
@@ -116,7 +116,7 @@ crontab -u www -e
 ```
 计划任务内容
 ```bash
-*/1 * * * * /www/server/php/74/bin/php /www/wwwroot/test.demo.com/artisan schedule:run >> /www/wwwroot/test.demo.com/storage/logs/cron.log 2>&1
+*/1 * * * * /www/server/php/81/bin/php /www/wwwroot/test.demo.com/artisan schedule:run >> /www/wwwroot/test.demo.com/storage/logs/cron.log 2>&1
 ```
 然后执行以下命令,查看是否生效
 ```bash
@@ -133,7 +133,7 @@ crontab -u www -l
 
 ->运行目录:选择当前网站根目录 /www/wwwroot/test.demo.com/
 
-->启动命令:/www/server/php/74/bin/php /www/wwwroot/test.demo.com/artisan horizon
+->启动命令:/www/server/php/81/bin/php /www/wwwroot/test.demo.com/artisan horizon
 
 然后保存即可
 
