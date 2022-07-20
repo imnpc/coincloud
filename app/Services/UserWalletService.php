@@ -4,10 +4,10 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\WalletType;
-use Bavix\Wallet\Interfaces\Mathable;
+use Bavix\Wallet\Internal\Service\MathServiceInterface;
 use Bavix\Wallet\Models\Transaction;
 use Bavix\Wallet\Models\Wallet;
-use Bavix\Wallet\Services\WalletService;
+use Bavix\Wallet\Services\CastServiceInterface;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -86,9 +86,6 @@ class UserWalletService
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
 
-        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
-        $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
-
         // 昨日增加
         $data = $wallet->transactions()
             ->where('type', '=', Transaction::TYPE_DEPOSIT)
@@ -99,7 +96,13 @@ class UserWalletService
         if ($data <= 0) {
             return 0;
         } else {
-            return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+            $math = app(MathServiceInterface::class);
+            $decimalPlacesValue = app(CastServiceInterface::class)
+                ->getWallet($wallet)
+                ->decimal_places;
+            $decimalPlaces = $math->powTen($decimalPlacesValue);
+
+            return $math->div($data, $decimalPlaces, $decimalPlacesValue);
         }
     }
 
@@ -111,10 +114,6 @@ class UserWalletService
         $wallet_type = WalletType::find($wallet_type_id);
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
-
-        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
-        $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
-
         $data = $wallet->transactions()
             ->where('type', '=', Transaction::TYPE_DEPOSIT)
             ->where('wallet_id', '=', $wallet->id)
@@ -122,7 +121,13 @@ class UserWalletService
         if ($data <= 0) {
             return 0;
         } else {
-            return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+            $math = app(MathServiceInterface::class);
+            $decimalPlacesValue = app(CastServiceInterface::class)
+                ->getWallet($wallet)
+                ->decimal_places;
+            $decimalPlaces = $math->powTen($decimalPlacesValue);
+
+            return $math->div($data, $decimalPlaces, $decimalPlacesValue);
         }
     }
 
@@ -136,13 +141,16 @@ class UserWalletService
             ->sum('balance');
         $wallet = Wallet::where('slug', $name)->first();
         if ($wallet) {
-            $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
-            $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
-
             if ($data <= 0) {
                 return 0;
             } else {
-                return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+                $math = app(MathServiceInterface::class);
+                $decimalPlacesValue = app(CastServiceInterface::class)
+                    ->getWallet($wallet)
+                    ->decimal_places;
+                $decimalPlaces = $math->powTen($decimalPlacesValue);
+
+                return $math->div($data, $decimalPlaces, $decimalPlacesValue);
             }
         } else {
             return 0;
@@ -156,9 +164,6 @@ class UserWalletService
         $name = $wallet_type->slug;
 
         $wallet = Wallet::where('slug', $name)->first();
-        $decimalPlaces = app(WalletService::class)->decimalPlaces($wallet);
-        $decimalPlacesValue = app(WalletService::class)->decimalPlacesValue($wallet);
-
         $list = Wallet::where('slug', $name)->get();
         $ids = [];
 
@@ -173,7 +178,13 @@ class UserWalletService
         if ($data <= 0) {
             return 0;
         } else {
-            return app(Mathable::class)->div($data, $decimalPlaces, $decimalPlacesValue);
+            $math = app(MathServiceInterface::class);
+            $decimalPlacesValue = app(CastServiceInterface::class)
+                ->getWallet($wallet)
+                ->decimal_places;
+            $decimalPlaces = $math->powTen($decimalPlacesValue);
+
+            return $math->div($data, $decimalPlaces, $decimalPlacesValue);
         }
     }
 }

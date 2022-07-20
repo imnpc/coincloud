@@ -48,7 +48,9 @@ trait PassportToken
     {
         $maxGenerationAttempts = 10;
         $refreshTokenRepository = app(RefreshTokenRepository::class);
+
         $refreshToken = $refreshTokenRepository->getNewRefreshToken();
+//        $refreshToken->setExpiryDateTime((new \DateTime())->add(Passport::refreshTokensExpireIn()));
         $refreshToken->setExpiryDateTime((new DateTimeImmutable())->add(Passport::refreshTokensExpireIn()));
         $refreshToken->setAccessToken($accessToken);
 
@@ -68,8 +70,11 @@ trait PassportToken
 
     protected function createPassportTokenByUser(User $user, $clientId)
     {
+//        $accessToken = new AccessToken($user->id);
         $accessToken = new AccessToken($user->id,[],new Client($clientId, null, null));
         $accessToken->setIdentifier($this->generateUniqueIdentifier());
+
+//        $accessToken->setExpiryDateTime((new DateTime())->add(Passport::tokensExpireIn()));
         $accessToken->setExpiryDateTime((new DateTimeImmutable())->add(Passport::tokensExpireIn()) );
 
         $accessTokenRepository = new AccessTokenRepository(new TokenRepository(), new Dispatcher());

@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'domain' => null,
+    'domain' => env('HORIZON_DOMAIN', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -28,7 +28,7 @@ return [
     |
     */
 
-    'path' => 'horizon',
+    'path' => env('HORIZON_PATH', 'horizon'),
 
     /*
     |--------------------------------------------------------------------------
@@ -170,8 +170,11 @@ return [
             'queue' => ['default'],
             'balance' => 'auto',
             'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
             'memory' => 128,
             'tries' => 1,
+            'timeout' => 60,
             'nice' => 0,
         ],
     ],
