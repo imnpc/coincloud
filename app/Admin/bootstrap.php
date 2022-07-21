@@ -36,7 +36,7 @@ Admin::navbar(function (\Encore\Admin\Widgets\Navbar $navbar) {
                 ->count();
             $navbar->right(Nav\Link::make('待处理订单' . '(<font color=red>' . $orders . '</font>)', 'orders', 'fa-reorder'));
             $navbar->right(Nav\Link::make('实名待审核' . '(<font color=red>' . $total . '</font>)', 'verify', 'fa-shield'));
-            $navbar->right(Nav\Link::make('设置', 'configx/edit'));
+            $navbar->right(Nav\Link::make('设置', 'configx/edit/0'));
         }
     }
 
