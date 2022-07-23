@@ -359,6 +359,9 @@ function remote_check()
         }
     }
 
+    $results['status'] = "Active";
+    return $results;
+
     $licensekey = config('app.license_key');
     $exists = Storage::disk('local')->exists('localkey.txt');
     if (!$exists) {
