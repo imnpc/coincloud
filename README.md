@@ -110,6 +110,8 @@ php artisan storage:link
 
 chmod -R  0777 storage
 ```
+导入默认菜单和管理员  base.sql
+
 新增计划任务
 ```bash
 crontab -u www -e
