@@ -455,7 +455,7 @@ class UserController extends Controller
             ])
             ->defaultSort('-id')
             ->where('user_id', '=', auth('api')->id())
-            ->select('id', 'wallet_type_id', 'product_id', 'from', 'day', 'add', 'remark', 'created_at')
+            ->select('id', 'wallet_type_id', 'product_id', 'from', 'day', 'old', 'add', 'new', 'remark', 'created_at')
             ->paginate();
 
         return UserWalletLogResource::collection($logs);

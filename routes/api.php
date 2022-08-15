@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ElectricChargeLogController;
 use App\Http\Controllers\Api\IndexController;
 use App\Http\Controllers\Api\PledgeController;
 use App\Http\Controllers\Api\RechargeController;
+use App\Http\Controllers\Api\UtilsController;
 use App\Http\Controllers\Api\WithdrawController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -63,6 +64,13 @@ Route::prefix('v1')
                 Route::post('captchasms', [UserController::class, 'captchasms']); // 使用图片验证码获取短信验证码
                 Route::post('forget', [UserController::class, 'forgetPassword']); // 找回重置密码
                 Route::post('reg', [UserController::class, 'store']); // 注册
+                Route::post('huobiKline', [UtilsController::class, 'huobiKline']); // 火币K线数据
+                Route::post('getHistoryTrade', [UtilsController::class, 'getHistoryTrade']); // 火币 获得近期交易记录
+                Route::post('usdToCny', [UtilsController::class, 'usdToCny']); // 美元转人民币
+                Route::post('getCandles', [UtilsController::class, 'getCandles']); // OKEX 获取交易产品K线数据
+                Route::post('huobiDepth', [UtilsController::class, 'huobiDepth']); // 火币 市场深度数据
+                Route::post('huobiTrade', [UtilsController::class, 'huobiTrade']); // 火币 最近市场成交记录
+                Route::post('huobiDetail', [UtilsController::class, 'huobiDetail']); // 火币 最近24小时行情数据
 
                 // 登录后可以访问的接口
                 Route::middleware('auth:api')->group(function () {
