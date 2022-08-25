@@ -761,7 +761,8 @@ class UserController extends Controller
         if (!$exists) {
             // 不存在就生成并上传二维码图片
             //$qr = QrCode::format('png')->merge('https://cloudimg.xhkylm.com/logo120.png', .3, true)->size(300)->errorCorrection('H')->generate($url);
-            $qr = QrCode::format('png')->size(300)->errorCorrection('H')->generate($url);
+//            $qr = QrCode::format('png')->size(300)->errorCorrection('H')->generate($url);
+            $qr = QrCode::format('png')->size(300)->margin(0)->errorCorrection('L')->generate($url);
             Storage::disk(config('filesystems.default'))->put($path, $qr); //上传到 OSS
         }
 

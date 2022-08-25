@@ -140,3 +140,16 @@ crontab -u www -l
 然后保存即可
 
 
+## Thanks
+
+### JetBrains
+
+Thanks JetBrains for the OpenSource license.
+
+感谢 JetBrains 提供开源 license
+
+This is a 100% open source project. We do not receive any funding from the industry, nor provide paid support or development of features. That said, we are grateful for our supporters who provide free access for open source projects:
+
+[![JetBrains](https://avatars0.githubusercontent.com/u/878437?s=200&v=4)](https://www.jetbrains.com/)
+
+Thanks to [JetBrains](https://www.jetbrains.com/) for supporting the project through sponsoring some [All Products Packs](https://www.jetbrains.com/products.html) within their [Free Open Source License](https://www.jetbrains.com/buy/opensource/) program.
