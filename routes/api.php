@@ -64,6 +64,12 @@ Route::prefix('v1')
                 Route::post('captchasms', [UserController::class, 'captchasms']); // 使用图片验证码获取短信验证码
                 Route::post('forget', [UserController::class, 'forgetPassword']); // 找回重置密码
                 Route::post('reg', [UserController::class, 'store']); // 注册
+
+                Route::post('emailCaptcha', [UserController::class, 'emailCaptcha']); // 使用邮箱获取图片验证码
+                Route::post('captchaEmailCode', [UserController::class, 'captchaEmailCode']); // 使用邮箱获取短信验证码
+                Route::post('emailForget', [UserController::class, 'emailForgetPassword']); // 找回重置密码
+                Route::post('emailReg', [UserController::class, 'emailReg']); // 邮箱注册
+
                 Route::post('huobiKline', [UtilsController::class, 'huobiKline']); // 火币K线数据
                 Route::post('getHistoryTrade', [UtilsController::class, 'getHistoryTrade']); // 火币 获得近期交易记录
                 Route::post('usdToCny', [UtilsController::class, 'usdToCny']); // 美元转人民币

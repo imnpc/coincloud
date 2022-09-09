@@ -16,11 +16,14 @@ use App\Models\UserBonus;
 use App\Models\UserWalletLog;
 use App\Models\WalletType;
 use App\Notifications\VerificationCode;
+use App\Notifications\VerifyCodeEmail;
+use App\Services\LogService;
 use App\Services\UserWalletService;
 use Bavix\Wallet\Interfaces\Mathable;
 use Bavix\Wallet\Models\Transaction;
 use Bavix\Wallet\Services\WalletService;
 use Carbon\Carbon;
+use Hash;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -1012,5 +1015,173 @@ class UserController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * 使用邮箱获取图形验证码
+     * @param Request $request
+     * @param Captcha $captchaBuilder
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function emailCaptcha(Request $request, Captcha $captcha)
+    {
+        $this->validate($request, [
+            'email' => 'required|email',
+        ]);
+
+        $key = 'captcha-' . Str::random(15);
+        $email = $request->email;
+
+        $captcha = $captcha->create('math', true);
+
+        $expiredAt = now()->addMinutes(30); // 有效时间 10 分钟
+
+        \Cache::put($key, [
+            'email' => $email,
+            'captcha' => $captcha['key'],
+        ], $expiredAt);
+
+        $result = [
+            'captcha_key' => $key,
+            'expired_at' => $expiredAt->toDateTimeString(),
+            'captcha_img' => $captcha['img']
+        ];
+
+        return response()->json($result)->setStatusCode(201);
+    }
+
+    /**
+     * 图片验证码获取邮箱验证码
+     * @param  Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Overtrue\EasySms\Exceptions\InvalidArgumentException
+     * @throws \Overtrue\EasySms\Exceptions\NoGatewayAvailableException
+     */
+    public function captchaEmailCode(Request $request)
+    {
+        $captchaData = \Cache::get($request->captcha_key);
+
+        if (!$captchaData) {
+            abort(403, '图片验证码已失效');
+        }
+
+        if (!captcha_api_check($request->captcha_code, $captchaData['captcha'], 'flat')) {
+            Cache::forget($request->captcha_key);
+            abort(403, '验证码错误');
+        }
+
+        $email = $captchaData['email'];
+
+        $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT); // 生成6位随机数，左侧补0
+
+        $key = 'verificationCode_' . $email;
+        $expiredAt = now()->addMinutes(30);
+
+        //        $verifyData = \Cache::get($key);
+        //        if ($verifyData) {
+        //            abort(200, '已经发送过验证码了');
+        //        }
+
+        // TODO 发送验证码邮件
+        Notification::route('mail', $email)->notify(new VerifyCodeEmail($code));// 发送邮件验证码
+
+        \Cache::put($key, ['email' => $email, 'code' => $code], $expiredAt); // 缓存验证码 30 分钟过期。
+
+        $data['message'] = "验证码发送成功";
+        return response()->json($data, 200);
+    }
+
+    /**
+     * 邮箱注册
+     * @param  Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function emailReg(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email|unique:users,email',
+            'verify_code' => 'required|numeric',
+            'password' => 'required|string|min:6|confirmed',
+            'parent_id' => 'string',
+        ]);
+        // print_r($request->all());
+
+        $email = $request->email;
+        $key = 'verificationCode_' . $email;
+
+        $verifyData = \Cache::get($key);
+        if (!$verifyData) {
+            $data['message'] = "验证码已失效！";
+            return response()->json($data, 403);
+        }
+        if (!hash_equals($verifyData['code'], $request->verify_code)) {
+            $data['message'] = "验证码不正确！";
+            return response()->json($data, 403);
+        }
+
+        if ($request->parent_id) {
+            $decode_id = \Hashids::decode($request->parent_id);// 解密传递的 ID
+            if (empty($decode_id)) {
+                $data['message'] = "邀请码不正确！";
+                return response()->json($data, 403);
+            }
+            $parent_id = $decode_id[0];// 解密后的 ID
+        } else {
+            $parent_id = 0;
+        }
+
+        // 创建用户 TODO
+        $user = User::create([
+            'email' => $email,
+            'name' => $email,
+            'nickname' => $email,
+            //'email' => $mobile . '@qq.com',
+            'password' => bcrypt($request->password),
+            'parent_id' => $parent_id,
+        ]);
+        //session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
+        //        return redirect()->route('user.show', [$user]);
+        // 清除验证码缓存
+        \Cache::forget($key);
+        $data['message'] = "注册成功";
+        return response()->json($data, 200);
+    }
+
+    /**
+     * 邮箱重设密码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function emailForgetPassword(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email|exists:users,email',
+            'code' => 'required|numeric',
+            'password' => 'required|string|min:6|confirmed', // 需要字段 password_confirmation
+        ]);
+
+        $email = $request->email;
+        $key = 'verificationCode_' . $email;
+
+        $verifyData = \Cache::get($key);
+        if (!$verifyData) {
+            abort(403, '验证码已失效');// 验证码失效
+        }
+        if (!hash_equals($verifyData['code'], $request->code)) {
+            abort(401, '验证码不正确');// 验证码不正确
+        }
+
+        // 查询该邮箱用户 重设密码  bcrypt($request->password)
+        $user = User::where('email', '=', $request->email)->first();
+        if ($user) {
+            \Cache::forget($key);
+            $user->update(['password' => bcrypt($request->password)]);
+            $data['message'] = "密码重设成功";
+            return response()->json($data, 200);
+        } else {
+            $data['message'] = "用户不存在";
+            return response()->json($data, 404);
+        }
     }
 }
