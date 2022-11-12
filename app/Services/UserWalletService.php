@@ -10,6 +10,7 @@ use Bavix\Wallet\Models\Wallet;
 use Bavix\Wallet\Services\CastServiceInterface;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class UserWalletService
 {
@@ -23,6 +24,7 @@ class UserWalletService
         $name = $wallet_type->slug;
         $wallet = $user->getWallet($name);
 
+        DB::beginTransaction(); // 开始事务
         // 如果钱包带小数点
         if ($wallet->decimal_places > 0) {
             $decimal = 1;
@@ -37,6 +39,7 @@ class UserWalletService
         } elseif ($money < 0 && $decimal == 0) {
             $wallet->withdraw(abs($money), $remark); // 减少
         }
+        DB::commit(); // 结束事务
     }
 
     // 查询用户是否创建钱包
