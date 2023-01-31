@@ -306,13 +306,14 @@ function shy_check_license($licensekey, $localkey = '')
         }
         if ($responseCode != 200) {
             $localexpiry = date("Ymd", mktime(0, 0, 0, date("m"), date("d") - ($localkeydays + $allowcheckfaildays), date("Y")));
+            $originalcheckdate = $localkeyresults['checkdate'];
             if ($originalcheckdate > $localexpiry) {
                 $results = $localkeyresults;
-                $results['description'] = "检测失败";
+                $results['description'] = "检测失败D";
             } else {
                 $results = array();
                 $results['status'] = "Invalid";
-                $results['description'] = "检测失败";
+                $results['description'] = "检测失败I";
                 return $results;
             }
         } else {
@@ -500,4 +501,72 @@ function isAllChinese($str)
         return true;
     }
     return false;
+}
+
+/**
+ * 格式化数字
+ */
+function float_number($number)
+{
+    $length = strlen($number);  //数字长度
+    if ($length > 8) { //亿单位
+        $str = substr_replace(floor($number * 0.0000001), '.', -1, 0)."亿";
+    } elseif ($length > 4) { //万单位
+        //截取前俩为
+        $str = floor($number * 0.001) * 0.1 ."万";
+    } else {
+        return $number;
+    }
+    return $str;
+}
+
+/**
+ * 二维数组根据某个字段排序
+ * @param array $array 要排序的数组
+ * @param string $keys 要排序的键字段
+ * @param string $sort 排序类型  SORT_ASC     SORT_DESC
+ * @return array 排序后的数组
+ */
+function arraySort($array, $keys, $sort = SORT_DESC)
+{
+    $keysValue = [];
+    foreach ($array as $k => $v) {
+        $keysValue[$k] = $v[$keys];
+    }
+    array_multisort($keysValue, $sort, $array);
+    return $array;
+}
+
+/**
+ * 二分查找法
+ * @param $num 数量
+ * @param $filter 对应集合
+ * @return array
+ */
+function priceSearch($num, $filter)
+{
+    if (count($filter) == 1) {
+        return $filter;
+    }
+    $half = floor(count($filter) / 2); // 取出中间数
+
+    // 判断数量在哪个区间
+    if ($num < $filter[$half]['number']) {
+        $filter = array_slice($filter, 0, $half);
+    } else {
+        $filter = array_slice($filter, $half, count($filter));
+    }
+    //print_r($filter);
+    // 继续递归直到只剩一个元素
+    if (count($filter) > 1) {
+        $filter = priceSearch($num, $filter);
+    }
+
+    return $filter;
+}
+
+// 随机返回所需范围数字
+function randNumber(): int
+{
+    return rand(1, 10);
 }

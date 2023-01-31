@@ -67,6 +67,7 @@ return [
             'use_ssl'           => env('OSS_SSL', false),              // Optional, 是否使用HTTPS
             'prefix'            => env('OSS_PREFIX', ''),              // Optional, 统一存储地址前缀
             'reverse_proxy'     => env('OSS_REVERSE_PROXY', false),    // Optional, 域名是否使用NGINX代理绑定
+            "is_cname" => env("OSS_CNAME", false), // If this is the CName and binded in the bucket.
         ],
 
     ],
