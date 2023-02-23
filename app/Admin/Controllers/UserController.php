@@ -199,12 +199,12 @@ class UserController extends AdminController
 
         // 保存前回调 设置未填写参数的默认值
         $form->saving(function (Form $form) {
-            if (empty($form->nickname)) {
-                $form->nickname = $form->mobile;
-            }
-            if (empty($form->name)) {
-                $form->name = $form->mobile;
-            }
+//            if (empty($form->nickname)) {
+//                $form->nickname = $form->mobile;
+//            }
+//            if (empty($form->name)) {
+//                $form->name = $form->mobile;
+//            }
             // 密码修改
             if (empty($form->input('password'))) {
                 $form->input('password', $form->model()->password);
