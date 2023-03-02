@@ -7,6 +7,7 @@ use App\Models\WalletType;
 use Bavix\Wallet\Internal\Service\MathServiceInterface;
 use Bavix\Wallet\Models\Transaction;
 use Bavix\Wallet\Models\Wallet;
+use Bavix\Wallet\Services\AtomicServiceInterface;
 use Bavix\Wallet\Services\CastServiceInterface;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -22,24 +23,40 @@ class UserWalletService
         $this->checkWallet($uid); // 检测用户是否创建过钱包
         $wallet_type = WalletType::find($wallet_type_id);
         $name = $wallet_type->slug;
-        $wallet = $user->getWallet($name);
 
         DB::beginTransaction(); // 开始事务
+        $key = 'lock_'.$wallet_type_id.'_'.$uid;
+        $wallet = $user->getWallet($name);
+        $wallet->balanceInt;
         // 如果钱包带小数点
         if ($wallet->decimal_places > 0) {
             $decimal = 1;
         }
 
-        if ($money > 0 && $decimal == 1) {
-            $wallet->depositFloat($money, $remark); // 增加
-        } elseif ($money > 0 && $decimal == 0) {
-            $wallet->deposit($money, $remark); // 增加
-        } elseif ($money < 0 && $decimal == 1) {
-            $wallet->withdrawFloat(abs($money), $remark); // 减少
-        } elseif ($money < 0 && $decimal == 0) {
-            $wallet->withdraw(abs($money), $remark); // 减少
-        }
+        app(AtomicServiceInterface::class)->block($wallet, function () use ($wallet, $decimal, $money, $remark) {
+            if ($money > 0 && $decimal == 1) {
+                $wallet->depositFloat($money, $remark); // 增加
+            } elseif ($money > 0 && $decimal == 0) {
+                $wallet->deposit($money, $remark); // 增加
+            } elseif ($money < 0 && $decimal == 1) {
+                $wallet->withdrawFloat(abs($money), $remark); // 减少
+            } elseif ($money < 0 && $decimal == 0) {
+                $wallet->withdraw(abs($money), $remark); // 减少
+            }
+        });
+
+//        if ($money > 0 && $decimal == 1) {
+//            $wallet->depositFloat($money, $remark); // 增加
+//        } elseif ($money > 0 && $decimal == 0) {
+//            $wallet->deposit($money, $remark); // 增加
+//        } elseif ($money < 0 && $decimal == 1) {
+//            $wallet->withdrawFloat(abs($money), $remark); // 减少
+//        } elseif ($money < 0 && $decimal == 0) {
+//            $wallet->withdraw(abs($money), $remark); // 减少
+//        }
+        \Cache::forget($key); // 清除缓存
         DB::commit(); // 结束事务
+
     }
 
     // 查询用户是否创建钱包
@@ -68,16 +85,27 @@ class UserWalletService
         $this->checkWallet($uid); // 检测用户是否创建过钱包
         $wallet_type = WalletType::find($wallet_type_id);
         $name = $wallet_type->slug;
+
+        $money = 0;
+
+        DB::beginTransaction(); // 开始事务
+
         $wallet = $user->getWallet($name);
+        $wallet->refreshBalance();
+        $wallet->balanceInt;
+
         // 如果钱包带小数点
         if ($wallet->decimal_places > 0) {
             $decimal = 1;
         }
         if ($decimal == 1) {
-            return $wallet->balanceFloat;
+            $money = $wallet->balanceFloat;
         } else {
-            return $wallet->balance;
+            $money =  $wallet->balance;
         }
+        DB::commit(); // 结束事务
+
+        return $money;
     }
 
     // 获得用户昨日增加金额

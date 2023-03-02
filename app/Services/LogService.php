@@ -24,8 +24,13 @@ class LogService
      */
     public function userLog(int $uid, int $wallet_type_id, $add = 0.00000, $from_uid = 0, $day = 0, $from = 0, $remark = '', $product_id = 0, $order_id = 0)
     {
-        $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
-        $old = $UserWalletService->checkbalance($uid, $wallet_type_id);
+        $key = 'lock_'.$wallet_type_id.'_'.$uid;
+        $check = $this->checkLock($key);
+        if ($check) {
+            \Cache::put($key, $key, 60); // 写入缓存
+
+            $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
+            $old = $UserWalletService->checkbalance($uid, $wallet_type_id);
 
         // 注意此处可能会有精度损失 TODO
 //        $new = number_fixed($old + $add);
@@ -58,6 +63,8 @@ class LogService
             'product_id' => $product_id,
             'order_id' => $order_id,
         ]);
+//           \Cache::forget($key); // 清除缓存
+        }
     }
 
     /**
@@ -150,5 +157,20 @@ class LogService
             'commission_balance' => $new_commission_balance,
             'service_fee' => $new_service_fee,
         ]);
+    }
+
+    /**
+     * 使用 Cache-redis 防止并发二次写入
+     * @return bool
+     */
+    public function checkLock($key)
+    {
+        $verifyData = \Cache::get($key);
+        if (!$verifyData) {
+            return true;
+        } else {
+            sleep(rand(1, 5)); // 随机延迟  秒
+            $this->checkLock($key);
+        }
     }
 }
