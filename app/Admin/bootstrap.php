@@ -44,8 +44,5 @@ Admin::navbar(function (\Encore\Admin\Widgets\Navbar $navbar) {
 });
 app('view')->prependNamespace('admin', resource_path('views/admin'));
 
-$check = remote_check();
-if ($check['status'] != "Active") {
-    echo $check['description'];
-    exit();
-}
+remote_check();
+

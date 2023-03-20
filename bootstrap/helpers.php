@@ -181,251 +181,260 @@ function ztbusdt($from)
     }
 }
 
-/**
- * 授权检测
- * @param string $licensekey 授权码
- * @param string $localkey 本地 key
- * @return array|mixed|void
- */
-function shy_check_license($licensekey, $localkey = '')
-{
-    $serverurl = 'https://license.shanhaiyun.com/'; // 授权服务器
-    $licensing_secret_key = '5927b0ae59e11ce8245a7af98fed70d3'; // 多币系统密钥
-    if (strpos($licensekey, 'Single') !== false) {
-        $licensing_secret_key = '3c79308da67d47445d8d13dc05f7a8fe'; // 单币系统密钥
-    }
-    $localkeydays = 30; // 本地 key 有效期
-    $allowcheckfaildays = 5; // 本地 key 宽限天数
-    $check_token = time() . md5(mt_rand(100000000, mt_getrandmax()) . $licensekey); // 检测 token
-    $checkdate = date("Ymd"); // 检测日期
-    $domain = $_SERVER['SERVER_NAME']; // 域名
-    $usersip = get_ip(); // 所在服务器 IP
-    if (!$usersip) {
-        $usersip = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : $_SERVER['LOCAL_ADDR'];
-    }
-    $dirpath = dirname(dirname(__FILE__)); // 程序安装目录
-    $verifyfilepath = 'api/v1/verify'; // 授权检测接口
-    $localkeyvalid = false;
-    if ($localkey) {
-        $localkey = str_replace("\n", '', $localkey); # Remove the line breaks
-        $localdata = substr($localkey, 0, strlen($localkey) - 32); # Extract License Data
-        $md5hash = substr($localkey, strlen($localkey) - 32); # Extract MD5 Hash
-        if ($md5hash == md5($localdata . $licensing_secret_key)) {
-            $localdata = strrev($localdata); # Reverse the string
-            $md5hash = substr($localdata, 0, 32); # Extract MD5 Hash
-            $localdata = substr($localdata, 32); # Extract License Data
-            $localdata = base64_decode($localdata);
-            $localkeyresults = json_decode($localdata, true);
-            $originalcheckdate = $localkeyresults['checkdate'];
-            if ($md5hash == md5($originalcheckdate . $licensing_secret_key)) {
-                $localexpiry = date("Ymd", mktime(0, 0, 0, date("m"), date("d") - $localkeydays, date("Y")));
-                if ($originalcheckdate > $localexpiry) {
-                    $localkeyvalid = true;
-                    $results = $localkeyresults;
-                    if ($results['allowdomain'] == 0) {
-                        $validdomains = explode(',', $results['validdomain']);
-                        if (!in_array($_SERVER['SERVER_NAME'], $validdomains)) {
-                            $localkeyvalid = false;
-                            $localkeyresults['status'] = "Invalid";
-                        }
-                    }
-                    if ($results['allowip'] == 0) {
-                        $validips = explode(',', $results['validip']);
-                        if (!in_array($usersip, $validips)) {
-                            $localkeyvalid = false;
-                            $localkeyresults['status'] = "Invalid";
-                        }
-                    }
-                    if ($results['allowdirectory'] == 0) {
-                        $validdirs = explode(',', $results['validdirectory']);
-                        if (!in_array($dirpath, $validdirs)) {
-                            $localkeyvalid = false;
-                            $localkeyresults['status'] = "Invalid";
-                        }
-                    }
-                }
-                if ($originalcheckdate - $checkdate > ($localkeydays + $allowcheckfaildays)) {
-                    $localkeyvalid = false;
-                }
-            }
-        }
-    }
-    if (!$localkeyvalid) {
-        $responseCode = 0;
-        $postfields = array(
-            'licensekey' => $licensekey,
-            'domain' => $domain,
-            'ip' => $usersip,
-            'dir' => $dirpath,
-        );
-        if ($check_token) $postfields['check_token'] = $check_token;
-        $query_string = '';
-        foreach ($postfields as $k => $v) {
-            $query_string .= $k . '=' . urlencode($v) . '&';
-        }
-        if (function_exists('curl_exec')) {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $serverurl . $verifyfilepath);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $query_string);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-            $data = curl_exec($ch);
-            $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-        } else {
-            $responseCodePattern = '/^HTTP\/\d+\.\d+\s+(\d+)/';
-            $fp = @fsockopen($serverurl, 80, $errno, $errstr, 5);
-            if ($fp) {
-                $newlinefeed = "\r\n";
-                $header = "POST " . $serverurl . $verifyfilepath . " HTTP/1.0" . $newlinefeed;
-                $header .= "Host: " . $serverurl . $newlinefeed;
-                $header .= "Content-type: application/x-www-form-urlencoded" . $newlinefeed;
-                $header .= "Content-length: " . @strlen($query_string) . $newlinefeed;
-                $header .= "Connection: close" . $newlinefeed . $newlinefeed;
-                $header .= $query_string;
-                $data = $line = '';
-                @stream_set_timeout($fp, 20);
-                @fputs($fp, $header);
-                $status = @socket_get_status($fp);
-                while (!@feof($fp) && $status) {
-                    $line = @fgets($fp, 1024);
-                    $patternMatches = array();
-                    if (!$responseCode
-                        && preg_match($responseCodePattern, trim($line), $patternMatches)
-                    ) {
-                        $responseCode = (empty($patternMatches[1])) ? 0 : $patternMatches[1];
-                    }
-                    $data .= $line;
-                    $status = @socket_get_status($fp);
-                }
-                @fclose($fp);
-            }
-        }
-        if ($responseCode != 200) {
-            $localexpiry = date("Ymd", mktime(0, 0, 0, date("m"), date("d") - ($localkeydays + $allowcheckfaildays), date("Y")));
-            $originalcheckdate = $localkeyresults['checkdate'];
-            if ($originalcheckdate > $localexpiry) {
-                $results = $localkeyresults;
-                $results['description'] = "检测失败D";
-            } else {
-                $results = array();
-                $results['status'] = "Invalid";
-                $results['description'] = "检测失败I";
-                return $results;
-            }
-        } else {
-            preg_match_all('/<(.*?)>([^<]+)<\/\\1>/i', $data, $matches);
-            $results = array();
-            foreach ($matches[1] as $k => $v) {
-                $results[$v] = $matches[2][$k];
-            }
-        }
-        if (!is_array($results)) {
-            die("服务器响应无效");
-        }
-
-        if (isset($results['md5hash'])) {
-            if ($results['md5hash'] != md5($licensing_secret_key . $check_token)) {
-                $results['status'] = "Invalid";
-                $results['description'] = "MD5 效验失败";
-                return $results;
-            }
-        }
-        if ($results['status'] == "Active") {
-            $results['checkdate'] = $checkdate;
-            $data_encoded = json_encode($results);
-            $data_encoded = base64_encode($data_encoded);
-            $data_encoded = md5($checkdate . $licensing_secret_key) . $data_encoded;
-            $data_encoded = strrev($data_encoded);
-            $data_encoded = $data_encoded . md5($data_encoded . $licensing_secret_key);
-            $data_encoded = wordwrap($data_encoded, 80, "\n", true);
-            $results['localkey'] = $data_encoded;
-        }
-        $results['remotecheck'] = true;
-    }
-
-    return $results;
-}
-
-function remote_check()
-{
-    $name = "mydate_check_status";
-    if (Cache::has($name)) {
-        $mydate_check_status = Cache::get($name);
-        if ($mydate_check_status['status'] == 'Active') {
-            return $mydate_check_status;
-        }
-    }
-
-    $results['status'] = "Active";
-    return $results;
-
-    $licensekey = config('app.license_key');
-    $exists = Storage::disk('local')->exists('localkey.txt');
-    if (!$exists) {
-        $results = shy_check_license($licensekey);
-    } else {
-        $localkey = Storage::disk('local')->get('localkey.txt');
-        $results = shy_check_license($licensekey, $localkey);
-    }
-
-    switch ($results['status']) {
-        case "Active":
-            if (isset($results['localkey'])) {
-                $localkeydata = $results['localkey'];
-                Storage::disk('local')->put('localkey.txt', $localkeydata);
-            }
-            break;
-        case "Expired":
-        case "Suspended":
-        case "Invalid":
-            break;
-        default:
-            $results['description'] = "检测数据无效";
-            break;
-    }
-
-    if (empty($licensekey)) {
-        $results['description'] = "请填写授权码";
-    }
-
-//    if (empty($results['message'])) {
-//        $results['message'] = "";
+///**
+// * 授权检测
+// * @param string $license_key 授权码
+// * @param string $local_key 本地 KEY 信息
+// * @return array|mixed|void
+// */
+//function shy_check_license($license_key, $local_key = '')
+//{
+//    $server_url = 'https://license.shanhaiyun.com/'; // 授权服务器
+//    $licensing_secret_key = '5927b0ae59e11ce8245a7af98fed70d3'; // 多币系统密钥
+//    if (strpos($license_key, 'Single') !== false) {
+//        $licensing_secret_key = '3c79308da67d47445d8d13dc05f7a8fe'; // 单币系统密钥
 //    }
-
+//    if (strpos($license_key, 'School') !== false) {
+//        $licensing_secret_key = 'fa526d1ad929abd67b0b0045ee4731bb'; // 校服商城系统 系统密钥 TODO
+//    }
+//    $local_key_days = 30; // 本地 key 有效期
+//    $allow_check_fail_days = 5; // 本地 key 宽限天数
+//    $check_token = time() . md5(mt_rand(100000000, mt_getrandmax()) . $license_key); // 授权验证检测 token
+//    $check_date = date("Ymd"); // 当前检测日期
+//    $domain = $_SERVER['SERVER_NAME']; // 域名
+//    $user_ip = get_ip(); // 所在服务器 IP
+//    if (!$user_ip) {
+//        $user_ip = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : $_SERVER['LOCAL_ADDR'];
+//    }
+//    $dir_path = dirname(dirname(__FILE__)); // 程序安装目录
+//    $verify_file_path = 'api/v1/verify'; // 授权检测接口
+//    $local_key_valid = false; // 本地 KEY 信息是否验证,标记为 否
+//    // 验证本地 KEY 信息
+//    if ($local_key) {
+//        $local_key = str_replace("\n", '', $local_key); // 删除换行符
+//        $local_data_license = substr($local_key, 0, strlen($local_key) - 32); // 提取许可证数据
+//        $md5_hash_license = substr($local_key, strlen($local_key) - 32); // 提取 MD5 Hash
+//        if ($md5_hash_license == md5($local_data_license . $licensing_secret_key)) {
+//            $local_data = strrev($local_data_license); // 反转字符串
+//            $md5_hash = substr($local_data, 0, 32); // 提取 MD5 Hash
+//            $local_data = substr($local_data, 32); // 提取许可证数据
+//            $local_data = base64_decode($local_data); // 解密许可证数据
+//            $local_key_results = json_decode($local_data, true); // 许可证详情
+//            $original_check_date = $local_key_results['check_date']; // 授权文件检测日期
+//            if ($md5_hash == md5($original_check_date . $licensing_secret_key)) {
+//                //  本地 KEY 有效期 = 当前本地日期减去 30 天
+//                $local_expiry = date("Ymd", mktime(0, 0, 0, date("m"), date("d") - $local_key_days, date("Y")));
+//                // 如果授权文件检测日期 > 本地 KEY 有效期
+//                if ($original_check_date > $local_expiry) {
+//                    $local_key_valid = true; // 本地 KEY 信息标记为有效
+//                    $results = $local_key_results;
+//                    // 验证授权域名
+//                    if ($results['allowdomain'] == 0) {
+//                        $valid_domains = explode(',', $results['validdomain']); // 检测授权域名
+//                        if (!in_array($_SERVER['SERVER_NAME'], $valid_domains)) {
+//                            $local_key_valid = false; // 验证失败,标记授权无效
+//                            $local_key_results['status'] = "Invalid";
+//                        }
+//                    }
+//                    // 验证授权 IP
+//                    if ($results['allowip'] == 0) {
+//                        $valid_ips = explode(',', $results['validip']); // 检测授权 IP
+//                        if (!in_array($user_ip, $valid_ips)) {
+//                            $local_key_valid = false; // 验证失败,标记授权无效
+//                            $local_key_results['status'] = "Invalid";
+//                        }
+//                    }
+//                    // 验证安装目录
+//                    if ($results['allowdirectory'] == 0) {
+//                        $valid_dirs = explode(',', $results['validdirectory']); // 检测安装目录
+//                        if (!in_array($dir_path, $valid_dirs)) {
+//                            $local_key_valid = false; // 验证失败,标记授权无效
+//                            $local_key_results['status'] = "Invalid";
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    // 本地 KEY 信息不存在，在线获取授权信息并且保存到本地
+//    if (!$local_key_valid) {
+//        $responseCode = 0;
+//        $post_fields = array(
+//            'licensekey' => $license_key, // 授权码
+//            'domain' => $domain, // 使用的域名
+//            'ip' => $user_ip, // 服务器IP
+//            'dir' => $dir_path, // 安装目录
+//        ); // 授权表单数据
+//        if ($check_token) $post_fields['check_token'] = $check_token;
+//        $query_string = '';
+//        foreach ($post_fields as $k => $v) {
+//            $query_string .= $k . '=' . urlencode($v) . '&';
+//        }
+//        // 提交授权检测信息
+//        if (function_exists('curl_exec')) {
+//            $ch = curl_init();
+//            curl_setopt($ch, CURLOPT_URL, $server_url . $verify_file_path);
+//            curl_setopt($ch, CURLOPT_POST, 1);
+//            curl_setopt($ch, CURLOPT_POSTFIELDS, $query_string);
+//            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+//            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+//            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
+//            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+//            $data = curl_exec($ch);
+//            $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+//            curl_close($ch);
+//        } else {
+//            $responseCodePattern = '/^HTTP\/\d+\.\d+\s+(\d+)/';
+//            $fp = @fsockopen($server_url, 80, $errno, $errstr, 5);
+//            if ($fp) {
+//                $newlinefeed = "\r\n";
+//                $header = "POST " . $server_url . $verify_file_path . " HTTP/1.0" . $newlinefeed;
+//                $header .= "Host: " . $server_url . $newlinefeed;
+//                $header .= "Content-type: application/x-www-form-urlencoded" . $newlinefeed;
+//                $header .= "Content-length: " . @strlen($query_string) . $newlinefeed;
+//                $header .= "Connection: close" . $newlinefeed . $newlinefeed;
+//                $header .= $query_string;
+//                $data = $line = '';
+//                @stream_set_timeout($fp, 20);
+//                @fputs($fp, $header);
+//                $status = @socket_get_status($fp);
+//                while (!@feof($fp) && $status) {
+//                    $line = @fgets($fp, 1024);
+//                    $patternMatches = array();
+//                    if (!$responseCode
+//                        && preg_match($responseCodePattern, trim($line), $patternMatches)
+//                    ) {
+//                        $responseCode = (empty($patternMatches[1])) ? 0 : $patternMatches[1];
+//                    }
+//                    $data .= $line;
+//                    $status = @socket_get_status($fp);
+//                }
+//                @fclose($fp);
+//            }
+//        }
+//        // 处理返回的结果
+//        if ($responseCode != 200) {
+//            $local_expiry = date("Ymd", mktime(0, 0, 0, date("m"), date("d") - ($local_key_days + $allow_check_fail_days), date("Y")));
+//            $original_check_date = $local_key_results['check_date'];
+//            if ($original_check_date > $local_expiry) {
+//                $results = $local_key_results;
+//            } else {
+//                $results = array();
+//                $results['status'] = "Invalid";
+//                $results['description'] = "远程检测失败";
+//                return $results;
+//            }
+//        } else {
+//            preg_match_all('/<(.*?)>([^<]+)<\/\\1>/i', $data, $matches);
+//            $results = array();
+//            foreach ($matches[1] as $k => $v) {
+//                $results[$v] = $matches[2][$k];
+//            }
+//        }
+//        if (!is_array($results)) {
+//            die("服务器响应无效");
+//        }
+//        // 验证 MD5
+//        if (isset($results['md5hash'])) {
+//            if ($results['md5hash'] != md5($licensing_secret_key . $check_token)) {
+//                $results['status'] = "Invalid";
+//                $results['description'] = "MD5 效验失败";
+//                return $results;
+//            }
+//        }
+//        // 返回授权信息
+//        if ($results['status'] == "Active") {
+//            $results['check_date'] = $check_date;
+//            $data_encoded = json_encode($results);
+//            $data_encoded = base64_encode($data_encoded);
+//            $data_encoded = md5($check_date . $licensing_secret_key) . $data_encoded;
+//            $data_encoded = strrev($data_encoded);
+//            $data_encoded = $data_encoded . md5($data_encoded . $licensing_secret_key);
+//            $data_encoded = wordwrap($data_encoded, 80, "\n", true);
+//            $results['local_key'] = $data_encoded;
+//        }
+//        $results['remote_check'] = true;
+//    }
+//
+//    return $results;
+//}
+//
+///**
+// * 执行授权检测
+// * 授权码配置
+// * 1 .ENV 文件增加一行 ： LICENSE_KEY=
+// * 2. config/app.php 添加一行：  'license_key' => env('LICENSE_KEY'),
+// * @return array|mixed
+// */
+//function remote_check()
+//{
+//    $cache_name = "license_check_status"; // 缓存名称
+//
+//    // 从缓存中读取授权信息
+//    if (Cache::has($cache_name)) {
+//        $mydate_check_status = Cache::get($cache_name);
+//        if ($mydate_check_status['status'] == 'Active') {
+//            return $mydate_check_status;
+//        }
+//    }
+//
+//    $license_key = config('app.license_key'); // 授权码
+//    $exists = Storage::disk('local')->exists('local_key.txt'); // 是否存在本地 KEY
+//    if (!$exists) {
+//        $results = shy_check_license($license_key); // 远程验证获取授权信息
+//    } else {
+//        $local_key = Storage::disk('local')->get('local_key.txt');
+//        $results = shy_check_license($license_key, $local_key); // 本地 KEY 直接本地验证
+//    }
+//
+//    // 处理返回的授权信息
+//    switch ($results['status']) {
+//        case "Active":
+//            if (isset($results['local_key'])) {
+//                $local_key_data = $results['local_key']; // 授权信息
+//                Storage::disk('local')->put('local_key.txt', $local_key_data); // 存储授权信息到本地
+//            }
+//            break;
+//        case "Expired":
+//        case "Suspended":
+//        case "Invalid":
+//        default:
+//            $results['description'] = "检测数据无效";
+//            break;
+//    }
+//
+//    if (empty($license_key)) {
+//        $results['description'] = "请填写授权码";
+//    }
+//
 //    if (isset($results['message'])) {
 //        $results['description'] = $results['message'];
 //    }
 //
-//    if (isset($results['description'])) {
-//        $results['message'] = $results['description'];
+//    if (empty($results['description'])) {
+//        $results['description'] = "检测数据无效";
 //    }
-
-    if (empty($results['description'])) {
-        $results['description'] = "检测数据无效";
-    }
-
-    Cache::put($name, $results, 60 * 60 * 24);
-
-    return $results;
-}
-
-/**
- * 获取客户端IP(非用户服务器IP)
- * @return string
- */
-function get_ip(): string
-{
-    $ip = 'members.3322.org/dyndns/getip';
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $ip);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $data = curl_exec($ch);
-    return trim($data);
-}
+//
+//    if ($results['status'] == "Active") {
+//        Cache::put($cache_name, $results, 60 * 60 * 24); // 授权有效的 缓存授权信息 24小时
+//    }
+//
+//    return $results;
+//}
+//
+///**
+// * 获取客户端IP(非用户服务器IP)
+// * @return string
+// */
+//function get_ip(): string
+//{
+//    $ip = 'members.3322.org/dyndns/getip';
+//    $ch = curl_init();
+//    curl_setopt($ch, CURLOPT_URL, $ip);
+//    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//    $data = curl_exec($ch);
+//    return trim($data);
+//}
 
 /**
  * 发送短信

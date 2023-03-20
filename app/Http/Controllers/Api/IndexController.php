@@ -110,7 +110,7 @@ class IndexController extends Controller
 
     public function test()
     {
-
+        exit();
         $csv_file = Storage::disk('public')->url('2022-01-10.csv');
         $list = read_csv($csv_file);
 

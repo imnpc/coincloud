@@ -67,7 +67,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "bootstrap/helpers.php"
+            "bootstrap/helpers.php",
+            "bootstrap/license.php"
         ]
     },
     "autoload-dev": {
