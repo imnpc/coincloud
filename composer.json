@@ -41,7 +41,6 @@
         "overtrue/laravel-lang": "~6.0",
         "propaganistas/laravel-phone": "^4.3",
         "psr/simple-cache": "^2.0",
-        "solutionforest/laravel-admin-translatable": "^1.2",
         "spatie/laravel-query-builder": "^5.0",
         "stingbo/easyexchange": "^2.0",
         "torann/currency": "^1.1",
@@ -105,14 +104,5 @@
         "sort-packages": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "storage/extensions/laravel-admin-translatable",
-            "options": {
-                "symlink": false
-            }
-        }
-    ]
+    "prefer-stable": true
 }
