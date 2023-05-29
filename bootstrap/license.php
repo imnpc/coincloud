@@ -189,9 +189,6 @@ function shy_check_license($license_key, $local_key = '')
 
 /**
  * 执行授权检测
- * 授权码配置
- * 1 .ENV 文件增加一行 ： LICENSE_KEY=
- * 2. config/app.php 添加一行：  'license_key' => env('LICENSE_KEY'),
  * @return array|mixed
  */
 function remote_check()
@@ -199,7 +196,7 @@ function remote_check()
     $cache_name = "license_check_status"; // 缓存名称
 
     // 随机删除缓存 TODO
-    
+
     // 从缓存中读取授权信息
 //    if (Cache::has($cache_name)) {
 //        $mydate_check_status = Cache::get($cache_name);
@@ -208,8 +205,14 @@ function remote_check()
 //        }
 //    }
 
-
     $license_key = config('app.license_key'); // 授权码
+
+    if (empty($license_key)) {
+        $results['description'] = "请在.env文件中配置授权码";
+        echo $results['description'];
+        exit();
+    }
+
     $exists = Storage::disk('local')->exists('local_key.txt'); // 是否存在本地 KEY
     if (!$exists) {
         $results = shy_check_license($license_key); // 远程验证获取授权信息
@@ -232,10 +235,6 @@ function remote_check()
         default:
             $results['description'] = "检测数据无效";
             break;
-    }
-
-    if (empty($license_key)) {
-        $results['description'] = "请填写授权码";
     }
 
     if (isset($results['message'])) {
