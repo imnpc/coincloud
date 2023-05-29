@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ebf7097e4805e48d9a8c3b200e976292",
+    "content-hash": "275819278f1c31ca263dc8ac35f62264",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -8761,128 +8761,6 @@
             "time": "2017-11-26T15:27:12+00:00"
         },
         {
-            "name": "solutionforest/laravel-admin-translatable",
-            "version": "v1.2.0",
-            "dist": {
-                "type": "path",
-                "url": "storage/extensions/laravel-admin-translatable",
-                "reference": "048bb6f4e2cafa51f29a7706ff232f32745c1840"
-            },
-            "require": {
-                "encore/laravel-admin": "~1.6",
-                "php": ">=7.0.0",
-                "solutionforest/laravel-translatable": "^5.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~6.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "solutionforest\\LaravelAdmin\\Translatable\\TranslatableServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "solutionforest\\LaravelAdmin\\Translatable\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Alan Lam",
-                    "email": "alan@solutionforest.net"
-                }
-            ],
-            "description": "Laravel-admin translation tools",
-            "homepage": "https://github.com/solutionforest/laravel-admin-translatable",
-            "keywords": [
-                "extension",
-                "laravel-admin"
-            ],
-            "transport-options": {
-                "symlink": false,
-                "relative": true
-            }
-        },
-        {
-            "name": "solutionforest/laravel-translatable",
-            "version": "5.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/solutionforestteam/laravel-translatable.git",
-                "reference": "7a1669701a77df8d30bb1d20777d7e86b33f1b75"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/solutionforestteam/laravel-translatable/zipball/7a1669701a77df8d30bb1d20777d7e86b33f1b75",
-                "reference": "7a1669701a77df8d30bb1d20777d7e86b33f1b75",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/database": "~5.8.0|^6.0|^7.0|^8.0|^9.0",
-                "illuminate/support": "~5.8.0|^6.0|^7.0|^8.0|^9.0",
-                "php": "^7.2|^8.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.3",
-                "orchestra/testbench": "~3.8.0|^4.0|^5.0|^6.0|^7.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "SolutionForest\\Translatable\\SFTranslationServiceProvider"
-                    ],
-                    "aliases": {
-                        "SimplePackage": "SolutionForest\\Translatable\\SFTranslationServiceFacade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "SolutionForest\\Translatable\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Alan Lam",
-                    "email": "alan@solutionforest.net",
-                    "homepage": "https://solutionforest.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A trait to make an Eloquent model hold translations",
-            "homepage": "https://github.com/solutionforest/laravel-translatable",
-            "keywords": [
-                "eloquent",
-                "i8n",
-                "laravel-translatable",
-                "model",
-                "multilingual",
-                "solutionforest",
-                "translate"
-            ],
-            "support": {
-                "source": "https://github.com/solutionforestteam/laravel-translatable/tree/5.4.0"
-            },
-            "funding": [
-                {
-                    "url": "https://www.patreon.com/solutionforest",
-                    "type": "patreon"
-                }
-            ],
-            "time": "2022-04-19T09:33:39+00:00"
-        },
-        {
             "name": "spatie/eloquent-sortable",
             "version": "4.0.2",
             "source": {
@@ -15173,4 +15051,145 @@
             },
             "funding": [
                 {
-           
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-01-03T19:28:04+00:00"
+        },
+        {
+            "name": "symfony/yaml",
+            "version": "v6.2.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "61916f3861b1e9705b18cfde723921a71dd1559d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/61916f3861b1e9705b18cfde723921a71dd1559d",
+                "reference": "61916f3861b1e9705b18cfde723921a71dd1559d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/polyfill-ctype": "^1.8"
+            },
+            "conflict": {
+                "symfony/console": "<5.4"
+            },
+            "require-dev": {
+                "symfony/console": "^5.4|^6.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "bin": [
+                "Resources/bin/yaml-lint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Loads and dumps YAML files",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/yaml/tree/v6.2.10"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-04-28T13:25:36+00:00"
+        },
+        {
+            "name": "theseer/tokenizer",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/theseer/tokenizer.git",
+                "reference": "34a41e998c2183e22995f158c581e7b5e755ab9e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/34a41e998c2183e22995f158c581e7b5e755ab9e",
+                "reference": "34a41e998c2183e22995f158c581e7b5e755ab9e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-tokenizer": "*",
+                "ext-xmlwriter": "*",
+                "php": "^7.2 || ^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Arne Blankerts",
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
+            "support": {
+                "issues": "https://github.com/theseer/tokenizer/issues",
+                "source": "https://github.com/theseer/tokenizer/tree/1.2.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/theseer",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-07-28T10:34:58+00:00"
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": [],
+    "prefer-stable": true,
+    "prefer-lowest": false,
+    "platform": {
+        "php": "^8.0.2"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
+}
