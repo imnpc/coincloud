@@ -218,4 +218,25 @@ class UserWalletService
             return $math->div($data, $decimalPlaces, $decimalPlacesValue);
         }
     }
+
+    /**
+     * 获取某个用户的所有钱包余额
+     * @param  int  $uid 用户 ID
+     * @return array
+     */
+    public function getUserWallets(int $uid): array
+    {
+        $this->checkWallet($uid); // 检测用户钱包
+        $data = [];
+        $list = User::with('wallets')->find($uid);
+        foreach ($list->wallets as $v) {
+            $type = WalletType::where('slug','=',$v->slug)->first();
+            $name = strtolower($v->slug);
+            $data[$name.'_id'] = $type->id;
+            $data[$name.'_name'] = $v->name;
+            $data[$name.'_balance'] = $v->balanceFloat;
+        }
+
+        return $data;
+    }
 }
