@@ -13,7 +13,7 @@ class LogService
     /**
      * @param int $uid 用户ID
      * @param int $wallet_type_id 钱包类型 ID
-     * @param $add 更改金额 支持加减  + -
+     * @param float $add 更改金额 支持加减  + -
      * @param int $from_uid 来自用户 ID
      * @param int $day 所属日期
      * @param int $from 来源
@@ -32,12 +32,11 @@ class LogService
             $UserWalletService = app()->make(UserWalletService::class); // 钱包服务初始化
             $old = $UserWalletService->checkbalance($uid, $wallet_type_id);
 
-        // 注意此处可能会有精度损失 TODO
-//        $new = number_fixed($old + $add);
+        // 使用高精度计算 避免出错
         if ($add >= 0) {
-            $new = bcadd($old, $add, 5);
+            $new = @bcadd($old, $add, 5);
         } elseif ($add < 0) {
-            $new = bcsub($old, abs($add), 5);
+            $new = @bcsub($old, abs($add), 5);
         }
 
         $meta['old'] = $old;
@@ -69,11 +68,11 @@ class LogService
 
     /**
      * @param int $wallet_type_id 钱包类型ID
-     * @param  $team_a 分红池A
-     * @param  $team_b 分红池B
-     * @param  $team_c 分红池C
-     * @param  $risk 风控账户
-     * @param  $commission_balance 推荐
+     * @param  float $team_a 分红池A
+     * @param  float $team_b 分红池B
+     * @param  float $team_c 分红池C
+     * @param  float $risk 风控账户
+     * @param  float $commission_balance 推荐
      * @param int $day 天数
      * @param int $from_uid 来自用户ID
      * @param string $remark 备注
@@ -89,9 +88,7 @@ class LogService
         }
 
         if (!$wallet) {
-            if ($product_id > 0) {
-                $product_id = $product_id;
-            } else {
+            if (!$product_id) {
                 $product = Product::where('wallet_type_id', $wallet_type_id)->first();
                 $product_id = $product->id;
             }
@@ -111,12 +108,12 @@ class LogService
 //        $new_commission_balance = number_fixed($wallet->commission_balance + $commission_balance);
 //        $new_service_fee = number_fixed($wallet->service_fee + $service_fee);
 
-        $new_team_a = bcadd($wallet->team_a, $team_a, 5);
-        $new_team_b = bcadd($wallet->team_b, $team_b, 5);
-        $new_team_c = bcadd($wallet->team_c, $team_c, 5);
-        $new_risk = bcadd($wallet->risk, $risk, 5);
-        $new_commission_balance = bcadd($wallet->commission_balance, $commission_balance, 5);
-        $new_service_fee = bcadd($wallet->service_fee, $service_fee, 5);
+        $new_team_a = @bcadd($wallet->team_a, $team_a, 5);
+        $new_team_b = @bcadd($wallet->team_b, $team_b, 5);
+        $new_team_c = @bcadd($wallet->team_c, $team_c, 5);
+        $new_risk = @bcadd($wallet->risk, $risk, 5);
+        $new_commission_balance = @bcadd($wallet->commission_balance, $commission_balance, 5);
+        $new_service_fee = @bcadd($wallet->service_fee, $service_fee, 5);
 
         $log = SystemWalletLog::create([
             'system_wallet_id' => $wallet->id,
@@ -169,7 +166,7 @@ class LogService
         if (!$verifyData) {
             return true;
         } else {
-            sleep(rand(1, 5)); // 随机延迟  秒
+            sleep(rand(1, 5)); // 随机延迟 N 秒
             $this->checkLock($key);
         }
     }

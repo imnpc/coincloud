@@ -27,9 +27,7 @@ class Money extends RowAction
         $remark = $request->get('remark');
         $day = Carbon::now()->toDateString();
         // 给用户账户增加对应金额
-        if ($remark) {
-            $remark = $remark;
-        } else {
+        if (!$remark) {
             $remark = "管理员后台调整 " . $money;
         }
         $logService->userLog($model->id, $type, $money, 0, $day, UserWalletLog::FROM_ADMIN, $remark);
