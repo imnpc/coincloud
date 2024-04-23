@@ -6,7 +6,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
-        "alphasnow/aliyun-oss-laravel": "^4.2",
         "bavix/laravel-wallet": "^9.0",
         "coderello/laravel-passport-social-grant": "^3.0",
         "doctrine/dbal": "^3.3",
@@ -32,6 +31,7 @@
         "laravel/sanctum": "^2.14.1",
         "laravel/socialite": "^5.5",
         "laravel/tinker": "^2.7",
+        "larva/laravel-flysystem-oss": "^2.0",
         "league/oauth2-server": "^8.3",
         "leonis/easysms-notification-channel": "^2.0",
         "linwj/exchanges": "^1.4",
