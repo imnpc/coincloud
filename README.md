@@ -6,7 +6,7 @@ Composer
 
 PHP >= 8.1
 
-MySql > 5.7
+MySql >= 5.7 推荐 8.0
 
 Zip PHP Extension
 
@@ -32,7 +32,7 @@ Redis PHP Extension
 yum install -y wget && wget -O install.sh http://download.bt.cn/install/install_6.0.sh && sh install.sh
 ```
 
-安装完毕以后登录到面板 选择 Nginx 1.18 + PHP 8.1 + MySql 5.7 进行安装,安装完毕前往 软件商店->运行环境,安装 Redis.
+安装完毕以后登录到面板 选择 Nginx 1.25 + PHP 8.1 + MySql 5.7 进行安装,安装完毕前往 软件商店->运行环境,安装 Redis.
 
 php配置:软件商店->运行环境->PHP 8.1->设置,
 
