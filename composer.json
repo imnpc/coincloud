@@ -46,6 +46,7 @@
         "torann/currency": "^1.1",
         "torann/geoip": "^3.0",
         "vinkla/hashids": "^10.0",
+        "yansongda/laravel-pay": "~3.7.0",
         "zhuzhichao/bank-card-info": "^2.1"
     },
     "require-dev": {
